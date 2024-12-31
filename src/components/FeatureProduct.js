@@ -6,13 +6,13 @@ const FeatureProduct = () => {
   const { isLoading, featureProducts } = useProductContext();
 
   if (isLoading) {
-    return <div> ......Loading </div>;
+    return <div style={{textAlign: "center", backgroundColor: "black"}}> <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcjAzM2VoenNoODI5aGczdXMzM3B1dWU1M3pzeDJjcGd5MjFsOTJ3YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/uIJBFZoOaifHf52MER/giphy.gif"/> </div>;
   }
 
   return (
     <Wrapper className="section">
       <div className="container">
-        <div className="intro-data">Check Now!</div>
+        {/* <div className="intro-data">Check Now!</div> */}
         <div className="common-heading">Our Feature Services</div>
         <div className="grid grid-three-column">
           {featureProducts.map((curElem) => {
@@ -69,8 +69,8 @@ const Wrapper = styled.section`
       top: 15%;
       right: 10%;
       text-transform: uppercase;
-      background-color: ${({ theme }) => theme.colors.bg};
-      color: ${({ theme }) => theme.colors.helper};
+      background-color: ${({ theme }) => theme.colors.navbg};
+      color: ${({ theme }) => theme.colors.red};
       padding: 0.8rem 2rem;
       font-size: 1.2rem;
       border-radius: 2rem;
@@ -78,8 +78,10 @@ const Wrapper = styled.section`
   }
 
   .card {
-    background-color: #fff;
-    border-radius: 1rem;
+    background-color: ${({ theme }) => theme.colors.navbg};
+    border-radius: 2rem;
+    padding-bottom: 0.2rem;
+    padding-top: 1rem;
 
     .card-data {
       padding: 0 2rem;
@@ -93,12 +95,12 @@ const Wrapper = styled.section`
     }
 
     h3 {
-      color: ${({ theme }) => theme.colors.text};
+      color: white;
       text-transform: capitalize;
     }
 
     .card-data--price {
-      color: ${({ theme }) => theme.colors.helper};
+      color: ${({ theme }) => theme.colors.red};
     }
 
     .btn {

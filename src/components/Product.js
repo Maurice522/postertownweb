@@ -8,7 +8,7 @@ const Product = (curElem) => {
     <NavLink to={`/singleproduct/${id}`}>
       <div className="card">
         <figure>
-          <img src={image} alt={name} />
+          <img src={image} alt={name} style={{borderRadius:"1.2rem"}}/>
           <figcaption className="caption">{category}</figcaption>
         </figure>
 

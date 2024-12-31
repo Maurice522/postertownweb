@@ -20,12 +20,16 @@ const App = () => {
       white: "#fff",
       black: " #212529",
       helper: "#8490ff",
-
+      navbg: "#2E2E2E",
+      charcoal: "2E2E2E",
+      navtxt: "#ffffff",
       bg: "#F6F8FA",
       footer_bg: "#0a1435",
       btn: "rgb(98 84 243)",
       border: "rgba(98, 84, 243, 0.5)",
       hr: "#ffffff",
+      red: "#FF4C4C",
+      red2: "#FF1C1C",
       gradient:
         "linear-gradient(0deg, rgb(132 144 255) 0%, rgb(98 189 252) 100%)",
       shadow:

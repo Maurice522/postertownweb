@@ -26,7 +26,7 @@ const Nav = () => {
           font-size: 1.8rem;
           font-weight: 500;
           text-transform: uppercase;
-          color: ${({ theme }) => theme.colors.black};
+          color: ${({ theme }) => theme.colors.navtxt};
           transition: color 0.3s linear;
         }
 
@@ -61,17 +61,17 @@ const Nav = () => {
       }
 
       .cart-total--item {
-        width: 2.4rem;
-        height: 2.4rem;
+        width: 2.6rem;
+        height: 2.6rem;
         position: absolute;
         background-color: #000;
-        color: #000;
+        color: white;
         border-radius: 50%;
         display: grid;
         place-items: center;
-        top: -20%;
+        top: -30%;
         left: 70%;
-        background-color: ${({ theme }) => theme.colors.helper};
+        background-color: ${({ theme }) => theme.colors.red};
       }
     }
 
@@ -89,11 +89,11 @@ const Nav = () => {
       .mobile-navbar-btn {
         display: inline-block;
         z-index: 9999;
-        border: ${({ theme }) => theme.colors.black};
+        border: ${({ theme }) => theme.colors.navtxt};
 
         .mobile-nav-icon {
           font-size: 4.2rem;
-          color: ${({ theme }) => theme.colors.black};
+          color: ${({ theme }) => theme.colors.navtxt};
         }
       }
 
@@ -103,7 +103,7 @@ const Nav = () => {
         position: absolute;
         top: 30%;
         right: 10%;
-        color: ${({ theme }) => theme.colors.black};
+        color: ${({ theme }) => theme.colors.navtxt};
         z-index: 9999;
       }
 

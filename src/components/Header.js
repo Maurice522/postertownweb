@@ -7,7 +7,17 @@ const Header = () => {
   return (
     <MainHeader>
       <NavLink to="/">
-        <img src="./images/logo.png" alt="my logo img" />
+      <div className="logocontainer">s
+        <img
+          src="images/PosterTownc.png"
+          alt="Logo"
+          className="logo"
+        />
+        
+          <h1 className="logotxt">
+            POSTER TOWN
+          </h1>
+        </div>
       </NavLink>
       <Nav />
     </MainHeader>
@@ -17,14 +27,27 @@ const Header = () => {
 const MainHeader = styled.header`
   padding: 0 4.8rem;
   height: 10rem;
-  background-color: ${({ theme }) => theme.colors.bg};
+  background-color: ${({ theme }) => theme.colors.navbg};
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
-
+  color: white;
   .logo {
-    height: 5rem;
+    height: 6.5rem;
+  }
+  .logotxt {
+    font-size: 18px;
+    background-color: white;
+    padding: 4px 8px;
+    border-radius: 20px;
+    height: 35px;
+    margin-top: 15px;
+    margin-left: 10px;
+  }
+  .logocontainer{
+    display: flex;
+    flex-direction: row;
   }
 `;
 export default Header;

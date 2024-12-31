@@ -11,7 +11,7 @@ const Services = () => {
         <div className="grid grid-three-column">
           <div className="services-1">
             <div>
-              <TbTruckDelivery className="icon" />
+              <TbTruckDelivery color="#FF4C4C" className="icon" />
               <h3>Super Fast and Free Delivery</h3>
             </div>
           </div>
@@ -19,13 +19,13 @@ const Services = () => {
           <div className="services-2">
             <div className="services-colum-2">
               <div>
-                <MdSecurity className="icon" />
+                <MdSecurity color="#FF4C4C" className="icon" />
                 <h3>Non-contact Shipping</h3>
               </div>
             </div>
             <div className="services-colum-2">
               <div>
-                <GiReceiveMoney className="icon" />
+                <GiReceiveMoney color="#FF4C4C" className="icon" />
                 <h3>Money-back Guaranteed</h3>
               </div>
             </div>
@@ -33,7 +33,7 @@ const Services = () => {
 
           <div className="services-3">
             <div>
-              <RiSecurePaymentLine className="icon" />
+              <RiSecurePaymentLine color="#FF4C4C" className="icon" />
               <h3>Super Secure Payment System</h3>
             </div>
           </div>
@@ -59,7 +59,7 @@ const Wrapper = styled.section`
     flex-direction: column;
     justify-content: center;
     align-content: center;
-    background: ${({ theme }) => theme.colors.bg};
+    background: ${({ theme }) => theme.colors.navbg};
     text-align: center;
     border-radius: 2rem;
     box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
@@ -71,7 +71,7 @@ const Wrapper = styled.section`
     box-shadow: none;
 
     .services-colum-2 {
-      background: ${({ theme }) => theme.colors.bg};
+      background: ${({ theme }) => theme.colors.navbg};
       display: flex;
       flex-direction: row;
       flex: 1;
@@ -93,6 +93,7 @@ const Wrapper = styled.section`
   h3 {
     margin-top: 1.4rem;
     font-size: 2rem;
+    color: white;
   }
 
   .icon {
@@ -101,7 +102,8 @@ const Wrapper = styled.section`
     height: 8rem;
     padding: 2rem;
     border-radius: 50%;
-    background-color: #fff;
+    background-color:${({ theme }) => theme.colors.navbg};
+    border: 2px solid #FF4C4C;
     color: #5138ee;
   }
 `;

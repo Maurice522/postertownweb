@@ -23,13 +23,12 @@ const HeroSection = ({ myData }) => {
           </div>
           {/* our homepage image  */}
           <div className="hero-section-image">
-            <figure>
+            
               <img
-                src="images/hero.jpg"
+                src="images/naruto.jpg"
                 alt="hero-section-photo"
                 className="img-style"
               />
-            </figure>
           </div>
         </div>
       </div>
@@ -38,14 +37,16 @@ const HeroSection = ({ myData }) => {
 };
 
 const Wrapper = styled.section`
-  padding: 12rem 0;
-
+  padding: 0rem 0;
+  padding-left: 5rem;
+  padding-bottom: 2rem;
   img {
     min-width: 10rem;
     height: 10rem;
   }
 
   .hero-section-data {
+    padding-top: 12rem;
     p {
       margin: 2rem 0;
     }
@@ -53,15 +54,19 @@ const Wrapper = styled.section`
     h1 {
       text-transform: capitalize;
       font-weight: bold;
+      color :  ${({ theme }) => theme.colors.charcoal};
+
     }
 
     .intro-data {
       margin-bottom: 0;
+      color :  ${({ theme }) => theme.colors.red2};
     }
   }
 
   .hero-section-image {
-    width: 100%;
+    width: 60%;
+    margin-left: 18%;
     height: auto;
     display: flex;
     justify-content: center;
@@ -84,6 +89,7 @@ const Wrapper = styled.section`
   .img-style {
     width: 100%;
     height: auto;
+    z-index: -100;
   }
 
   @media (max-width: ${({ theme }) => theme.media.mobile}) {
