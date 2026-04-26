@@ -1,43 +1,48 @@
 import { useProductContext } from "../context/productcontex";
+import { useCartContext } from "../context/cart_context";
 import styled from "styled-components";
 import Product from "./Product";
 import RotatingText from './RotatingText';
 import { CardBody, CardContainer, CardItem } from "./3dcard";
+import { FiShoppingCart, FiShoppingBag } from "react-icons/fi";
 import './Tailwind.css';
 
 const FeatureProductLandscape = () => {
   const { isLoading, featureProducts } = useProductContext();
+  const { addToCart } = useCartContext();
 
   if (isLoading) {
     return <div style={{textAlign: "center", backgroundColor: "black"}}> <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcjAzM2VoenNoODI5aGczdXMzM3B1dWU1M3pzeDJjcGd5MjFsOTJ3YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/uIJBFZoOaifHf52MER/giphy.gif"/> </div>;
   }
 
   const productList = [
-    { id:1, 
+    { id:"poster-001", 
       name: "Solo Leveling", 
       image:"images/sololeveling.jpeg", 
-      price:"99900", 
-      category:"Anime" },
-    { id:2, 
-      name: "Luffy", 
+      price: 999, 
+      category:"Anime",
+      stock: 50 },
+    { id:"poster-002", 
+      name: "Luffy Gear 5", 
       image:"images/luffyland.jpg", 
-      price:"99900", 
-      category:"Anime" },
-    
+      price: 999, 
+      category:"Anime",
+      stock: 30 },
   ]
 
   const productList2 = [
-    { id:1, 
+    { id:"pikachu-001", 
       name: "Pikachu", 
       image:"images/pikachuland.jpg", 
-      price:"99900", 
-      category:"Anime" },
-    { id:2, 
+      price: 999, 
+      category:"Anime",
+      stock: 25 },
+    { id:"minion-001", 
       name: "Minion", 
       image:"images/minionland.jpg", 
-      price:"99900", 
-      category:"Cartoon" },
-   
+      price: 999, 
+      category:"Cartoon",
+      stock: 30 },
   ]
 
   return (
@@ -88,19 +93,20 @@ const FeatureProductLandscape = () => {
                 <div className="flex justify-between items-center mt-20">
                   <CardItem
                     translateZ={20}
-                    as="a"
-                    href="https://twitter.com/mannupaaji"
-                    target="__blank"
-                    className="px-4 py-2 rounded-xl text-xs font-normal dark:text-white"
+                    as="button"
+                    onClick={() => addToCart(curElem)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold hover:bg-gray-200 transition-colors"
                   >
-                    Try now →
+                    <FiShoppingCart />
+                    Add to Cart
                   </CardItem>
                   <CardItem
                     translateZ={20}
                     as="button"
-                    className="px-4 py-2 rounded-xl bg-black dark:bg-white dark:text-black text-white text-xs font-bold"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition-colors"
                   >
-                    Sign up
+                    <FiShoppingBag />
+                    Buy Now
                   </CardItem>
                 </div>
               </CardBody>
@@ -204,24 +210,42 @@ const Wrapper = styled.section`
       color: ${({ theme }) => theme.colors.red};
     }
 
-    .btn {
-      margin: 2rem auto;
-      background-color: rgb(0 0 0 / 0%);
-      border: 0.1rem solid rgb(98 84 243);
+    .card-buttons {
       display: flex;
+      gap: 1rem;
+      margin-top: 0.8rem;
+      margin-bottom: 1.5rem;
       justify-content: center;
+    }
+
+    .btn {
+      padding: 0.8rem 1.2rem;
+      border: 0.1rem solid rgb(98 84 243);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.1rem;
+      text-transform: capitalize;
+      display: flex;
       align-items: center;
+      gap: 0.5rem;
 
-      &:hover {
-        background-color: rgb(98 84 243);
-      }
-
-      &:hover a {
-        color: #fff;
-      }
-      a {
+      &.add-to-cart {
+        background-color: white;
         color: rgb(98 84 243);
-        font-size: 1.4rem;
+        &:hover {
+          background-color: rgb(98 84 243);
+          color: white;
+        }
+      }
+
+      &.buy-now {
+        background-color: rgb(98 84 243);
+        color: white;
+        &:hover {
+          background-color: white;
+          color: rgb(98 84 243);
+        }
       }
     }
   }

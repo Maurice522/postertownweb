@@ -79,7 +79,7 @@ const Wrapper = styled.section`
     }
 
     .card-data-flex {
-      margin: 2rem 0;
+      margin: 2rem 0 0.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -94,24 +94,42 @@ const Wrapper = styled.section`
       color: ${({ theme }) => theme.colors.red};
     }
 
-    .btn {
-      margin: 2rem auto;
-      background-color: rgb(0 0 0 / 0%);
-      border: 0.1rem solid rgb(98 84 243);
+    .card-buttons {
       display: flex;
+      gap: 1rem;
+      margin-top: 0.8rem;
+      margin-bottom: 1.5rem;
       justify-content: center;
+    }
+
+    .btn {
+      padding: 0.8rem 1.2rem;
+      border: 0.1rem solid rgb(98 84 243);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.1rem;
+      text-transform: capitalize;
+      display: flex;
       align-items: center;
+      gap: 0.5rem;
 
-      &:hover {
-        background-color: rgb(98 84 243);
-      }
-
-      &:hover a {
-        color: #fff;
-      }
-      a {
+      &.add-to-cart {
+        background-color: white;
         color: rgb(98 84 243);
-        font-size: 1.4rem;
+        &:hover {
+          background-color: rgb(98 84 243);
+          color: white;
+        }
+      }
+
+      &.buy-now {
+        background-color: rgb(98 84 243);
+        color: white;
+        &:hover {
+          background-color: white;
+          color: rgb(98 84 243);
+        }
       }
     }
   }

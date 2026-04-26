@@ -2,6 +2,8 @@ import { useProductContext } from "../context/productcontex";
 import styled from "styled-components";
 import Product from "./Product";
 import RotatingText from './RotatingText'
+import { FiShoppingCart, FiShoppingBag } from 'react-icons/fi';
+import { useCartContext } from "../context/cart_context";
 
 const FeatureProduct = () => {
   const { isLoading, featureProducts } = useProductContext();
@@ -11,39 +13,45 @@ const FeatureProduct = () => {
   }
 
   const productList = [
-    { id:1, 
+    { id:"poster-006", 
       name: "Giyu Tomoioka", 
       image:"images/giyu.jpg", 
-      price:"99900", 
-      category:"Anime" },
-    { id:2, 
+      price: 999, 
+      category:"Anime",
+      stock: 15 },
+    { id:"batman-001", 
       name: "Batman", 
       image:"images/batmanneon.jpg", 
-      price:"99900", 
-      category:"DC" },
-    { id:3, 
+      price: 999, 
+      category:"DC",
+      stock: 20 },
+    { id:"deadpool-001", 
       name: "Deadpool", 
       image:"images/deadpool.jpg", 
-      price:"99900", 
-      category:"Marvel" },
+      price: 999, 
+      category:"Marvel",
+      stock: 25 },
   ]
 
   const productList2 = [
-    { id:1, 
+    { id:"movie-001", 
       name: "Optimus Prime", 
       image:"images/optimusprime.jpg", 
-      price:"99900", 
-      category:"Movie" },
-    { id:2, 
+      price: 999, 
+      category:"Movie",
+      stock: 12 },
+    { id:"car-001", 
       name: "GT3 RS", 
       image:"images/gt3rswhite.jpg", 
-      price:"99900", 
-      category:"Car" },
-    { id:3, 
-      name: "Mordern Warfare 2", 
+      price: 999, 
+      category:"Car",
+      stock: 8 },
+    { id:"games-001", 
+      name: "Modern Warfare 2", 
       image:"images/mw2.jpg", 
-      price:"99900", 
-      category:"Games" },
+      price: 999, 
+      category:"Games",
+      stock: 20 },
   ]
 
   return (
@@ -164,24 +172,42 @@ const Wrapper = styled.section`
       color: ${({ theme }) => theme.colors.red};
     }
 
-    .btn {
-      margin: 2rem auto;
-      background-color: rgb(0 0 0 / 0%);
-      border: 0.1rem solid rgb(98 84 243);
+    .card-buttons {
       display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      margin-bottom: 1.5rem;
       justify-content: center;
+    }
+
+    .btn {
+      padding: 0.8rem 1.2rem;
+      border: 0.1rem solid rgb(98 84 243);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.1rem;
+      text-transform: capitalize;
+      display: flex;
       align-items: center;
+      gap: 0.5rem;
 
-      &:hover {
-        background-color: rgb(98 84 243);
-      }
-
-      &:hover a {
-        color: #fff;
-      }
-      a {
+      &.add-to-cart {
+        background-color: white;
         color: rgb(98 84 243);
-        font-size: 1.4rem;
+        &:hover {
+          background-color: rgb(98 84 243);
+          color: white;
+        }
+      }
+
+      &.buy-now {
+        background-color: rgb(98 84 243);
+        color: white;
+        &:hover {
+          background-color: white;
+          color: rgb(98 84 243);
+        }
       }
     }
   }
