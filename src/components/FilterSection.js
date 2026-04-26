@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useFilterContext } from "../context/filter_context";
 import { FaCheck } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import FormatPrice from "../Helpers/FormatPrice";
 import { Button } from "../styles/Button";
 
@@ -43,6 +44,13 @@ const FilterSection = () => {
             <FiSearch />
           </button>
         </form>
+      </div>
+
+      <div className="filter-clear-top">
+        <button className="clear-btn" onClick={clearFilters}>
+          <FiX />
+          <span className="btn-text">Clear Filters</span>
+        </button>
       </div>
 
       <div className="filter-category">
@@ -94,6 +102,7 @@ const FilterSection = () => {
                 type="button"
                 value={curColor}
                 name="color"
+                title={curColor}
                 style={{ 
                   backgroundColor: curColor,
                   border: isWhite ? "2px solid #ccc" : "none"
@@ -134,25 +143,49 @@ const FilterSection = () => {
           onChange={updateFilterValue}
         />
       </div>
-
-      <div className="filter-clear">
-        <Button className="btn" onClick={clearFilters}>
-          Clear Filters
-        </Button>
-      </div>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.section`
-  padding: 5rem 0;
+  padding: 4rem 0;
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2.5rem;
 
   h3 {
-    padding: 2rem 0;
+    padding: 1.5rem 0;
     font-size: bold;
+  }
+
+  .filter-clear-top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.5rem 0;
+    
+    .clear-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      color: #666;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: ${({ theme }) => theme.colors.btn};
+        color: white;
+      }
+      
+      .btn-text {
+        display: inline;
+      }
+    }
   }
 
   .filter-search {
@@ -209,6 +242,7 @@ const Wrapper = styled.section`
 
         &:hover {
           background-color: #f0f0f0;
+          color: black;
         }
       }
 
@@ -292,7 +326,7 @@ const Wrapper = styled.section`
         border: 1px solid #ccc;
         border-radius: 0.5rem;
         width: 120px;
-        font-size: 1rem;
+        font-size: 1.2rem;
 
         &:focus {
           outline: none;
@@ -301,12 +335,12 @@ const Wrapper = styled.section`
       }
       
       .currency-symbol {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
         font-weight: bold;
       }
       
       p {
-        font-size: 0.9rem;
+        font-size: 1.1rem;
         color: #666;
       }
     }
