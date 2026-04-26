@@ -1,10 +1,9 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import axios from "axios";
 import reducer from "../reducer/productReducer";
+import localProducts from "../data/products.json";
 
 const AppContext = createContext();
-
-const API = "https://api.pujakaitem.com/api/products";
 
 const initialState = {
   isLoading: false,
@@ -18,12 +17,10 @@ const initialState = {
 const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const getProducts = async (url) => {
+  const getProducts = async () => {
     dispatch({ type: "SET_LOADING" });
     try {
-      const res = await axios.get(url);
-      const products = await res.data;
-      dispatch({ type: "SET_API_DATA", payload: products });
+      dispatch({ type: "SET_API_DATA", payload: localProducts });
     } catch (error) {
       dispatch({ type: "API_ERROR" });
     }
@@ -43,7 +40,7 @@ const AppProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    getProducts(API);
+    getProducts();
   }, []);
 
   return (

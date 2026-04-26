@@ -26,8 +26,14 @@ const Products = () => {
 };
 
 const Wrapper = styled.section`
+  .container {
+    max-width: 150rem;
+    width: 100%;
+    margin: 0 auto;
+  }
+
   .grid-filter-column {
-    grid-template-columns: 0.2fr 1fr;
+    grid-template-columns: 0.15fr 1fr;
   }
 
   @media (max-width: ${({ theme }) => theme.media.mobile}) {

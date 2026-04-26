@@ -1,35 +1,10 @@
 const filterReducer = (state, action) => {
   switch (action.type) {
     case "LOAD_FILTER_PRODUCTS":
-      let priceArr = action.payload.map((curElem) => curElem.price);
-      console.log(
-        "🚀 ~ file: filterReducer.js ~ line 5 ~ filterReducer ~ priceArr",
-        priceArr
-      );
-
-      // 1way
-      // console.log(Math.max.apply(null, priceArr));
-
-      // let maxPrice = priceArr.reduce(
-      //   (initialVal, curVal) => Math.max(initialVal, curVal),
-      //   0
-      // );
-      // console.log(
-      //   "🚀 ~ file: filterReducer.js ~ line 16 ~ filterReducer ~ maxPrice",
-      //   maxPrice
-      // );
-
-      let maxPrice = Math.max(...priceArr);
-      console.log(
-        "🚀 ~ file: filterReducer.js ~ line 23 ~ filterReducer ~ maxPrice",
-        maxPrice
-      );
-
       return {
         ...state,
         filter_products: [...action.payload],
         all_products: [...action.payload],
-        filters: { ...state.filters, maxPrice, price: maxPrice },
       };
 
     case "SET_GRID_VIEW":
@@ -87,6 +62,44 @@ const filterReducer = (state, action) => {
     case "UPDATE_FILTERS_VALUE":
       const { name, value } = action.payload;
 
+      if (name === "category") {
+        const { categories } = state.filters;
+        let newCategories;
+        if (value === "all") {
+          newCategories = [];
+        } else if (categories.includes(value)) {
+          newCategories = categories.filter(cat => cat !== value);
+        } else {
+          newCategories = [...categories, value];
+        }
+        return {
+          ...state,
+          filters: {
+            ...state.filters,
+            categories: newCategories,
+          },
+        };
+      }
+
+      if (name === "color") {
+        const { colors } = state.filters;
+        let newColors;
+        if (value === "all") {
+          newColors = [];
+        } else if (colors.includes(value)) {
+          newColors = colors.filter(c => c !== value);
+        } else {
+          newColors = [...colors, value];
+        }
+        return {
+          ...state,
+          filters: {
+            ...state.filters,
+            colors: newColors,
+          },
+        };
+      }
+
       return {
         ...state,
         filters: {
@@ -99,41 +112,32 @@ const filterReducer = (state, action) => {
       let { all_products } = state;
       let tempFilterProduct = [...all_products];
 
-      const { text, category, company, color, price } = state.filters;
+      const { text, categories, colors, price } = state.filters;
 
-      if (text) {
+      if (text && text.trim()) {
         tempFilterProduct = tempFilterProduct.filter((curElem) => {
-          return curElem.name.toLowerCase().includes(text);
+          return curElem.name && curElem.name.toLowerCase().includes(text.toLowerCase());
         });
       }
 
-      if (category !== "all") {
+      if (categories.length > 0) {
         tempFilterProduct = tempFilterProduct.filter(
-          (curElem) => curElem.category === category
+          (curElem) => categories.includes(curElem.category)
         );
       }
 
-      if (company !== "all") {
+if (colors.length > 0) {
         tempFilterProduct = tempFilterProduct.filter(
-          (curElem) => curElem.company.toLowerCase() === company.toLowerCase()
+          (curElem) => colors.includes(curElem.color)
         );
       }
 
-      if (color !== "all") {
-        tempFilterProduct = tempFilterProduct.filter((curElem) =>
-          curElem.colors.includes(color)
-        );
-      }
-
-      if (price === 0) {
-        tempFilterProduct = tempFilterProduct.filter(
-          (curElem) => curElem.price == price
-        );
-      } else {
+      if (price > 0 && price < 5000) {
         tempFilterProduct = tempFilterProduct.filter(
           (curElem) => curElem.price <= price
         );
       }
+
       return {
         ...state,
         filter_products: tempFilterProduct,
@@ -145,12 +149,9 @@ const filterReducer = (state, action) => {
         filters: {
           ...state.filters,
           text: "",
-          category: "all",
-          company: "all",
-          color: "all",
-          maxPrice: 0,
-          price: state.filters.maxPrice,
-          minPrice: state.filters.maxPrice,
+          categories: [],
+          colors: [],
+          price: 5000,
         },
       };
 

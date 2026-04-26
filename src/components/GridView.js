@@ -5,7 +5,7 @@ import Product from "./Product";
 const GridView = ({ products }) => {
   return (
     <Wrapper className="section">
-      <div className="container grid grid-three-column">
+      <div className="grid grid-three-column">
         {products.map((curElem) => {
           return <Product key={curElem.id} {...curElem} />;
         })}
@@ -16,11 +16,8 @@ const GridView = ({ products }) => {
 
 const Wrapper = styled.section`
   padding: 9rem 0;
-
-  .container {
-    max-width: 120rem;
-  }
-
+  width: 100%;
+  
   .grid {
     gap: 3.2rem;
   }
@@ -40,7 +37,6 @@ const Wrapper = styled.section`
       left: 0;
       width: 0%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
       transition: all 0.2s linear;
       cursor: pointer;
     }
@@ -51,19 +47,35 @@ const Wrapper = styled.section`
       transform: scale(1.2);
     }
     img {
-      max-width: 90%;
+      max-width: 85%;
+      max-height: 420px;
       margin-top: 1.5rem;
-      height: 20rem;
+      border-top-left-radius: 80px 80px;
       transition: all 0.2s linear;
+    }
+
+    .caption {
+      box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+      top: 15%;
+      right: 10%;
+      text-transform: uppercase;
+      background-color: ${({ theme }) => theme.colors.navbg};
+      color: ${({ theme }) => theme.colors.red};
+      padding: 0.8rem 2rem;
+      font-size: 1.2rem;
+      border-radius: 2rem;
     }
   }
 
   .card {
-    background-color: ${({ theme }) => theme.colors.bg};
-    border-radius: 1rem;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+    background-color: ${({ theme }) => theme.colors.navbg};
+    border-radius: 2rem;
+    padding-bottom: 0.2rem;
+    padding-top: 1rem;
 
     .card-data {
-      padding: 0 1rem;
+      padding: 0 2rem;
     }
 
     .card-data-flex {
@@ -73,13 +85,13 @@ const Wrapper = styled.section`
       align-items: center;
     }
 
-    .card-data--price {
-      color: ${({ theme }) => theme.colors.helper};
+    h3 {
+      color: white;
+      text-transform: capitalize;
     }
 
-    h3 {
-      color: ${({ theme }) => theme.colors.text};
-      text-transform: capitalize;
+    .card-data--price {
+      color: ${({ theme }) => theme.colors.red};
     }
 
     .btn {

@@ -11,12 +11,10 @@ const initialState = {
   sorting_value: "lowest",
   filters: {
     text: "",
-    category: "all",
-    company: "all",
-    color: "all",
-    maxPrice: 0,
-    price: 0,
-    minPrice: 0,
+    categories: [],
+    colors: [],
+    maxPrice: 5000,
+    price: 5000,
   },
 };
 
@@ -45,6 +43,10 @@ export const FilterContextProvider = ({ children }) => {
   const updateFilterValue = (event) => {
     let name = event.target.name;
     let value = event.target.value;
+
+    if (name === "price" || name === "minPrice" || name === "maxPrice") {
+      value = parseInt(value) || 0;
+    }
 
     return dispatch({ type: "UPDATE_FILTERS_VALUE", payload: { name, value } });
   };
