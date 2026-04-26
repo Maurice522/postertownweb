@@ -1,6 +1,7 @@
 import { useProductContext } from "../context/productcontex";
 import styled from "styled-components";
 import Product from "./Product";
+import RotatingText from './RotatingText'
 
 const FeatureProduct = () => {
   const { isLoading, featureProducts } = useProductContext();
@@ -9,13 +10,67 @@ const FeatureProduct = () => {
     return <div style={{textAlign: "center", backgroundColor: "black"}}> <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcjAzM2VoenNoODI5aGczdXMzM3B1dWU1M3pzeDJjcGd5MjFsOTJ3YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/uIJBFZoOaifHf52MER/giphy.gif"/> </div>;
   }
 
+  const productList = [
+    { id:1, 
+      name: "Giyu Tomoioka", 
+      image:"images/giyu.jpg", 
+      price:"99900", 
+      category:"Anime" },
+    { id:2, 
+      name: "Batman", 
+      image:"images/batmanneon.jpg", 
+      price:"99900", 
+      category:"DC" },
+    { id:3, 
+      name: "Deadpool", 
+      image:"images/deadpool.jpg", 
+      price:"99900", 
+      category:"Marvel" },
+  ]
+
+  const productList2 = [
+    { id:1, 
+      name: "Optimus Prime", 
+      image:"images/optimusprime.jpg", 
+      price:"99900", 
+      category:"Movie" },
+    { id:2, 
+      name: "GT3 RS", 
+      image:"images/gt3rswhite.jpg", 
+      price:"99900", 
+      category:"Car" },
+    { id:3, 
+      name: "Mordern Warfare 2", 
+      image:"images/mw2.jpg", 
+      price:"99900", 
+      category:"Games" },
+  ]
+
   return (
     <Wrapper className="section">
       <div className="container">
         {/* <div className="intro-data">Check Now!</div> */}
-        <div className="common-heading">Our Feature Services</div>
+       
+        <div className="common-heading">
+          <RotatingText
+          texts={['Anime', 'Artist', 'Cars', 'Cartoon', 'DC', 'Games','Marvel' ,'Movies', 'Scenery', 'Sports']}
+          mainClassName=""
+          staggerFrom={"last"}
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "-120%" }}
+          staggerDuration={0.025}
+          splitLevelClassName=""
+          transition={{ type: "spring", damping: 30, stiffness: 400 }}
+          rotationInterval={2000}
+        /></div>
         <div className="grid grid-three-column">
-          {featureProducts.map((curElem) => {
+          {productList.map((curElem) => {
+            return <Product key={curElem.id} {...curElem} />;
+          })}
+        </div>
+        <div className="grid grid-three-column mgtop">
+          {productList2.map((curElem) => {
             return <Product key={curElem.id} {...curElem} />;
           })}
         </div>
@@ -30,6 +85,10 @@ const Wrapper = styled.section`
 
   .container {
     max-width: 120rem;
+  }
+  
+  .mgtop{
+    margin-top: 5%;
   }
 
   figure {
@@ -47,7 +106,7 @@ const Wrapper = styled.section`
       left: 0;
       width: 0%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
+      border-top-left-radius: 80px 80px;
       transition: all 0.2s linear;
       cursor: pointer;
     }
@@ -58,14 +117,15 @@ const Wrapper = styled.section`
       transform: scale(1.2);
     }
     img {
-      max-width: 90%;
+      max-width:85%;
+      max-height:420px;
       margin-top: 1.5rem;
-      height: 20rem;
+      border-top-left-radius: 80px 80px;
       transition: all 0.2s linear;
     }
 
     .caption {
-      position: absolute;
+      box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
       top: 15%;
       right: 10%;
       text-transform: uppercase;
@@ -78,6 +138,7 @@ const Wrapper = styled.section`
   }
 
   .card {
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
     background-color: ${({ theme }) => theme.colors.navbg};
     border-radius: 2rem;
     padding-bottom: 0.2rem;

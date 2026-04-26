@@ -8,7 +8,7 @@ const Products = () => {
   return (
     <Wrapper>
       <div className="container grid grid-filter-column">
-        <div>
+        <div className="filter-section">
           <FilterSection />
         </div>
 
@@ -33,12 +33,28 @@ const Wrapper = styled.section`
   }
 
   .grid-filter-column {
-    grid-template-columns: 0.15fr 1fr;
+    grid-template-columns: 0.18fr 1fr;
+  }
+
+  .filter-section {
+    position: sticky;
+    top: 80px;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  .main-product {
+    height: calc(100vh - 150px);
+    overflow-y: auto;
   }
 
   @media (max-width: ${({ theme }) => theme.media.mobile}) {
     .grid-filter-column {
       grid-template-columns: 1fr;
+    }
+    .filter-section, .main-product {
+      position: static;
+      height: auto;
     }
   }
 `;

@@ -1,0 +1,32 @@
+Here's a JSON product schema:
+{
+  "id": "string",
+  "name": "string",
+  "images": ["https://example.com/img1.jpg", "https://example.com/img2.jpg"],
+  "category": "Anime | Movie | Cartoon | Sports",
+  "description": "string",
+  "price": 99900,
+  "originalPrice": 129900,
+  "tags": ["trending", "bestseller"],
+  "orientation": "portrait | landscape | square",
+  "shape": "rectangle | circle | square",
+  "quantity": 40,
+  "rating": 4.5,
+  "reviews": [
+    {
+      "user": "string",
+      "comment": "string",
+      "rating": 5,
+      "date": "2024-01-01"
+    }
+  ],
+  "createdAt": "2024-01-01"
+}
+Fields:
+- orientation - for poster aspect ratio (portrait/landscape/square)
+- shape - for canvas/frame shape (rectangle/circle/square)
+- images - array for multiple product images
+- tags - for filtering (trending, bestseller, new)
+- originalPrice - for showing discounts
+- inStock - stock availability
+- rating/reviews - customer feedback

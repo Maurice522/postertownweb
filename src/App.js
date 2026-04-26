@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import About from "./About";
 import Home from "./Home";
@@ -11,6 +11,11 @@ import { GlobalStyle } from "./GlobalStyle";
 import { ThemeProvider } from "styled-components";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
+import { AppProvider } from "./context/productcontex";
+import { FilterContextProvider } from "./context/filter_context";
+import { CartProvider } from "./context/cart_context";
+import { UserProvider } from "./context/user_context";
 
 const App = () => {
   const theme = {
@@ -42,22 +47,36 @@ const App = () => {
     },
   };
 
+  // useEffect(()=>{
+  //   tailwindcss();
+  //   console.log("appconsole")
+  // },[])
+
   return (
     <ThemeProvider theme={theme}>
-      <Router>
-        <GlobalStyle />
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/singleproduct/:id" element={<SingleProduct />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="*" element={<ErrorPage />} />
-        </Routes>
-        <Footer />
-      </Router>
+      <AppProvider>
+        <FilterContextProvider>
+          <CartProvider>
+            <UserProvider>
+              <Router>
+                <GlobalStyle />
+                <Header />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/singleproduct/:id" element={<SingleProduct />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="*" element={<ErrorPage />} />
+                </Routes>
+                <ScrollToTop />
+                <Footer />
+              </Router>
+            </UserProvider>
+          </CartProvider>
+        </FilterContextProvider>
+      </AppProvider>
     </ThemeProvider>
   );
 };

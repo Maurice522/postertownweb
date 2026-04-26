@@ -91,6 +91,7 @@ const FilterSection = () => {
             name="color"
             className={colors.length === 0 ? "color-all--style active" : "color-all--style"}
             onClick={updateFilterValue}>
+            <span className="color-dot" style={{ backgroundColor: "#888", border: "none" }}></span>
             All
           </button>
           {colorData.map((curColor, index) => {
@@ -103,13 +104,10 @@ const FilterSection = () => {
                 value={curColor}
                 name="color"
                 title={curColor}
-                style={{ 
-                  backgroundColor: curColor,
-                  border: isWhite ? "2px solid #ccc" : "none"
-                }}
-                className={colors.includes(curColor) ? "btnStyle active" : "btnStyle"}
+                className={colors.includes(curColor) ? "active" : ""}
                 onClick={updateFilterValue}>
-                {colors.includes(curColor) ? <FaCheck className="checkStyle" style={{ color: curColor === "white" || curColor === "yellow" ? "#333" : "#fff" }} /> : null}
+                <span className="color-dot" style={{ backgroundColor: curColor, border: isWhite ? "1px solid #ccc" : "none" }}></span>
+                {curColor}
               </button>
             );
           })}
@@ -130,7 +128,7 @@ const FilterSection = () => {
             onChange={updateFilterValue}
             className="price-input"
           />
-          <p>and below</p>
+          <p>{price >= 5000 ? "and above" : "and below"}</p>
         </div>
         <input
           type="range"
@@ -256,7 +254,6 @@ const Wrapper = styled.section`
 
   .filter-color-style {
     display: flex;
-    justify-content: flex-start;
     flex-wrap: wrap;
     gap: 0.8rem;
   }
@@ -269,6 +266,10 @@ const Wrapper = styled.section`
     border-radius: 1.5rem;
     cursor: pointer;
     transition: all 0.2s;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 
     &:hover {
       background-color: #f0f0f0;
@@ -280,35 +281,39 @@ const Wrapper = styled.section`
       border-color: ${({ theme }) => theme.colors.btn};
     }
   }
-  .btnStyle {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    margin-left: 0;
-    border: 2px solid transparent;
-    outline: none;
-    opacity: 0.6;
+  
+  button[name="color"] {
+    border: 1px solid #ccc;
+    background-color: transparent;
+    padding: 0.5rem 1.2rem;
+    border-radius: 1.5rem;
     cursor: pointer;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    position: relative;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    text-transform: capitalize;
+
+    .color-dot {
+      width: 1.3rem;
+      height: 1.3rem;
+      border-radius: 50%;
+    }
 
     &:hover {
-      opacity: 1;
-      transform: scale(1.1);
+      background-color: #f0f0f0;
     }
 
     &.active {
-      opacity: 1;
-      border: 2px solid #333;
-      transform: scale(1.15);
+      background-color: ${({ theme }) => theme.colors.btn};
+      color: white;
+      border-color: ${({ theme }) => theme.colors.btn};
     }
   }
 
   .checkStyle {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #fff;
     font-weight: bold;
     text-shadow: 0 0 2px #000;

@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <MainHeader>
       <NavLink to="/">
-      <div className="logocontainer">s
+      <div className="logocontainer">
         <img
           src="images/PosterTownc.png"
           alt="Logo"
@@ -27,7 +27,7 @@ const Header = () => {
 const MainHeader = styled.header`
   padding: 0 4.8rem;
   height: 10rem;
-  background-color: ${({ theme }) => theme.colors.navbg};
+  background-color: #1D1D1D};
   display: flex;
   justify-content: space-between;
   align-items: center;

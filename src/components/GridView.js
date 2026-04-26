@@ -15,11 +15,11 @@ const GridView = ({ products }) => {
 };
 
 const Wrapper = styled.section`
-  padding: 9rem 0;
+  padding: 6rem 2rem;
   width: 100%;
   
   .grid {
-    gap: 3.2rem;
+    gap: 4.5rem;
   }
 
   figure {

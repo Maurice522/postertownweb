@@ -3,6 +3,7 @@ import { TbTruckDelivery } from "react-icons/tb";
 import { MdSecurity } from "react-icons/md";
 import { GiReceiveMoney } from "react-icons/gi";
 import { RiSecurePaymentLine } from "react-icons/ri";
+import { RiRefund2Fill } from "react-icons/ri";
 
 const Services = () => {
   return (
@@ -16,11 +17,11 @@ const Services = () => {
             </div>
           </div>
 
-          <div className="services-2">
+<div className="services-2">
             <div className="services-colum-2">
               <div>
-                <MdSecurity color="#FF4C4C" className="icon" />
-                <h3>Non-contact Shipping</h3>
+                <RiRefund2Fill color="#FF4C4C" className="icon" />
+                <h3>7 Day Refund Guaranteed</h3>
               </div>
             </div>
             <div className="services-colum-2">
@@ -96,6 +97,13 @@ const Wrapper = styled.section`
     color: white;
   }
 
+  .services-1 > div,
+  .services-3 > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .icon {
     /* font-size: rem; */
     width: 8rem;
@@ -105,6 +113,107 @@ const Wrapper = styled.section`
     background-color:${({ theme }) => theme.colors.navbg};
     border: 2px solid #FF4C4C;
     color: #5138ee;
+  }
+
+  @media (max-width: 1030px) {
+    padding: 5rem 0;
+
+    .services-2 {
+      .services-colum-2 {
+        width: 100%;
+        min-height: 18rem;
+        padding: 1.5rem;
+      }
+    }
+
+    h3 {
+      font-size: 1.8rem;
+    }
+
+    .icon {
+      width: 7rem;
+      height: 7rem;
+      padding: 1.7rem;
+    }
+
+    .grid {
+      gap: 3rem;
+    }
+
+    .container {
+      margin: 40px;
+    }
+  }
+
+  @media (max-width: 998px) {
+    padding: 5rem 0;
+
+    .services-1,
+    .services-2,
+    .services-3 {
+      height: auto;
+      min-height: 20rem;
+      padding: 2rem 1rem;
+    }
+
+    .services-2 {
+      gap: 2rem;
+
+      .services-colum-2 {
+        min-height: 15rem;
+        padding: 1.5rem;
+      }
+    }
+
+    h3 {
+      font-size: 1.6rem;
+      margin-top: 1rem;
+    }
+
+    .icon {
+      width: 6rem;
+      height: 6rem;
+      padding: 1.5rem;
+    }
+
+    .grid {
+      gap: 2.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 4rem 0;
+
+    .grid {
+      gap: 2rem;
+    }
+
+    .services-1,
+    .services-2,
+    .services-3 {
+      min-height: auto;
+      padding: 1.5rem 1rem;
+    }
+
+    .services-2 {
+      flex-direction: column;
+      gap: 1.5rem;
+
+      .services-colum-2 {
+        width: 100%;
+        min-height: 12rem;
+      }
+    }
+
+    h3 {
+      font-size: 1.4rem;
+    }
+
+    .icon {
+      width: 5rem;
+      height: 5rem;
+      padding: 1.2rem;
+    }
   }
 `;
 export default Services;
