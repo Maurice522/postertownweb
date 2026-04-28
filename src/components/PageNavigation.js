@@ -5,22 +5,61 @@ import styled from "styled-components";
 const PageNavigation = ({ title }) => {
   return (
     <Wrapper>
-      <NavLink to="/">Home</NavLink>/{title}
+      <div className="breadcrumb-shell">
+        <NavLink to="/">Home</NavLink>
+        <span className="divider">/</span>
+        <span className="current">{title}</span>
+      </div>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.section`
-  height: 10rem;
-  background-color: ${({ theme }) => theme.colors.bg};
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  font-size: 3.2rem;
-  padding-left: 1.2rem;
+  background: transparent;
+  padding: 2rem 0 0;
+
+  .breadcrumb-shell {
+    width: min(100%, 156rem);
+    margin: 0 auto;
+    padding: 0 2.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: #8a7d72;
+    font-size: 1.45rem;
+    line-height: 1;
+  }
 
   a {
-    font-size: 3.2rem;
+    color: #5f544b;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: #cf6d3f;
+  }
+
+  .divider {
+    color: #b4a79b;
+  }
+
+  .current {
+    color: #231f20;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: ${({ theme }) => theme.media.mobile}) {
+    padding-top: 1.4rem;
+
+    .breadcrumb-shell {
+      padding: 0 1.4rem;
+      font-size: 1.3rem;
+      gap: 0.7rem;
+    }
   }
 `;
 
