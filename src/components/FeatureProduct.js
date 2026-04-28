@@ -1,86 +1,87 @@
-import { useProductContext } from "../context/productcontex";
 import styled from "styled-components";
+import RotatingText from "./RotatingText";
 import Product from "./Product";
-import RotatingText from './RotatingText'
-import { FiShoppingCart, FiShoppingBag } from 'react-icons/fi';
-import { useCartContext } from "../context/cart_context";
 
 const FeatureProduct = () => {
-  const { isLoading, featureProducts } = useProductContext();
-
-  if (isLoading) {
-    return <div style={{textAlign: "center", backgroundColor: "black"}}> <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcjAzM2VoenNoODI5aGczdXMzM3B1dWU1M3pzeDJjcGd5MjFsOTJ3YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/uIJBFZoOaifHf52MER/giphy.gif"/> </div>;
-  }
-
   const productList = [
-    { id:"poster-006", 
-      name: "Giyu Tomoioka", 
-      image:"images/giyu.jpg", 
-      price: 999, 
-      category:"Anime",
-      stock: 15 },
-    { id:"batman-001", 
-      name: "Batman", 
-      image:"images/batmanneon.jpg", 
-      price: 999, 
-      category:"DC",
-      stock: 20 },
-    { id:"deadpool-001", 
-      name: "Deadpool", 
-      image:"images/deadpool.jpg", 
-      price: 999, 
-      category:"Marvel",
-      stock: 25 },
-  ]
-
-  const productList2 = [
-    { id:"movie-001", 
-      name: "Optimus Prime", 
-      image:"images/optimusprime.jpg", 
-      price: 999, 
-      category:"Movie",
-      stock: 12 },
-    { id:"car-001", 
-      name: "GT3 RS", 
-      image:"images/gt3rswhite.jpg", 
-      price: 999, 
-      category:"Car",
-      stock: 8 },
-    { id:"games-001", 
-      name: "Modern Warfare 2", 
-      image:"images/mw2.jpg", 
-      price: 999, 
-      category:"Games",
-      stock: 20 },
-  ]
+    {
+      id: "poster-006",
+      name: "Giyu Tomoioka",
+      image: "images/giyu.jpg",
+      price: 999,
+      category: "Anime",
+      stock: 15,
+      color: "blue",
+    },
+    {
+      id: "batman-001",
+      name: "Batman",
+      image: "images/batmanneon.jpg",
+      price: 999,
+      category: "DC",
+      stock: 20,
+      color: "black",
+    },
+    {
+      id: "deadpool-001",
+      name: "Deadpool",
+      image: "images/deadpool.jpg",
+      price: 999,
+      category: "Marvel",
+      stock: 25,
+      color: "red",
+    },
+    {
+      id: "movie-001",
+      name: "Optimus Prime",
+      image: "images/optimusprime.jpg",
+      price: 999,
+      category: "Movie",
+      stock: 12,
+      color: "blue",
+    },
+    {
+      id: "car-001",
+      name: "GT3 RS",
+      image: "images/gt3rswhite.jpg",
+      price: 999,
+      category: "Car",
+      stock: 8,
+      color: "white",
+    },
+    {
+      id: "games-001",
+      name: "Modern Warfare 2",
+      image: "images/mw2.jpg",
+      price: 999,
+      category: "Games",
+      stock: 20,
+      color: "black",
+    },
+  ];
 
   return (
     <Wrapper className="section">
       <div className="container">
-        {/* <div className="intro-data">Check Now!</div> */}
-       
         <div className="common-heading">
           <RotatingText
-          texts={['Anime', 'Artist', 'Cars', 'Cartoon', 'DC', 'Games','Marvel' ,'Movies', 'Scenery', 'Sports']}
-          mainClassName=""
-          staggerFrom={"last"}
-          initial={{ y: "100%" }}
-          animate={{ y: 0 }}
-          exit={{ y: "-120%" }}
-          staggerDuration={0.025}
-          splitLevelClassName=""
-          transition={{ type: "spring", damping: 30, stiffness: 400 }}
-          rotationInterval={2000}
-        /></div>
-        <div className="grid grid-three-column">
-          {productList.map((curElem) => {
-            return <Product key={curElem.id} {...curElem} />;
-          })}
+            texts={["Anime", "Artist", "Cars", "Cartoon", "DC", "Games", "Marvel", "Movies", "Scenery", "Sports"]}
+            mainClassName="feature-rotator"
+            staggerFrom="last"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "-120%" }}
+            staggerDuration={0.025}
+            splitLevelClassName=""
+            transition={{ type: "spring", damping: 30, stiffness: 400 }}
+            rotationInterval={2000}
+          />
         </div>
-        <div className="grid grid-three-column mgtop">
-          {productList2.map((curElem) => {
-            return <Product key={curElem.id} {...curElem} />;
-          })}
+
+        <div className="product-grid">
+          {productList.map((curElem) => (
+            <Product key={curElem.id} {...curElem} />
+          ))}
         </div>
       </div>
     </Wrapper>
@@ -89,126 +90,69 @@ const FeatureProduct = () => {
 
 const Wrapper = styled.section`
   padding: 9rem 0;
-  background-color: ${({ theme }) => theme.colors.bg};
+  background: linear-gradient(180deg, #f8f5ef 0%, #f1e7da 100%);
 
   .container {
-    max-width: 120rem;
-  }
-  
-  .mgtop{
-    margin-top: 5%;
+    max-width: 132rem;
   }
 
-  figure {
-    width: auto;
+  .common-heading {
     display: flex;
     justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.5s linear;
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 0%;
-      height: 100%;
-      border-top-left-radius: 80px 80px;
-      transition: all 0.2s linear;
-      cursor: pointer;
-    }
-    &:hover::after {
-      width: 100%;
-    }
-    &:hover img {
-      transform: scale(1.2);
-    }
-    img {
-      max-width:85%;
-      max-height:420px;
-      margin-top: 1.5rem;
-      border-top-left-radius: 80px 80px;
-      transition: all 0.2s linear;
+    margin-bottom: 4rem;
+  }
+
+  .feature-rotator {
+    width: auto;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .feature-rotator .text-rotate {
+    background: transparent;
+    width: auto;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .feature-rotator .text-rotate-word,
+  .feature-rotator .text-rotate-element,
+  .feature-rotator .text-rotate-space {
+    color: #2d241e;
+    font-size: clamp(3rem, 4vw, 5rem);
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  @media (max-width: ${({ theme }) => theme.media.tab}) {
+    .container {
+      max-width: 100%;
     }
 
-    .caption {
-      box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
-      top: 15%;
-      right: 10%;
-      text-transform: uppercase;
-      background-color: ${({ theme }) => theme.colors.navbg};
-      color: ${({ theme }) => theme.colors.red};
-      padding: 0.8rem 2rem;
-      font-size: 1.2rem;
-      border-radius: 2rem;
+    .product-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  .card {
-  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
-    background-color: ${({ theme }) => theme.colors.navbg};
-    border-radius: 2rem;
-    padding-bottom: 0.2rem;
-    padding-top: 1rem;
+  @media (max-width: ${({ theme }) => theme.media.mobile}) {
+    padding: 6rem 0;
 
-    .card-data {
-      padding: 0 2rem;
+    .common-heading {
+      margin-bottom: 3rem;
     }
 
-    .card-data-flex {
-      margin: 2rem 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    h3 {
-      color: white;
-      text-transform: capitalize;
-    }
-
-    .card-data--price {
-      color: ${({ theme }) => theme.colors.red};
-    }
-
-    .card-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
-      margin-bottom: 1.5rem;
-      justify-content: center;
-    }
-
-    .btn {
-      padding: 0.8rem 1.2rem;
-      border: 0.1rem solid rgb(98 84 243);
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 1.1rem;
-      text-transform: capitalize;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      &.add-to-cart {
-        background-color: white;
-        color: rgb(98 84 243);
-        &:hover {
-          background-color: rgb(98 84 243);
-          color: white;
-        }
-      }
-
-      &.buy-now {
-        background-color: rgb(98 84 243);
-        color: white;
-        &:hover {
-          background-color: white;
-          color: rgb(98 84 243);
-        }
-      }
+    .product-grid {
+      grid-template-columns: 1fr;
+      gap: 1.6rem;
     }
   }
 `;

@@ -1,124 +1,87 @@
-import { useProductContext } from "../context/productcontex";
-import { useCartContext } from "../context/cart_context";
 import styled from "styled-components";
 import Product from "./Product";
-import RotatingText from './RotatingText';
-import { CardBody, CardContainer, CardItem } from "./3dcard";
-import { FiShoppingCart, FiShoppingBag } from "react-icons/fi";
-import './Tailwind.css';
+import RotatingText from "./RotatingText";
 
 const FeatureProductLandscape = () => {
-  const { isLoading, featureProducts } = useProductContext();
-  const { addToCart } = useCartContext();
-
-  if (isLoading) {
-    return <div style={{textAlign: "center", backgroundColor: "black"}}> <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcjAzM2VoenNoODI5aGczdXMzM3B1dWU1M3pzeDJjcGd5MjFsOTJ3YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/uIJBFZoOaifHf52MER/giphy.gif"/> </div>;
-  }
-
   const productList = [
-    { id:"poster-001", 
-      name: "Solo Leveling", 
-      image:"images/sololeveling.jpeg", 
-      price: 999, 
-      category:"Anime",
-      stock: 50 },
-    { id:"poster-002", 
-      name: "Luffy Gear 5", 
-      image:"images/luffyland.jpg", 
-      price: 999, 
-      category:"Anime",
-      stock: 30 },
-  ]
-
-  const productList2 = [
-    { id:"pikachu-001", 
-      name: "Pikachu", 
-      image:"images/pikachuland.jpg", 
-      price: 999, 
-      category:"Anime",
-      stock: 25 },
-    { id:"minion-001", 
-      name: "Minion", 
-      image:"images/minionland.jpg", 
-      price: 999, 
-      category:"Cartoon",
-      stock: 30 },
-  ]
+    {
+      id: "poster-001",
+      name: "Solo Leveling",
+      image: "images/sololeveling.jpeg",
+      price: 999,
+      category: "Anime",
+      stock: 50,
+      color: "black",
+    },
+    {
+      id: "poster-002",
+      name: "Luffy Gear 5",
+      image: "images/luffyland.jpg",
+      price: 999,
+      category: "Anime",
+      stock: 30,
+      color: "orange",
+    },
+    {
+      id: "poster-004",
+      name: "Demon Slayer",
+      image: "images/demonslayerall.jpg",
+      price: 999,
+      category: "Anime",
+      stock: 25,
+      color: "blue",
+    },
+    {
+      id: "poster-007",
+      name: "Rengoku",
+      image: "images/rengoku.jpg",
+      price: 999,
+      category: "Anime",
+      stock: 18,
+      color: "red",
+    },
+    {
+      id: "poster-003",
+      name: "Naruto Shippuden",
+      image: "images/naruto.jpg",
+      price: 899,
+      category: "Anime",
+      stock: 0,
+      color: "orange",
+    },
+    {
+      id: "poster-005",
+      name: "Dragon Ball Z",
+      image: "images/broly.jpg",
+      price: 799,
+      category: "Anime",
+      stock: 40,
+      color: "yellow",
+    },
+  ];
 
   return (
     <Wrapper className="section">
       <div className="container">
-        {/* <div className="intro-data">Check Now!</div> */}
-       
         <div className="common-heading">
           <RotatingText
-          texts={['Landscape', 'Awesome']}
-          mainClassName=""
-          staggerFrom={"last"}
-          initial={{ y: "100%" }}
-          animate={{ y: 0 }}
-          exit={{ y: "-120%" }}
-          staggerDuration={0.025}
-          splitLevelClassName=""
-          transition={{ type: "spring", damping: 30, stiffness: 400 }}
-          rotationInterval={2000}
-        /></div>
-        <div className="grid grid-two-column">
-          {productList.map((curElem) => {
-            return (
-              <CardContainer className="inter-var">
-              <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl p-6 border  ">
-                <CardItem
-                  translateZ="50"
-                  className="text-xl font-bold text-neutral-600 dark:text-white"
-                >
-                  Make things float in air
-                </CardItem>
-                <CardItem
-                  as="p"
-                  translateZ="60"
-                  className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
-                >
-                  Hover over this card to unleash the power of CSS perspective
-                </CardItem>
-                <CardItem translateZ="100" className="w-full mt-4">
-                  <img
-                    src={curElem.image}
-                    height="1000"
-                    width="1000"
-                    className="h-60 w-full object-cover rounded-xl group-hover/card:shadow-xl"
-                    alt="thumbnail"
-                  />
-                </CardItem>
-                <div className="flex justify-between items-center mt-20">
-                  <CardItem
-                    translateZ={20}
-                    as="button"
-                    onClick={() => addToCart(curElem)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold hover:bg-gray-200 transition-colors"
-                  >
-                    <FiShoppingCart />
-                    Add to Cart
-                  </CardItem>
-                  <CardItem
-                    translateZ={20}
-                    as="button"
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition-colors"
-                  >
-                    <FiShoppingBag />
-                    Buy Now
-                  </CardItem>
-                </div>
-              </CardBody>
-            </CardContainer>
-
-            )
-          })}
+            texts={["Landscape", "Awesome"]}
+            mainClassName="landscape-rotator"
+            staggerFrom="last"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "-120%" }}
+            staggerDuration={0.025}
+            splitLevelClassName=""
+            transition={{ type: "spring", damping: 30, stiffness: 400 }}
+            rotationInterval={2000}
+          />
         </div>
-        <div className="grid grid-two-column mgtop">
-          {productList2.map((curElem) => {
-            return <Product key={curElem.id} {...curElem} />;
-          })}
+
+        <div className="product-grid">
+          {productList.map((curElem) => (
+            <Product key={curElem.id} {...curElem} cardStyle="landscape" />
+          ))}
         </div>
       </div>
     </Wrapper>
@@ -127,126 +90,69 @@ const FeatureProductLandscape = () => {
 
 const Wrapper = styled.section`
   padding: 9rem 0;
-  background-color: ${({ theme }) => theme.colors.bg};
+  background: linear-gradient(180deg, #f1e7da 0%, #f8f5ef 100%);
 
   .container {
-    max-width: 120rem;
-  }
-  
-  .mgtop{
-    margin-top: 5%;
+    max-width: 132rem;
   }
 
-  figure {
-    width: auto;
+  .common-heading {
+    margin-bottom: 4rem;
     display: flex;
     justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.5s linear;
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 0%;
-      height: 100%;
-      
-      transition: all 0.2s linear;
-      cursor: pointer;
-    }
-    &:hover::after {
-      width: 100%;
-    }
-    &:hover img {
-      transform: scale(1.2);
-    }
-    img {
-      max-width:85%;
-      max-height:420px;
-      margin-top: 1.5rem;
-      border-top-left-radius: 80px 80px;
-      transition: all 0.2s linear;
+  }
+
+  .landscape-rotator {
+    width: auto;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .landscape-rotator .text-rotate {
+    background: transparent;
+    width: auto;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .landscape-rotator .text-rotate-word,
+  .landscape-rotator .text-rotate-element,
+  .landscape-rotator .text-rotate-space {
+    color: #2d241e;
+    font-size: clamp(3rem, 4vw, 5rem);
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  @media (max-width: ${({ theme }) => theme.media.tab}) {
+    .container {
+      max-width: 100%;
     }
 
-    .caption {
-      box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
-      top: 15%;
-      right: 10%;
-      text-transform: uppercase;
-      background-color: ${({ theme }) => theme.colors.navbg};
-      color: ${({ theme }) => theme.colors.red};
-      padding: 0.8rem 2rem;
-      font-size: 1.2rem;
-      border-radius: 2rem;
+    .product-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  .card {
-  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
-    background-color: ${({ theme }) => theme.colors.navbg};
-    border-radius: 2rem;
-    padding-bottom: 0.2rem;
-    padding-top: 3rem;
+  @media (max-width: ${({ theme }) => theme.media.mobile}) {
+    padding: 6rem 0;
 
-    .card-data {
-      padding: 0 2rem;
+    .common-heading {
+      margin-bottom: 3rem;
     }
 
-    .card-data-flex {
-      margin: 2rem 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    h3 {
-      color: white;
-      text-transform: capitalize;
-    }
-
-    .card-data--price {
-      color: ${({ theme }) => theme.colors.red};
-    }
-
-    .card-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-top: 0.8rem;
-      margin-bottom: 1.5rem;
-      justify-content: center;
-    }
-
-    .btn {
-      padding: 0.8rem 1.2rem;
-      border: 0.1rem solid rgb(98 84 243);
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 1.1rem;
-      text-transform: capitalize;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      &.add-to-cart {
-        background-color: white;
-        color: rgb(98 84 243);
-        &:hover {
-          background-color: rgb(98 84 243);
-          color: white;
-        }
-      }
-
-      &.buy-now {
-        background-color: rgb(98 84 243);
-        color: white;
-        &:hover {
-          background-color: white;
-          color: rgb(98 84 243);
-        }
-      }
+    .product-grid {
+      grid-template-columns: 1fr;
+      gap: 1.6rem;
     }
   }
 `;

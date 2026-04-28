@@ -53,9 +53,10 @@ const CollectionDBZ = () => {
           asciiFontSize={8}
         /> */}
         <h1 className="collhead permanent-marker-regular"> Dragon Ball Z Collection</h1>
-       <div style={{display:"flex", flexDirection:"row", margin: "7%", marginBottom:"0px", marginTop:"5%"}}>
+       <div className="collection-row">
        {productList.map((curElem) => {
             return <LightCard
+        key={curElem.id}
         dataImage={curElem.image}
         header={curElem.name}
         content="shuioadhuishduihsaui hsauishdui hsaiuh sahiud huisah uidhsaiu hiuashaius "
@@ -89,15 +90,28 @@ const Wrapper = styled.section`
   width: 100%;
   color:white;
   text-shadow: rgba(240, 46, 170, 0.4) 0px 5px, rgba(240, 46, 170, 0.3) 0px 10px, rgba(240, 46, 170, 0.2) 0px 15px, rgba(240, 46, 170, 0.1) 0px 20px, rgba(240, 46, 170, 0.05) 0px 25px;
-  text-align: right;
+  text-align: center;
   margin: 0px;
   font-size:72px;
   }
 
   .container {
-    max-width: 120rem;
-    margin:0;
+    max-width: 188rem;
+    margin: 0 auto;
+    padding: 0 2rem;
     
+  }
+
+  .collection-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    width: 100%;
+    gap: 1.6rem;
+    align-items: stretch;
+    margin: 5% auto 0;
+    max-width: 100%;
   }
 
   .permanent-marker-regular {
@@ -211,6 +225,40 @@ const Wrapper = styled.section`
         color: rgb(98 84 243);
         font-size: 1.4rem;
       }
+    }
+  }
+
+  @media (max-width: ${({ theme }) => theme.media.tab}) {
+    .collhead {
+      text-align: center;
+      font-size: 5.6rem;
+      padding: 0 2rem;
+    }
+
+    .container {
+      max-width: 100%;
+    }
+
+    .collection-row {
+      margin: 4rem auto 0;
+      gap: 1.2rem;
+    }
+  }
+
+  @media (max-width: ${({ theme }) => theme.media.mobile}) {
+    padding: 6rem 0;
+
+    .collhead {
+      font-size: 3.8rem;
+      text-align: center;
+      line-height: 1.2;
+      padding: 0 1.4rem;
+    }
+
+    .collection-row {
+      flex-wrap: wrap;
+      margin: 3rem 1.4rem 0;
+      gap: 1.2rem;
     }
   }
 `;

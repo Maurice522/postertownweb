@@ -1,10 +1,12 @@
 /* LightCard.css */
 
-.light-card-wrap {
+  .light-card-wrap {
     margin: 10px;
     transform: perspective(500px);
     transform-style: preserve-3d;
     cursor: pointer;
+    flex: 0 1 38rem;
+    max-width: 38rem;
   }
   
   .light-card-wrap:hover .light-card-info {
@@ -27,7 +29,7 @@
   
   .light-card {
     position: relative;
-    width: 280px;
+    width: 100%;
     height: 500px;
     background-color: #333;
     overflow: hidden;
@@ -74,5 +76,30 @@
   
   .light-card-info::after {
     content: none; /* Removed the black overlay */
+  }
+
+  @media (max-width: 768px) {
+    .light-card-wrap {
+      flex: 1 1 16rem;
+      max-width: 100%;
+      margin: 6px;
+    }
+
+    .light-card {
+      height: 360px;
+    }
+
+    .light-card-bg {
+      height: 360px;
+    }
+
+    .light-card-info {
+      transform: translateY(22%);
+      padding: 16px;
+    }
+
+    .light-card-info h1 {
+      font-size: 24px;
+    }
   }
   
