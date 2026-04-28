@@ -1,8 +1,8 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import styled from "styled-components";
+import { useUserContext } from "./context/user_context";
 
 const Contact = () => {
-  const { isAuthenticated, user } = useAuth0();
+  const { isAuthenticated, user } = useUserContext();
 
   const Wrapper = styled.section`
     padding: 9rem 0 5rem 0;
@@ -46,6 +46,7 @@ const Contact = () => {
         height="400"
         style={{ border: 0 }}
         allowFullScreen=""
+        title="Poster Town location"
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"></iframe>
 
@@ -62,6 +63,7 @@ const Contact = () => {
               value={isAuthenticated ? user.name : ""}
               required
               autoComplete="off"
+              readOnly={isAuthenticated}
             />
 
             <input
@@ -71,6 +73,7 @@ const Contact = () => {
               autoComplete="off"
               value={isAuthenticated ? user.email : ""}
               required
+              readOnly={isAuthenticated}
             />
 
             <textarea

@@ -1,268 +1,2691 @@
 [
   {
     "id": "poster-001",
+    "sku": "POSTER-001-PRT-01",
+    "slug": "poster-001",
     "name": "Solo Leveling",
-    "image": "images/sololeveling.jpeg",
-    "category": "Anime",
-    "company": "AnimePoster",
-    "description": "Solo Leveling official poster featuring Sung Jin-Woo",
-    "price": 999,
-    "originalPrice": 1299,
-    "stock": 50,
-    "stars": 4.5,
-    "featured": true,
-    "tags": ["trending", "bestseller"],
-    "orientation": "portrait",
-    "shape": "rectangle",
-    "quantity": 50,
-    "rating": 4.5,
-    "color": "black",
+    "subtitle": "Solo Leveling Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "AnimePoster",
+    "category": {
+      "main": "Anime",
+      "subCategory": "Solo Leveling",
+      "collection": "Anime Metal Prints"
+    },
+    "description": {
+      "short": "Solo Leveling official poster featuring Sung Jin-Woo",
+      "full": "Solo Leveling official poster featuring Sung Jin-Woo printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/sololeveling.jpeg",
+      "thumbnail": "images/sololeveling.jpeg",
+      "gallery": [
+        "images/sololeveling.jpeg",
+        "images/sololeveling.jpeg",
+        "images/sololeveling.jpeg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 999,
+      "compareAtPrice": 1299,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 50,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 50
+    },
+    "variants": [
+      {
+        "id": "poster-001-var-12x18",
+        "sku": "POSTER-001-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 999,
+        "stock": 25
+      },
+      {
+        "id": "poster-001-var-18x24",
+        "sku": "POSTER-001-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1499,
+        "stock": 25
+      },
+      {
+        "id": "poster-001-var-2436",
+        "sku": "POSTER-001-PRT-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1699,
+        "stock": 12
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Portrait",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Solo Leveling",
+      "character": "Solo Leveling",
+      "theme": "Anime",
+      "material": "Metal",
+      "orientation": "Portrait"
+    },
+    "filters": {
+      "theme": [
+        "Anime",
+        "Action"
+      ],
+      "character": [
+        "Solo Leveling"
+      ],
+      "colorPalette": [
+        "Black"
+      ],
+      "roomType": [
+        "Bedroom",
+        "Gaming Setup"
+      ],
+      "style": [
+        "Minimal",
+        "Anime"
+      ]
+    },
+    "badges": [
+      "Trending",
+      "Bestseller"
+    ],
+    "ratings": {
+      "average": 4.5,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [
       {
+        "id": "poster-001-rev-1",
         "user": "John Doe",
+        "title": "Great quality",
         "comment": "Amazing quality!",
         "rating": 5,
+        "verifiedPurchase": true,
         "date": "2024-01-15"
       }
     ],
-    "createdAt": "2024-01-01"
+    "metrics": {
+      "salesCount": 1000,
+      "wishlistCount": 80,
+      "viewCount": 5000,
+      "cartAdds": 120,
+      "conversionRate": 2.8
+    },
+    "socialProof": {
+      "currentlyViewing": 4,
+      "popularThisWeek": true,
+      "trendingScore": 70
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Solo Leveling | Poster Town",
+      "metaDescription": "Solo Leveling official poster featuring Sung Jin-Woo",
+      "keywords": [
+        "solo leveling poster",
+        "anime metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "poster-003",
+        "poster-004"
+      ],
+      "frequentlyBoughtTogether": []
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": false,
+      "exclusive": true
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-01-01",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "poster-001-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 999,
+        "stock": 25,
+        "sku": "POSTER-001-1218",
+        "variantId": "poster-001-var-12x18"
+      },
+      {
+        "id": "poster-001-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1499,
+        "stock": 25,
+        "sku": "POSTER-001-1824",
+        "variantId": "poster-001-var-18x24"
+      },
+      {
+        "id": "poster-001-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1699,
+        "stock": 12,
+        "sku": "POSTER-001-PRT-01-LARGE",
+        "variantId": "poster-001-var-2436"
+      }
+    ]
   },
   {
     "id": "poster-002",
+    "sku": "POSTER-002-LND-01",
+    "slug": "poster-002",
     "name": "Luffy Gear 5",
-    "image": "images/luffyland.jpg",
-    "category": "Anime",
-    "company": "AnimePoster",
-    "description": "One Piece Luffy Gear 5 poster",
-    "price": 9999,
-    "originalPrice": 1299,
-    "stock": 30,
-    "stars": 4.8,
-    "featured": true,
-    "tags": ["new", "bestseller"],
-    "orientation": "landscape",
-    "shape": "rectangle",
-    "quantity": 30,
-    "rating": 4.8,
-    "color": "orange",
+    "subtitle": "Luffy Gear 5 Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "AnimePoster",
+    "category": {
+      "main": "Anime",
+      "subCategory": "Luffy Gear 5",
+      "collection": "Anime Metal Prints"
+    },
+    "description": {
+      "short": "One Piece Luffy Gear 5 poster",
+      "full": "One Piece Luffy Gear 5 poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/luffyland.jpg",
+      "thumbnail": "images/luffyland.jpg",
+      "gallery": [
+        "images/luffyland.jpg",
+        "images/luffyland.jpg",
+        "images/luffyland.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 9999,
+      "compareAtPrice": 1299,
+      "currency": "INR",
+      "discountPercent": 0,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 30,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 30
+    },
+    "variants": [
+      {
+        "id": "poster-002-var-12x18",
+        "sku": "POSTER-002-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 9999,
+        "stock": 15
+      },
+      {
+        "id": "poster-002-var-18x24",
+        "sku": "POSTER-002-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 10499,
+        "stock": 15
+      },
+      {
+        "id": "poster-002-var-2436",
+        "sku": "POSTER-002-LND-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 10699,
+        "stock": 7
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Landscape",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Luffy Gear 5",
+      "character": "Luffy Gear 5",
+      "theme": "Anime",
+      "material": "Metal",
+      "orientation": "Landscape"
+    },
+    "filters": {
+      "theme": [
+        "Anime",
+        "Action"
+      ],
+      "character": [
+        "Luffy Gear 5"
+      ],
+      "colorPalette": [
+        "Orange"
+      ],
+      "roomType": [
+        "Living Room",
+        "Entertainment Wall"
+      ],
+      "style": [
+        "Minimal",
+        "Anime"
+      ]
+    },
+    "badges": [
+      "New",
+      "Bestseller"
+    ],
+    "ratings": {
+      "average": 4.8,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [
       {
+        "id": "poster-002-rev-1",
         "user": "Jane Smith",
+        "title": "Great quality",
         "comment": "Perfect for my room!",
         "rating": 5,
+        "verifiedPurchase": true,
         "date": "2024-02-01"
       }
     ],
-    "createdAt": "2024-01-10"
+    "metrics": {
+      "salesCount": 1187,
+      "wishlistCount": 91,
+      "viewCount": 5913,
+      "cartAdds": 147,
+      "conversionRate": 3.1
+    },
+    "socialProof": {
+      "currentlyViewing": 5,
+      "popularThisWeek": true,
+      "trendingScore": 71
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Luffy Gear 5 | Poster Town",
+      "metaDescription": "One Piece Luffy Gear 5 poster",
+      "keywords": [
+        "luffy gear 5 poster",
+        "anime metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "poster-004",
+        "poster-005"
+      ],
+      "frequentlyBoughtTogether": [
+        "poster-001"
+      ]
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": true,
+      "exclusive": true
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-01-10",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "poster-002-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 9999,
+        "stock": 15,
+        "sku": "POSTER-002-1218",
+        "variantId": "poster-002-var-12x18"
+      },
+      {
+        "id": "poster-002-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 10499,
+        "stock": 15,
+        "sku": "POSTER-002-1824",
+        "variantId": "poster-002-var-18x24"
+      },
+      {
+        "id": "poster-002-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 10699,
+        "stock": 7,
+        "sku": "POSTER-002-LND-01-LARGE",
+        "variantId": "poster-002-var-2436"
+      }
+    ]
   },
   {
     "id": "poster-003",
+    "sku": "POSTER-003-PRT-01",
+    "slug": "poster-003",
     "name": "Naruto Shippuden",
-    "image": "images/naruto.jpg",
-    "category": "Anime",
-    "company": "AnimePoster",
-    "description": "Naruto and Sasuke final battle poster",
-    "price": 899,
-    "stock": 0,
-    "stars": 4.2,
-    "featured": false,
-    "tags": ["classic"],
-    "orientation": "portrait",
-    "shape": "rectangle",
-    "quantity": 0,
-    "rating": 4.2,
-    "color": "orange",
+    "subtitle": "Naruto Shippuden Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "AnimePoster",
+    "category": {
+      "main": "Anime",
+      "subCategory": "Naruto Shippuden",
+      "collection": "Anime Metal Prints"
+    },
+    "description": {
+      "short": "Naruto and Sasuke final battle poster",
+      "full": "Naruto and Sasuke final battle poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/naruto.jpg",
+      "thumbnail": "images/naruto.jpg",
+      "gallery": [
+        "images/naruto.jpg",
+        "images/naruto.jpg",
+        "images/naruto.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 899,
+      "compareAtPrice": 1169,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 0,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "out_of_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 0
+    },
+    "variants": [
+      {
+        "id": "poster-003-var-12x18",
+        "sku": "POSTER-003-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 899,
+        "stock": 1
+      },
+      {
+        "id": "poster-003-var-18x24",
+        "sku": "POSTER-003-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1399,
+        "stock": 0
+      },
+      {
+        "id": "poster-003-var-2436",
+        "sku": "POSTER-003-PRT-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1599,
+        "stock": 0
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Portrait",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Naruto Shippuden",
+      "character": "Naruto Shippuden",
+      "theme": "Anime",
+      "material": "Metal",
+      "orientation": "Portrait"
+    },
+    "filters": {
+      "theme": [
+        "Anime",
+        "Action"
+      ],
+      "character": [
+        "Naruto Shippuden"
+      ],
+      "colorPalette": [
+        "Orange"
+      ],
+      "roomType": [
+        "Bedroom",
+        "Gaming Setup"
+      ],
+      "style": [
+        "Minimal",
+        "Anime"
+      ]
+    },
+    "badges": [
+      "Classic"
+    ],
+    "ratings": {
+      "average": 4.2,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [],
-    "createdAt": "2023-12-15"
+    "metrics": {
+      "salesCount": 1374,
+      "wishlistCount": 102,
+      "viewCount": 6826,
+      "cartAdds": 174,
+      "conversionRate": 3.4
+    },
+    "socialProof": {
+      "currentlyViewing": 6,
+      "popularThisWeek": false,
+      "trendingScore": 72
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Naruto Shippuden | Poster Town",
+      "metaDescription": "Naruto and Sasuke final battle poster",
+      "keywords": [
+        "naruto shippuden poster",
+        "anime metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "poster-005",
+        "poster-006"
+      ],
+      "frequentlyBoughtTogether": [
+        "poster-001",
+        "poster-002"
+      ]
+    },
+    "flags": {
+      "featured": false,
+      "newArrival": false,
+      "exclusive": false
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2023-12-15",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "poster-003-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 899,
+        "stock": 1,
+        "sku": "POSTER-003-1218",
+        "variantId": "poster-003-var-12x18"
+      },
+      {
+        "id": "poster-003-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1399,
+        "stock": 0,
+        "sku": "POSTER-003-1824",
+        "variantId": "poster-003-var-18x24"
+      },
+      {
+        "id": "poster-003-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1599,
+        "stock": 0,
+        "sku": "POSTER-003-PRT-01-LARGE",
+        "variantId": "poster-003-var-2436"
+      }
+    ]
   },
   {
     "id": "poster-004",
+    "sku": "POSTER-004-LND-01",
+    "slug": "poster-004",
     "name": "Demon Slayer",
-    "image": "images/demonslayerall.jpg",
-    "category": "Anime",
-    "company": "AnimePoster",
-    "description": "Demon Slayer main characters poster",
-    "price": 999,
-    "originalPrice": 1199,
-    "stock": 25,
-    "stars": 4.6,
-    "featured": true,
-    "tags": ["trending"],
-    "orientation": "landscape",
-    "shape": "rectangle",
-    "quantity": 25,
-    "rating": 4.6,
-    "color": "blue",
+    "subtitle": "Demon Slayer Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "AnimePoster",
+    "category": {
+      "main": "Anime",
+      "subCategory": "Demon Slayer",
+      "collection": "Anime Metal Prints"
+    },
+    "description": {
+      "short": "Demon Slayer main characters poster",
+      "full": "Demon Slayer main characters poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/demonslayerall.jpg",
+      "thumbnail": "images/demonslayerall.jpg",
+      "gallery": [
+        "images/demonslayerall.jpg",
+        "images/demonslayerall.jpg",
+        "images/demonslayerall.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 999,
+      "compareAtPrice": 1199,
+      "currency": "INR",
+      "discountPercent": 17,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 25,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 25
+    },
+    "variants": [
+      {
+        "id": "poster-004-var-12x18",
+        "sku": "POSTER-004-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 999,
+        "stock": 13
+      },
+      {
+        "id": "poster-004-var-18x24",
+        "sku": "POSTER-004-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1499,
+        "stock": 12
+      },
+      {
+        "id": "poster-004-var-2436",
+        "sku": "POSTER-004-LND-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1699,
+        "stock": 6
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Landscape",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Demon Slayer",
+      "character": "Demon Slayer",
+      "theme": "Anime",
+      "material": "Metal",
+      "orientation": "Landscape"
+    },
+    "filters": {
+      "theme": [
+        "Anime",
+        "Action"
+      ],
+      "character": [
+        "Demon Slayer"
+      ],
+      "colorPalette": [
+        "Blue"
+      ],
+      "roomType": [
+        "Living Room",
+        "Entertainment Wall"
+      ],
+      "style": [
+        "Minimal",
+        "Anime"
+      ]
+    },
+    "badges": [
+      "Trending"
+    ],
+    "ratings": {
+      "average": 4.6,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [
       {
+        "id": "poster-004-rev-1",
         "user": "AnimeFan",
+        "title": "Great quality",
         "comment": "Great print quality!",
         "rating": 4,
+        "verifiedPurchase": true,
         "date": "2024-01-20"
       }
     ],
-    "createdAt": "2024-01-05"
+    "metrics": {
+      "salesCount": 1561,
+      "wishlistCount": 113,
+      "viewCount": 7739,
+      "cartAdds": 201,
+      "conversionRate": 3.7
+    },
+    "socialProof": {
+      "currentlyViewing": 7,
+      "popularThisWeek": true,
+      "trendingScore": 73
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Demon Slayer | Poster Town",
+      "metaDescription": "Demon Slayer main characters poster",
+      "keywords": [
+        "demon slayer poster",
+        "anime metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "poster-006",
+        "poster-007"
+      ],
+      "frequentlyBoughtTogether": [
+        "poster-002",
+        "poster-003"
+      ]
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": false,
+      "exclusive": false
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-01-05",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "poster-004-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 999,
+        "stock": 13,
+        "sku": "POSTER-004-1218",
+        "variantId": "poster-004-var-12x18"
+      },
+      {
+        "id": "poster-004-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1499,
+        "stock": 12,
+        "sku": "POSTER-004-1824",
+        "variantId": "poster-004-var-18x24"
+      },
+      {
+        "id": "poster-004-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1699,
+        "stock": 6,
+        "sku": "POSTER-004-LND-01-LARGE",
+        "variantId": "poster-004-var-2436"
+      }
+    ]
   },
   {
     "id": "poster-005",
+    "sku": "POSTER-005-PRT-01",
+    "slug": "poster-005",
     "name": "Dragon Ball Z",
-    "image": "images/broly.jpg",
-    "category": "Anime",
-    "company": "AnimePoster",
-    "description": "Goku Super Saiyan poster",
-    "price": 799,
-    "stock": 40,
-    "stars": 4.9,
-    "featured": true,
-    "tags": ["classic", "bestseller"],
-    "orientation": "portrait",
-    "shape": "rectangle",
-    "quantity": 40,
-    "rating": 4.9,
-    "color": "yellow",
+    "subtitle": "Dragon Ball Z Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "AnimePoster",
+    "category": {
+      "main": "Anime",
+      "subCategory": "Dragon Ball Z",
+      "collection": "Anime Metal Prints"
+    },
+    "description": {
+      "short": "Goku Super Saiyan poster",
+      "full": "Goku Super Saiyan poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/broly.jpg",
+      "thumbnail": "images/broly.jpg",
+      "gallery": [
+        "images/broly.jpg",
+        "images/broly.jpg",
+        "images/broly.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 799,
+      "compareAtPrice": 1039,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 40,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 40
+    },
+    "variants": [
+      {
+        "id": "poster-005-var-12x18",
+        "sku": "POSTER-005-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 799,
+        "stock": 20
+      },
+      {
+        "id": "poster-005-var-18x24",
+        "sku": "POSTER-005-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1299,
+        "stock": 20
+      },
+      {
+        "id": "poster-005-var-2436",
+        "sku": "POSTER-005-PRT-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1499,
+        "stock": 10
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Portrait",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Dragon Ball Z",
+      "character": "Dragon Ball Z",
+      "theme": "Anime",
+      "material": "Metal",
+      "orientation": "Portrait"
+    },
+    "filters": {
+      "theme": [
+        "Anime",
+        "Action"
+      ],
+      "character": [
+        "Dragon Ball Z"
+      ],
+      "colorPalette": [
+        "Yellow"
+      ],
+      "roomType": [
+        "Bedroom",
+        "Gaming Setup"
+      ],
+      "style": [
+        "Minimal",
+        "Anime"
+      ]
+    },
+    "badges": [
+      "Classic",
+      "Bestseller"
+    ],
+    "ratings": {
+      "average": 4.9,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [],
-    "createdAt": "2023-11-20"
+    "metrics": {
+      "salesCount": 1748,
+      "wishlistCount": 124,
+      "viewCount": 8652,
+      "cartAdds": 228,
+      "conversionRate": 2.8
+    },
+    "socialProof": {
+      "currentlyViewing": 8,
+      "popularThisWeek": true,
+      "trendingScore": 74
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Dragon Ball Z | Poster Town",
+      "metaDescription": "Goku Super Saiyan poster",
+      "keywords": [
+        "dragon ball z poster",
+        "anime metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "poster-007",
+        "batman-001"
+      ],
+      "frequentlyBoughtTogether": [
+        "poster-003",
+        "poster-004"
+      ]
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": false,
+      "exclusive": true
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2023-11-20",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "poster-005-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 799,
+        "stock": 20,
+        "sku": "POSTER-005-1218",
+        "variantId": "poster-005-var-12x18"
+      },
+      {
+        "id": "poster-005-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1299,
+        "stock": 20,
+        "sku": "POSTER-005-1824",
+        "variantId": "poster-005-var-18x24"
+      },
+      {
+        "id": "poster-005-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1499,
+        "stock": 10,
+        "sku": "POSTER-005-PRT-01-LARGE",
+        "variantId": "poster-005-var-2436"
+      }
+    ]
   },
   {
     "id": "poster-006",
+    "sku": "POSTER-006-PRT-01",
+    "slug": "poster-006",
     "name": "Giyu Tomioka",
-    "image": "images/giyu.jpg",
-    "category": "Anime",
-    "company": "AnimePoster",
-    "description": "Demon Slayer Water Hashira poster",
-    "price": 999,
-    "stock": 15,
-    "stars": 4.7,
-    "featured": false,
-    "tags": ["new"],
-    "orientation": "portrait",
-    "shape": "rectangle",
-    "quantity": 15,
-    "rating": 4.7,
-    "color": "blue",
+    "subtitle": "Giyu Tomioka Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "AnimePoster",
+    "category": {
+      "main": "Anime",
+      "subCategory": "Giyu Tomioka",
+      "collection": "Anime Metal Prints"
+    },
+    "description": {
+      "short": "Demon Slayer Water Hashira poster",
+      "full": "Demon Slayer Water Hashira poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/giyu.jpg",
+      "thumbnail": "images/giyu.jpg",
+      "gallery": [
+        "images/giyu.jpg",
+        "images/giyu.jpg",
+        "images/giyu.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 999,
+      "compareAtPrice": 1299,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 15,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 15
+    },
+    "variants": [
+      {
+        "id": "poster-006-var-12x18",
+        "sku": "POSTER-006-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 999,
+        "stock": 8
+      },
+      {
+        "id": "poster-006-var-18x24",
+        "sku": "POSTER-006-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1499,
+        "stock": 7
+      },
+      {
+        "id": "poster-006-var-2436",
+        "sku": "POSTER-006-PRT-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1699,
+        "stock": 3
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Portrait",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Giyu Tomioka",
+      "character": "Giyu Tomioka",
+      "theme": "Anime",
+      "material": "Metal",
+      "orientation": "Portrait"
+    },
+    "filters": {
+      "theme": [
+        "Anime",
+        "Action"
+      ],
+      "character": [
+        "Giyu Tomioka"
+      ],
+      "colorPalette": [
+        "Blue"
+      ],
+      "roomType": [
+        "Bedroom",
+        "Gaming Setup"
+      ],
+      "style": [
+        "Minimal",
+        "Anime"
+      ]
+    },
+    "badges": [
+      "New"
+    ],
+    "ratings": {
+      "average": 4.7,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [],
-    "createdAt": "2024-02-01"
+    "metrics": {
+      "salesCount": 1935,
+      "wishlistCount": 135,
+      "viewCount": 9565,
+      "cartAdds": 255,
+      "conversionRate": 3.1
+    },
+    "socialProof": {
+      "currentlyViewing": 9,
+      "popularThisWeek": false,
+      "trendingScore": 75
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Giyu Tomioka | Poster Town",
+      "metaDescription": "Demon Slayer Water Hashira poster",
+      "keywords": [
+        "giyu tomioka poster",
+        "anime metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "batman-001",
+        "deadpool-001"
+      ],
+      "frequentlyBoughtTogether": [
+        "poster-004",
+        "poster-005"
+      ]
+    },
+    "flags": {
+      "featured": false,
+      "newArrival": true,
+      "exclusive": false
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-02-01",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "poster-006-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 999,
+        "stock": 8,
+        "sku": "POSTER-006-1218",
+        "variantId": "poster-006-var-12x18"
+      },
+      {
+        "id": "poster-006-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1499,
+        "stock": 7,
+        "sku": "POSTER-006-1824",
+        "variantId": "poster-006-var-18x24"
+      },
+      {
+        "id": "poster-006-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1699,
+        "stock": 3,
+        "sku": "POSTER-006-PRT-01-LARGE",
+        "variantId": "poster-006-var-2436"
+      }
+    ]
   },
   {
     "id": "poster-007",
+    "sku": "POSTER-007-PRT-01",
+    "slug": "poster-007",
     "name": "Rengoku",
-    "image": "images/rengoku.jpg",
-    "category": "Anime",
-    "company": "AnimePoster",
-    "description": "Demon Slayer Flame Hashira poster",
-    "price": 999,
-    "stock": 18,
-    "stars": 4.8,
-    "featured": true,
-    "tags": ["bestseller", "trending"],
-    "orientation": "portrait",
-    "shape": "rectangle",
-    "quantity": 18,
-    "rating": 4.8,
-    "color": "red",
+    "subtitle": "Rengoku Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "AnimePoster",
+    "category": {
+      "main": "Anime",
+      "subCategory": "Rengoku",
+      "collection": "Anime Metal Prints"
+    },
+    "description": {
+      "short": "Demon Slayer Flame Hashira poster",
+      "full": "Demon Slayer Flame Hashira poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/rengoku.jpg",
+      "thumbnail": "images/rengoku.jpg",
+      "gallery": [
+        "images/rengoku.jpg",
+        "images/rengoku.jpg",
+        "images/rengoku.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 999,
+      "compareAtPrice": 1299,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 18,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 18
+    },
+    "variants": [
+      {
+        "id": "poster-007-var-12x18",
+        "sku": "POSTER-007-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 999,
+        "stock": 9
+      },
+      {
+        "id": "poster-007-var-18x24",
+        "sku": "POSTER-007-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1499,
+        "stock": 9
+      },
+      {
+        "id": "poster-007-var-2436",
+        "sku": "POSTER-007-PRT-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1699,
+        "stock": 4
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Portrait",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Rengoku",
+      "character": "Rengoku",
+      "theme": "Anime",
+      "material": "Metal",
+      "orientation": "Portrait"
+    },
+    "filters": {
+      "theme": [
+        "Anime",
+        "Action"
+      ],
+      "character": [
+        "Rengoku"
+      ],
+      "colorPalette": [
+        "Red"
+      ],
+      "roomType": [
+        "Bedroom",
+        "Gaming Setup"
+      ],
+      "style": [
+        "Minimal",
+        "Anime"
+      ]
+    },
+    "badges": [
+      "Bestseller",
+      "Trending"
+    ],
+    "ratings": {
+      "average": 4.8,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [],
-    "createdAt": "2024-02-01"
+    "metrics": {
+      "salesCount": 2122,
+      "wishlistCount": 146,
+      "viewCount": 10478,
+      "cartAdds": 282,
+      "conversionRate": 3.4
+    },
+    "socialProof": {
+      "currentlyViewing": 10,
+      "popularThisWeek": true,
+      "trendingScore": 76
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Rengoku | Poster Town",
+      "metaDescription": "Demon Slayer Flame Hashira poster",
+      "keywords": [
+        "rengoku poster",
+        "anime metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "deadpool-001",
+        "movie-001"
+      ],
+      "frequentlyBoughtTogether": [
+        "poster-005",
+        "poster-006"
+      ]
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": false,
+      "exclusive": true
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-02-01",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "poster-007-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 999,
+        "stock": 9,
+        "sku": "POSTER-007-1218",
+        "variantId": "poster-007-var-12x18"
+      },
+      {
+        "id": "poster-007-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1499,
+        "stock": 9,
+        "sku": "POSTER-007-1824",
+        "variantId": "poster-007-var-18x24"
+      },
+      {
+        "id": "poster-007-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1699,
+        "stock": 4,
+        "sku": "POSTER-007-PRT-01-LARGE",
+        "variantId": "poster-007-var-2436"
+      }
+    ]
   },
   {
     "id": "batman-001",
+    "sku": "BATMAN-001-PRT-01",
+    "slug": "batman-001",
     "name": "Batman Neon",
-    "image": "images/batmanneon.jpg",
-    "category": "DC",
-    "company": "DC Comics",
-    "description": "Dark Knight rises - Neon Batman poster",
-    "price": 999,
-    "originalPrice": 1299,
-    "stock": 20,
-    "stars": 4.7,
-    "featured": true,
-    "tags": ["bestseller", "trending"],
-    "orientation": "portrait",
-    "shape": "rectangle",
-    "quantity": 20,
-    "rating": 4.7,
-    "color": "black",
+    "subtitle": "Batman Neon Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "DC Comics",
+    "category": {
+      "main": "DC",
+      "subCategory": "Batman Neon",
+      "collection": "DC Metal Prints"
+    },
+    "description": {
+      "short": "Dark Knight rises - Neon Batman poster",
+      "full": "Dark Knight rises - Neon Batman poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/batmanneon.jpg",
+      "thumbnail": "images/batmanneon.jpg",
+      "gallery": [
+        "images/batmanneon.jpg",
+        "images/batmanneon.jpg",
+        "images/batmanneon.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 999,
+      "compareAtPrice": 1299,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 20,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 20
+    },
+    "variants": [
+      {
+        "id": "batman-001-var-12x18",
+        "sku": "BATMAN-001-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 999,
+        "stock": 10
+      },
+      {
+        "id": "batman-001-var-18x24",
+        "sku": "BATMAN-001-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1499,
+        "stock": 10
+      },
+      {
+        "id": "batman-001-var-2436",
+        "sku": "BATMAN-001-PRT-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1699,
+        "stock": 5
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Portrait",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "DC",
+      "character": "Batman Neon",
+      "theme": "Superhero",
+      "material": "Metal",
+      "orientation": "Portrait"
+    },
+    "filters": {
+      "theme": [
+        "Superhero",
+        "Comic"
+      ],
+      "character": [
+        "Batman Neon"
+      ],
+      "colorPalette": [
+        "Black"
+      ],
+      "roomType": [
+        "Bedroom",
+        "Gaming Setup"
+      ],
+      "style": [
+        "Minimal",
+        "DC"
+      ]
+    },
+    "badges": [
+      "Bestseller",
+      "Trending"
+    ],
+    "ratings": {
+      "average": 4.7,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [],
-    "createdAt": "2024-02-01"
+    "metrics": {
+      "salesCount": 2309,
+      "wishlistCount": 157,
+      "viewCount": 11391,
+      "cartAdds": 309,
+      "conversionRate": 3.7
+    },
+    "socialProof": {
+      "currentlyViewing": 11,
+      "popularThisWeek": true,
+      "trendingScore": 77
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Batman Neon | Poster Town",
+      "metaDescription": "Dark Knight rises - Neon Batman poster",
+      "keywords": [
+        "batman neon poster",
+        "dc metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "movie-001",
+        "car-001"
+      ],
+      "frequentlyBoughtTogether": [
+        "poster-006",
+        "poster-007"
+      ]
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": false,
+      "exclusive": true
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-02-01",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "batman-001-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 999,
+        "stock": 10,
+        "sku": "BATMAN-001-1218",
+        "variantId": "batman-001-var-12x18"
+      },
+      {
+        "id": "batman-001-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1499,
+        "stock": 10,
+        "sku": "BATMAN-001-1824",
+        "variantId": "batman-001-var-18x24"
+      },
+      {
+        "id": "batman-001-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1699,
+        "stock": 5,
+        "sku": "BATMAN-001-PRT-01-LARGE",
+        "variantId": "batman-001-var-2436"
+      }
+    ]
   },
   {
     "id": "deadpool-001",
+    "sku": "DEADPOOL-001-PRT-01",
+    "slug": "deadpool-001",
     "name": "Deadpool",
-    "image": "images/deadpool.jpg",
-    "category": "Marvel",
-    "company": "Marvel Comics",
-    "description": "Deadpool Merc with a Mouth poster",
-    "price": 999,
-    "originalPrice": 1299,
-    "stock": 25,
-    "stars": 4.8,
-    "featured": true,
-    "tags": ["bestseller", "new"],
-    "orientation": "portrait",
-    "shape": "rectangle",
-    "quantity": 25,
-    "rating": 4.8,
-    "color": "red",
+    "subtitle": "Deadpool Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "Marvel Comics",
+    "category": {
+      "main": "Marvel",
+      "subCategory": "Deadpool",
+      "collection": "Marvel Metal Prints"
+    },
+    "description": {
+      "short": "Deadpool Merc with a Mouth poster",
+      "full": "Deadpool Merc with a Mouth poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/deadpool.jpg",
+      "thumbnail": "images/deadpool.jpg",
+      "gallery": [
+        "images/deadpool.jpg",
+        "images/deadpool.jpg",
+        "images/deadpool.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 999,
+      "compareAtPrice": 1299,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 25,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 25
+    },
+    "variants": [
+      {
+        "id": "deadpool-001-var-12x18",
+        "sku": "DEADPOOL-001-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 999,
+        "stock": 13
+      },
+      {
+        "id": "deadpool-001-var-18x24",
+        "sku": "DEADPOOL-001-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1499,
+        "stock": 12
+      },
+      {
+        "id": "deadpool-001-var-2436",
+        "sku": "DEADPOOL-001-PRT-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1699,
+        "stock": 6
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Portrait",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Marvel",
+      "character": "Deadpool",
+      "theme": "Superhero",
+      "material": "Metal",
+      "orientation": "Portrait"
+    },
+    "filters": {
+      "theme": [
+        "Superhero",
+        "Action"
+      ],
+      "character": [
+        "Deadpool"
+      ],
+      "colorPalette": [
+        "Red"
+      ],
+      "roomType": [
+        "Bedroom",
+        "Gaming Setup"
+      ],
+      "style": [
+        "Minimal",
+        "Marvel"
+      ]
+    },
+    "badges": [
+      "Bestseller",
+      "New"
+    ],
+    "ratings": {
+      "average": 4.8,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [],
-    "createdAt": "2024-02-01"
+    "metrics": {
+      "salesCount": 2496,
+      "wishlistCount": 168,
+      "viewCount": 12304,
+      "cartAdds": 336,
+      "conversionRate": 2.8
+    },
+    "socialProof": {
+      "currentlyViewing": 12,
+      "popularThisWeek": true,
+      "trendingScore": 78
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Deadpool | Poster Town",
+      "metaDescription": "Deadpool Merc with a Mouth poster",
+      "keywords": [
+        "deadpool poster",
+        "marvel metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "car-001",
+        "games-001"
+      ],
+      "frequentlyBoughtTogether": [
+        "poster-007",
+        "batman-001"
+      ]
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": true,
+      "exclusive": true
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-02-01",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "deadpool-001-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 999,
+        "stock": 13,
+        "sku": "DEADPOOL-001-1218",
+        "variantId": "deadpool-001-var-12x18"
+      },
+      {
+        "id": "deadpool-001-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1499,
+        "stock": 12,
+        "sku": "DEADPOOL-001-1824",
+        "variantId": "deadpool-001-var-18x24"
+      },
+      {
+        "id": "deadpool-001-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1699,
+        "stock": 6,
+        "sku": "DEADPOOL-001-PRT-01-LARGE",
+        "variantId": "deadpool-001-var-2436"
+      }
+    ]
   },
   {
     "id": "movie-001",
+    "sku": "MOVIE-001-PRT-01",
+    "slug": "movie-001",
     "name": "Optimus Prime",
-    "image": "images/optimusprime.jpg",
-    "category": "Movie",
-    "company": "Transformers",
-    "description": "Transformers Optimus Prime poster",
-    "price": 999,
-    "stock": 12,
-    "stars": 4.9,
-    "featured": true,
-    "tags": ["bestseller"],
-    "orientation": "portrait",
-    "shape": "rectangle",
-    "quantity": 12,
-    "rating": 4.9,
-    "color": "blue",
+    "subtitle": "Optimus Prime Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "Transformers",
+    "category": {
+      "main": "Movie",
+      "subCategory": "Optimus Prime",
+      "collection": "Movie Metal Prints"
+    },
+    "description": {
+      "short": "Transformers Optimus Prime poster",
+      "full": "Transformers Optimus Prime poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/optimusprime.jpg",
+      "thumbnail": "images/optimusprime.jpg",
+      "gallery": [
+        "images/optimusprime.jpg",
+        "images/optimusprime.jpg",
+        "images/optimusprime.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 999,
+      "compareAtPrice": 1299,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 12,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 12
+    },
+    "variants": [
+      {
+        "id": "movie-001-var-12x18",
+        "sku": "MOVIE-001-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 999,
+        "stock": 6
+      },
+      {
+        "id": "movie-001-var-18x24",
+        "sku": "MOVIE-001-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1499,
+        "stock": 6
+      },
+      {
+        "id": "movie-001-var-2436",
+        "sku": "MOVIE-001-PRT-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1699,
+        "stock": 3
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Portrait",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Movie",
+      "character": "Optimus Prime",
+      "theme": "Cinematic",
+      "material": "Metal",
+      "orientation": "Portrait"
+    },
+    "filters": {
+      "theme": [
+        "Cinematic",
+        "Sci-Fi"
+      ],
+      "character": [
+        "Optimus Prime"
+      ],
+      "colorPalette": [
+        "Blue"
+      ],
+      "roomType": [
+        "Bedroom",
+        "Gaming Setup"
+      ],
+      "style": [
+        "Minimal",
+        "Movie"
+      ]
+    },
+    "badges": [
+      "Bestseller"
+    ],
+    "ratings": {
+      "average": 4.9,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [],
-    "createdAt": "2024-01-15"
+    "metrics": {
+      "salesCount": 2683,
+      "wishlistCount": 179,
+      "viewCount": 13217,
+      "cartAdds": 363,
+      "conversionRate": 3.1
+    },
+    "socialProof": {
+      "currentlyViewing": 13,
+      "popularThisWeek": true,
+      "trendingScore": 79
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Optimus Prime | Poster Town",
+      "metaDescription": "Transformers Optimus Prime poster",
+      "keywords": [
+        "optimus prime poster",
+        "movie metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [
+        "games-001"
+      ],
+      "frequentlyBoughtTogether": [
+        "batman-001",
+        "deadpool-001"
+      ]
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": false,
+      "exclusive": true
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-01-15",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "movie-001-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 999,
+        "stock": 6,
+        "sku": "MOVIE-001-1218",
+        "variantId": "movie-001-var-12x18"
+      },
+      {
+        "id": "movie-001-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1499,
+        "stock": 6,
+        "sku": "MOVIE-001-1824",
+        "variantId": "movie-001-var-18x24"
+      },
+      {
+        "id": "movie-001-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1699,
+        "stock": 3,
+        "sku": "MOVIE-001-PRT-01-LARGE",
+        "variantId": "movie-001-var-2436"
+      }
+    ]
   },
   {
     "id": "car-001",
+    "sku": "CAR-001-LND-01",
+    "slug": "car-001",
     "name": "GT3 RS",
-    "image": "images/gt3rswhite.jpg",
-    "category": "Car",
-    "company": "Porsche",
-    "description": "Porsche GT3 RS poster",
-    "price": 999,
-    "stock": 8,
-    "stars": 4.8,
-    "featured": true,
-    "tags": ["new"],
-    "orientation": "landscape",
-    "shape": "rectangle",
-    "quantity": 8,
-    "rating": 4.8,
-    "color": "white",
+    "subtitle": "GT3 RS Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "Porsche",
+    "category": {
+      "main": "Car",
+      "subCategory": "GT3 RS",
+      "collection": "Car Metal Prints"
+    },
+    "description": {
+      "short": "Porsche GT3 RS poster",
+      "full": "Porsche GT3 RS poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/gt3rswhite.jpg",
+      "thumbnail": "images/gt3rswhite.jpg",
+      "gallery": [
+        "images/gt3rswhite.jpg",
+        "images/gt3rswhite.jpg",
+        "images/gt3rswhite.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 999,
+      "compareAtPrice": 1299,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 8,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 8
+    },
+    "variants": [
+      {
+        "id": "car-001-var-12x18",
+        "sku": "CAR-001-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 999,
+        "stock": 4
+      },
+      {
+        "id": "car-001-var-18x24",
+        "sku": "CAR-001-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1499,
+        "stock": 4
+      },
+      {
+        "id": "car-001-var-2436",
+        "sku": "CAR-001-LND-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1699,
+        "stock": 2
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Landscape",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Car",
+      "character": "GT3 RS",
+      "theme": "Automotive",
+      "material": "Metal",
+      "orientation": "Landscape"
+    },
+    "filters": {
+      "theme": [
+        "Automotive",
+        "Performance"
+      ],
+      "character": [
+        "GT3 RS"
+      ],
+      "colorPalette": [
+        "White"
+      ],
+      "roomType": [
+        "Living Room",
+        "Entertainment Wall"
+      ],
+      "style": [
+        "Minimal",
+        "Car"
+      ]
+    },
+    "badges": [
+      "New"
+    ],
+    "ratings": {
+      "average": 4.8,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [],
-    "createdAt": "2024-02-01"
+    "metrics": {
+      "salesCount": 2870,
+      "wishlistCount": 190,
+      "viewCount": 14130,
+      "cartAdds": 390,
+      "conversionRate": 3.4
+    },
+    "socialProof": {
+      "currentlyViewing": 14,
+      "popularThisWeek": true,
+      "trendingScore": 80
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "GT3 RS | Poster Town",
+      "metaDescription": "Porsche GT3 RS poster",
+      "keywords": [
+        "gt3 rs poster",
+        "car metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [],
+      "frequentlyBoughtTogether": [
+        "deadpool-001",
+        "movie-001"
+      ]
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": true,
+      "exclusive": false
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-02-01",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "car-001-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 999,
+        "stock": 4,
+        "sku": "CAR-001-1218",
+        "variantId": "car-001-var-12x18"
+      },
+      {
+        "id": "car-001-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1499,
+        "stock": 4,
+        "sku": "CAR-001-1824",
+        "variantId": "car-001-var-18x24"
+      },
+      {
+        "id": "car-001-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1699,
+        "stock": 2,
+        "sku": "CAR-001-LND-01-LARGE",
+        "variantId": "car-001-var-2436"
+      }
+    ]
   },
   {
     "id": "games-001",
+    "sku": "GAMES-001-PRT-01",
+    "slug": "games-001",
     "name": "Modern Warfare 2",
-    "image": "images/mw2.jpg",
-    "category": "Games",
-    "company": "Call of Duty",
-    "description": "Call of Duty Modern Warfare 2 poster",
-    "price": 999,
-    "stock": 20,
-    "stars": 4.6,
-    "featured": true,
-    "tags": ["bestseller"],
-    "orientation": "portrait",
-    "shape": "rectangle",
-    "quantity": 20,
-    "rating": 4.6,
-    "color": "black",
+    "subtitle": "Modern Warfare 2 Premium Wall Art",
+    "brand": "Poster Town",
+    "vendor": "Call of Duty",
+    "category": {
+      "main": "Games",
+      "subCategory": "Modern Warfare 2",
+      "collection": "Gaming Metal Prints"
+    },
+    "description": {
+      "short": "Call of Duty Modern Warfare 2 poster",
+      "full": "Call of Duty Modern Warfare 2 poster printed on rust-resistant galvanized metal with vivid UV artwork and wall-ready finishing.",
+      "features": [
+        "Premium HD metal print",
+        "Fade resistant UV artwork",
+        "Scratch resistant coating",
+        "Waterproof & rust resistant",
+        "Easy wall mounting"
+      ]
+    },
+    "media": {
+      "featuredImage": "images/mw2.jpg",
+      "thumbnail": "images/mw2.jpg",
+      "gallery": [
+        "images/mw2.jpg",
+        "images/mw2.jpg",
+        "images/mw2.jpg"
+      ],
+      "video": ""
+    },
+    "pricing": {
+      "price": 999,
+      "compareAtPrice": 1299,
+      "currency": "INR",
+      "discountPercent": 23,
+      "taxInclusive": true
+    },
+    "inventory": {
+      "stock": 20,
+      "trackInventory": true,
+      "lowStockThreshold": 5,
+      "allowBackorders": false,
+      "status": "in_stock"
+    },
+    "urgency": {
+      "lowStock": false,
+      "stockLeft": 20
+    },
+    "variants": [
+      {
+        "id": "games-001-var-12x18",
+        "sku": "GAMES-001-1218",
+        "size": "12x9",
+        "sizeType": "Small",
+        "price": 999,
+        "stock": 10
+      },
+      {
+        "id": "games-001-var-18x24",
+        "sku": "GAMES-001-1824",
+        "size": "15.8x12",
+        "sizeType": "Medium",
+        "price": 1499,
+        "stock": 10
+      },
+      {
+        "id": "games-001-var-2436",
+        "sku": "GAMES-001-PRT-01-LARGE",
+        "size": "24x18",
+        "sizeType": "Large",
+        "price": 1699,
+        "stock": 5
+      }
+    ],
+    "specifications": {
+      "material": "Galvanized Metal",
+      "finish": "Matte",
+      "orientation": "Portrait",
+      "shape": "Rectangle",
+      "thickness": "1.2mm",
+      "weight": "450g",
+      "mountType": "Magnetic"
+    },
+    "productAttributes": {
+      "waterproof": true,
+      "rustResistant": true,
+      "scratchResistant": true,
+      "fadeResistant": true
+    },
+    "filterableAttributes": {
+      "animeSeries": "Games",
+      "character": "Modern Warfare 2",
+      "theme": "Gaming",
+      "material": "Metal",
+      "orientation": "Portrait"
+    },
+    "filters": {
+      "theme": [
+        "Gaming",
+        "Action"
+      ],
+      "character": [
+        "Modern Warfare 2"
+      ],
+      "colorPalette": [
+        "Black"
+      ],
+      "roomType": [
+        "Bedroom",
+        "Gaming Setup"
+      ],
+      "style": [
+        "Minimal",
+        "Games"
+      ]
+    },
+    "badges": [
+      "Bestseller"
+    ],
+    "ratings": {
+      "average": 4.6,
+      "count": 12,
+      "breakdown": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 9
+      }
+    },
     "reviews": [],
-    "createdAt": "2024-01-20"
+    "metrics": {
+      "salesCount": 3057,
+      "wishlistCount": 201,
+      "viewCount": 15043,
+      "cartAdds": 417,
+      "conversionRate": 3.7
+    },
+    "socialProof": {
+      "currentlyViewing": 4,
+      "popularThisWeek": true,
+      "trendingScore": 81
+    },
+    "userState": {
+      "wishlisted": false,
+      "recentlyViewed": false,
+      "lastViewedAt": "2026-04-28T12:10:00Z"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "estimatedDelivery": "3-7 days",
+      "dispatchTime": "24-48 hours",
+      "codAvailable": true
+    },
+    "careInstructions": [
+      "Wipe with dry cloth",
+      "Avoid direct moisture"
+    ],
+    "seo": {
+      "metaTitle": "Modern Warfare 2 | Poster Town",
+      "metaDescription": "Call of Duty Modern Warfare 2 poster",
+      "keywords": [
+        "modern warfare 2 poster",
+        "games metal poster",
+        "wall art"
+      ]
+    },
+    "crossSell": {
+      "relatedProducts": [],
+      "frequentlyBoughtTogether": [
+        "movie-001",
+        "car-001"
+      ]
+    },
+    "flags": {
+      "featured": true,
+      "newArrival": false,
+      "exclusive": true
+    },
+    "compliance": {
+      "hsnCode": "49119100",
+      "taxClass": "GST18"
+    },
+    "createdAt": "2024-01-20",
+    "updatedAt": "2026-04-28",
+    "sizes": [
+      {
+        "id": "games-001-size-small",
+        "type": "Small",
+        "inches": "12 x 9",
+        "price": 999,
+        "stock": 10,
+        "sku": "GAMES-001-1218",
+        "variantId": "games-001-var-12x18"
+      },
+      {
+        "id": "games-001-size-medium",
+        "type": "Medium",
+        "inches": "15.8 x 12",
+        "price": 1499,
+        "stock": 10,
+        "sku": "GAMES-001-1824",
+        "variantId": "games-001-var-18x24"
+      },
+      {
+        "id": "games-001-size-large",
+        "type": "Large",
+        "inches": "24 x 18",
+        "price": 1699,
+        "stock": 5,
+        "sku": "GAMES-001-PRT-01-LARGE",
+        "variantId": "games-001-var-2436"
+      }
+    ]
   }
 ]

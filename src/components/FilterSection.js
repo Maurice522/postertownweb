@@ -4,7 +4,7 @@ import { useFilterContext } from "../context/filter_context";
 
 const FilterSection = () => {
   const {
-    filters: { text, categories, colors, price },
+    filters: { text, categories, colors, price, maxPrice },
     updateFilterValue,
     all_products,
     clearFilters,
@@ -124,15 +124,15 @@ const FilterSection = () => {
           <div className="price-box">
             <div className="price-top">
               <span className="price-value">Rs. {Number(price).toLocaleString("en-IN")}</span>
-              <span className="price-note">{price >= 5000 ? "and above" : "and below"}</span>
+              <span className="price-note">{price >= maxPrice ? "max range" : "and below"}</span>
             </div>
             <input
               type="range"
               name="price"
               min={100}
-              max={5000}
+              max={maxPrice || 5000}
               step="100"
-              value={price || 5000}
+              value={price || maxPrice || 5000}
               onChange={updateFilterValue}
             />
           </div>

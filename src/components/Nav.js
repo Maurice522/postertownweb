@@ -1,17 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { FiShoppingCart } from "react-icons/fi";
 import { CgMenuRight, CgClose } from "react-icons/cg";
 import { useCartContext } from "../context/cart_context";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useUserContext } from "../context/user_context";
 
 const Nav = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartAnimated, setCartAnimated] = useState(false);
   const { total_item } = useCartContext();
-  const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
+  const { logout, isAuthenticated, user } = useUserContext();
+  const previousTotalRef = useRef(total_item);
 
   const closeMenu = () => setMenuOpen(false);
+
+  useEffect(() => {
+    if (previousTotalRef.current === undefined) {
+      previousTotalRef.current = total_item;
+      return undefined;
+    }
+
+    if (Number(total_item) > Number(previousTotalRef.current)) {
+      setCartAnimated(true);
+      const timer = window.setTimeout(() => {
+        setCartAnimated(false);
+      }, 750);
+      previousTotalRef.current = total_item;
+      return () => window.clearTimeout(timer);
+    }
+
+    previousTotalRef.current = total_item;
+    return undefined;
+  }, [total_item]);
 
   return (
     <NavWrap>
@@ -33,8 +54,8 @@ const Nav = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/contact" className="navbar-link" onClick={closeMenu}>
-              Contact
+            <NavLink to="/orders" className="navbar-link" onClick={closeMenu}>
+              Orders
             </NavLink>
           </li>
         </ul>
@@ -55,18 +76,19 @@ const Nav = () => {
               Log out
             </button>
           ) : (
-            <button
-              type="button"
-              className="auth-button"
-              onClick={() => {
-                closeMenu();
-                loginWithRedirect();
-              }}>
+            <NavLink
+              to="/auth"
+              className="auth-button auth-link"
+              onClick={closeMenu}>
               Log in
-            </button>
+            </NavLink>
           )}
 
-          <NavLink to="/cart" className="cart-trolley--link" onClick={closeMenu} aria-label="Cart">
+          <NavLink
+            to="/cart"
+            className={cartAnimated ? "cart-trolley--link cart-bump" : "cart-trolley--link"}
+            onClick={closeMenu}
+            aria-label="Cart">
             <FiShoppingCart className="cart-trolley" />
             <span className="cart-total--item">{total_item || 0}</span>
           </NavLink>
@@ -147,6 +169,12 @@ const NavWrap = styled.nav`
     box-shadow: 0 14px 26px rgba(255, 92, 104, 0.2);
   }
 
+  .auth-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .auth-button:hover {
     transform: translateY(-1px);
     box-shadow: 0 18px 32px rgba(255, 92, 104, 0.26);
@@ -177,6 +205,10 @@ const NavWrap = styled.nav`
     background: rgba(255, 255, 255, 0.1);
   }
 
+  .cart-bump {
+    animation: cartPulse 0.72s ease;
+  }
+
   .cart-trolley {
     font-size: 2.4rem;
   }
@@ -198,6 +230,10 @@ const NavWrap = styled.nav`
     border: 2px solid rgba(32, 26, 24, 0.9);
   }
 
+  .cart-bump .cart-total--item {
+    animation: badgePop 0.72s ease;
+  }
+
   .mobile-navbar-btn {
     display: none;
     width: 4.8rem;
@@ -211,6 +247,39 @@ const NavWrap = styled.nav`
 
   .mobile-nav-icon {
     font-size: 2.8rem;
+  }
+
+  @keyframes cartPulse {
+    0% {
+      transform: scale(1);
+    }
+
+    28% {
+      transform: scale(1.14) rotate(-6deg);
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    54% {
+      transform: scale(0.95) rotate(4deg);
+    }
+
+    100% {
+      transform: scale(1) rotate(0deg);
+    }
+  }
+
+  @keyframes badgePop {
+    0% {
+      transform: scale(1);
+    }
+
+    30% {
+      transform: scale(1.25);
+    }
+
+    100% {
+      transform: scale(1);
+    }
   }
 
   @media (max-width: ${({ theme }) => theme.media.tab}) {

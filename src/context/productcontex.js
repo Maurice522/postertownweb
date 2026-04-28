@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useReducer } from "react";
 import axios from "axios";
 import reducer from "../reducer/productReducer";
 import localProducts from "../data/products.json";
+import { normalizeProducts } from "../utils/productHelpers";
 
 const AppContext = createContext();
 
@@ -20,7 +21,7 @@ const AppProvider = ({ children }) => {
   const getProducts = async () => {
     dispatch({ type: "SET_LOADING" });
     try {
-      dispatch({ type: "SET_API_DATA", payload: localProducts });
+      dispatch({ type: "SET_API_DATA", payload: normalizeProducts(localProducts) });
     } catch (error) {
       dispatch({ type: "API_ERROR" });
     }

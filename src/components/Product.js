@@ -1,38 +1,45 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import FormatPrice from "../Helpers/FormatPrice";
 import { useCartContext } from "../context/cart_context";
 import { FiShoppingCart, FiShoppingBag } from "react-icons/fi";
-
-const normalizeImagePath = (path) => {
-  if (!path) {
-    return "";
-  }
-
-  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
-    return path;
-  }
-
-  return `/${path}`;
-};
+import { normalizeProduct } from "../utils/productHelpers";
 
 const Product = (curElem) => {
-  const { id, name, image, price, category, stock = 10, color, cardStyle = "portrait" } = curElem;
+  const normalizedProduct = normalizeProduct(curElem);
+  const { id, name, image, price, category, stock = 10, color, cardStyle = "portrait" } = normalizedProduct;
   const { addToCart } = useCartContext();
   const navigate = useNavigate();
-  const imageUrl = normalizeImagePath(image);
+  const imageUrl = image;
+  const [isAdding, setIsAdding] = useState(false);
+  const defaultSize = normalizedProduct.sizes?.[0]?.type || "Small";
+  const addToCartWords = useMemo(() => ["Add", "to", "Cart"], []);
 
   const cartPayload = {
-    ...curElem,
+    ...normalizedProduct,
     image: [{ url: imageUrl, filename: name }],
-    colors: [color || "#212121"],
+    colors: normalizedProduct.colors?.length ? normalizedProduct.colors : [color || "#212121"],
     stock,
+    selectedSize: defaultSize,
   };
+
+  useEffect(() => {
+    if (!isAdding) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      setIsAdding(false);
+    }, 1050);
+
+    return () => window.clearTimeout(timer);
+  }, [isAdding]);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsAdding(true);
     addToCart(id, color || "#212121", 1, cartPayload);
   };
 
@@ -62,9 +69,18 @@ const Product = (curElem) => {
           <p className="sub-copy">Premium wall-ready print with a clean finish and bold detail.</p>
 
           <div className="card-actions">
-            <button className="card-btn secondary" onClick={handleAddToCart}>
-              <FiShoppingCart />
-              Add to Cart
+            <button className={isAdding ? "card-btn secondary is-adding" : "card-btn secondary"} onClick={handleAddToCart}>
+              <span className="btn-icon-wrap" aria-hidden="true">
+                <FiShoppingCart className="btn-icon trail-icon" />
+                <FiShoppingCart className="btn-icon moving-icon" />
+              </span>
+              <span className="btn-label" aria-label="Add to Cart">
+                {addToCartWords.map((word) => (
+                  <span key={word} className="btn-word">
+                    {word}
+                  </span>
+                ))}
+              </span>
             </button>
             <button className="card-btn primary" onClick={handleBuyNow}>
               <FiShoppingBag />
@@ -195,6 +211,8 @@ const CardLink = styled(NavLink)`
     font-size: 1.25rem;
     font-weight: 600;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
   }
 
   .card-btn:hover {
@@ -208,9 +226,92 @@ const CardLink = styled(NavLink)`
     border: 1px solid #dcc7b2;
   }
 
+  .btn-icon-wrap {
+    position: relative;
+    width: 1.8rem;
+    height: 1.8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .btn-icon {
+    font-size: 1.45rem;
+  }
+
+  .moving-icon {
+    position: absolute;
+    left: 0;
+    opacity: 0;
+  }
+
+  .btn-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 8.8rem;
+    justify-content: center;
+  }
+
+  .btn-word {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .is-adding .moving-icon {
+    animation: buttonCartSweep 0.95s ease forwards;
+  }
+
+  .is-adding .trail-icon {
+    opacity: 0.15;
+  }
+
+  .is-adding .btn-word:nth-child(1) {
+    animation: wordFadeAway 0.22s ease forwards;
+    animation-delay: 0.08s;
+  }
+
+  .is-adding .btn-word:nth-child(2) {
+    animation: wordFadeAway 0.22s ease forwards;
+    animation-delay: 0.18s;
+  }
+
+  .is-adding .btn-word:nth-child(3) {
+    animation: wordFadeAway 0.22s ease forwards;
+    animation-delay: 0.28s;
+  }
+
   .card-btn.primary {
     background: linear-gradient(135deg, #231f20 0%, #49372f 100%);
     color: #fff;
+  }
+
+  @keyframes buttonCartSweep {
+    0% {
+      transform: translateX(-0.2rem) scale(0.9);
+      opacity: 0;
+    }
+
+    18% {
+      opacity: 1;
+    }
+
+    55% {
+      transform: translateX(4.8rem) scale(1);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateX(8.8rem) scale(0.92);
+      opacity: 0;
+    }
+  }
+
+  @keyframes wordFadeAway {
+    to {
+      opacity: 0;
+      transform: translateY(-0.6rem);
+    }
   }
 
   @media (max-width: ${({ theme }) => theme.media.mobile}) {

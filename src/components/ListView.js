@@ -1,25 +1,15 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import FormatPrice from "../Helpers/FormatPrice";
-
-const normalizeImagePath = (path) => {
-  if (!path) {
-    return "";
-  }
-
-  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
-    return path;
-  }
-
-  return `/${path}`;
-};
+import { normalizeProduct } from "../utils/productHelpers";
 
 const ListView = ({ products }) => {
   return (
     <Wrapper>
       <div className="list-grid">
         {products.map((curElem) => {
-          const { id, name, image, price, description, category } = curElem;
+          const normalizedProduct = normalizeProduct(curElem);
+          const { id, name, image, price, description, category } = normalizedProduct;
           const teaser = (description || "Premium wall-ready poster with a bold finish.")
             .slice(0, 120)
             .trim();
@@ -28,7 +18,7 @@ const ListView = ({ products }) => {
             <Link key={id} to={`/singleproduct/${id}`} className="list-card">
               <div className="list-image-shell">
                 <span className="category-badge">{category}</span>
-                <img src={normalizeImagePath(image)} alt={name} />
+                <img src={image} alt={name} />
               </div>
 
               <div className="list-copy">

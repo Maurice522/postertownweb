@@ -4,16 +4,18 @@ const cartReducer = (state, action) => {
     const productImage = Array.isArray(product.image)
       ? product.image[0]?.url
       : product.image;
+    const productVariant = product.selectedSize || color || "default";
+    const itemKey = `${id}-${productVariant}`;
 
     // tackle the existing product
 
     let existingProduct = state.cart.find(
-      (curItem) => curItem.id === id + color
+      (curItem) => curItem.id === itemKey
     );
 
     if (existingProduct) {
       let updatedProduct = state.cart.map((curElem) => {
-        if (curElem.id === id + color) {
+        if (curElem.id === itemKey) {
           let newAmount = curElem.amount + amount;
 
           if (newAmount >= curElem.max) {
@@ -33,12 +35,19 @@ const cartReducer = (state, action) => {
       };
     } else {
       let cartProduct = {
-        id: id + color,
+        id: itemKey,
+        productId: id,
         name: product.name,
+        subtitle: product.subtitle || product.descriptionInfo?.short || "",
+        category: product.category || product.categoryInfo?.main || "",
         color,
+        size: product.selectedSize || null,
         amount,
         image: productImage,
         price: product.price,
+        originalPrice: product.originalPrice || product.pricing?.compareAtPrice || product.price,
+        badges: product.badges || product.tags || [],
+        rating: product.rating || product.stars || product.ratings?.average || 0,
         max: product.stock,
       };
 

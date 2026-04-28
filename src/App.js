@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import About from "./About";
 import Home from "./Home";
 import Products from "./Products";
-import Contact from "./Contact";
+import Orders from "./Orders";
 import Cart from "./Cart";
+import Auth from "./Auth";
 import SingleProduct from "./SingleProduct";
 import ErrorPage from "./ErrorPage";
 import { GlobalStyle } from "./GlobalStyle";
@@ -65,7 +66,9 @@ const App = () => {
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/products" element={<Products />} />
-                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/contact" element={<Orders />} />
+                  <Route path="/auth" element={<Auth />} />
                   <Route path="/singleproduct/:id" element={<SingleProduct />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="*" element={<ErrorPage />} />

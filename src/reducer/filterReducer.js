@@ -1,10 +1,19 @@
 const filterReducer = (state, action) => {
   switch (action.type) {
     case "LOAD_FILTER_PRODUCTS":
+      const maxPrice = action.payload.reduce((max, product) => {
+        return product.price > max ? product.price : max;
+      }, 0);
+
       return {
         ...state,
         filter_products: [...action.payload],
         all_products: [...action.payload],
+        filters: {
+          ...state.filters,
+          maxPrice,
+          price: maxPrice || state.filters.price,
+        },
       };
 
     case "SET_GRID_VIEW":
@@ -151,7 +160,7 @@ if (colors.length > 0) {
           text: "",
           categories: [],
           colors: [],
-          price: 5000,
+          price: state.filters.maxPrice,
         },
       };
 

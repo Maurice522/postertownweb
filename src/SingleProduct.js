@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { MdSecurity } from "react-icons/md";
 import { TbTruckDelivery, TbReplace } from "react-icons/tb";
 import PageNavigation from "./components/PageNavigation";
@@ -10,21 +10,15 @@ import FormatPrice from "./Helpers/FormatPrice";
 import Star from "./components/Star";
 import AddToCart from "./components/AddToCart";
 import localProducts from "./data/products.json";
+import { normalizeImagePath, normalizeProducts } from "./utils/productHelpers";
 
-const defaultSizes = ["Small", "Medium", "Large"];
+const defaultSizes = [
+  { label: "Small", dimensions: "12 x 9 inches" },
+  { label: "Medium", dimensions: "15.8 x 12 inches" },
+  { label: "Large", dimensions: "24 x 18 inches" },
+];
 const RECENTLY_VIEWED_KEY = "postertown_recently_viewed";
-
-const normalizeImagePath = (path) => {
-  if (!path) {
-    return "";
-  }
-
-  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
-    return path;
-  }
-
-  return `/${path}`;
-};
+const catalogProducts = normalizeProducts(localProducts);
 
 const getProductImages = (product) => {
   if (!product) {
@@ -118,23 +112,70 @@ const getStoredRecentIds = () => {
   return Array.isArray(parsed) ? parsed : [];
 };
 
+const waitForImage = (src) =>
+  new Promise((resolve) => {
+    if (typeof window === "undefined" || !src) {
+      resolve();
+      return;
+    }
+
+    const image = new window.Image();
+    image.onload = () => resolve();
+    image.onerror = () => resolve();
+    image.src = src;
+  });
+
 const SingleProduct = () => {
   const { id } = useParams();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState(defaultSizes[0]);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   useEffect(() => {
+    let isActive = true;
     setIsLoading(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     const matchedProduct =
-      localProducts.find((product) => String(product.id) === String(id)) || null;
+      catalogProducts.find((product) => String(product.id) === String(id)) || null;
 
-    setCurrentProduct(matchedProduct);
-    setSelectedSize(matchedProduct?.sizes?.[0] || defaultSizes[0]);
-    setIsLoading(false);
-  }, [id]);
+    const requestedSize = location.state?.selectedSize;
+    const matchedSize = matchedProduct?.sizes?.find(
+      (size) => size.type === requestedSize || `${size.inches} inches` === requestedSize || size.inches === requestedSize
+    );
+
+    const nextSelectedSize = matchedSize
+      ? {
+          label: matchedSize.type,
+          dimensions: `${matchedSize.inches} inches`,
+          price: matchedSize.price,
+        }
+      : matchedProduct?.sizes?.[0]
+      ? {
+          label: matchedProduct.sizes[0].type,
+          dimensions: `${matchedProduct.sizes[0].inches} inches`,
+          price: matchedProduct.sizes[0].price,
+        }
+      : defaultSizes[0];
+
+    const leadImage = getProductImages(matchedProduct)?.[0]?.url;
+
+    Promise.all([waitForImage(leadImage), new Promise((resolve) => setTimeout(resolve, 320))]).then(() => {
+      if (!isActive) {
+        return;
+      }
+
+      setCurrentProduct(matchedProduct);
+      setSelectedSize(nextSelectedSize);
+      setIsLoading(false);
+    });
+
+    return () => {
+      isActive = false;
+    };
+  }, [id, location.state]);
 
   useEffect(() => {
     if (!currentProduct || typeof window === "undefined") {
@@ -151,7 +192,7 @@ const SingleProduct = () => {
 
     const products = updatedIds
       .filter((productId) => productId !== currentProduct.id)
-      .map((productId) => localProducts.find((product) => product.id === productId))
+      .map((productId) => catalogProducts.find((product) => product.id === productId))
       .filter(Boolean)
       .slice(0, 4);
 
@@ -159,11 +200,28 @@ const SingleProduct = () => {
   }, [currentProduct]);
 
   if (isLoading) {
-    return <div className="page_loading">Loading...</div>;
+    return (
+      <Wrapper>
+        <div className="page_loading_shell">
+          <div className="page_loading">
+            <div className="loader-orb" />
+            <div className="loader-ring loader-ring-one" />
+            <div className="loader-ring loader-ring-two" />
+            <p>Loading poster details</p>
+          </div>
+        </div>
+      </Wrapper>
+    );
   }
 
   if (!currentProduct) {
-    return <div className="page_loading">Product not found.</div>;
+    return (
+      <Wrapper>
+        <div className="page_loading_shell">
+          <div className="page_loading page_loading_text_only">Product not found.</div>
+        </div>
+      </Wrapper>
+    );
   }
 
   const {
@@ -179,26 +237,29 @@ const SingleProduct = () => {
   const price = getProductPrice(currentProduct);
   const originalPrice = getProductOriginalPrice(currentProduct);
   const savings = originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
-  const sizes = currentProduct.sizes?.length ? currentProduct.sizes : defaultSizes;
+  const sizes = currentProduct.sizes?.length
+    ? currentProduct.sizes.map((size) => ({
+        label: size.type,
+        dimensions: `${size.inches} inches`,
+        price: size.price,
+      }))
+    : defaultSizes;
   const images = getProductImages(currentProduct);
   const colors = getProductColors(currentProduct);
   const reviewCount = Array.isArray(currentProduct.reviews)
     ? currentProduct.reviews.length
     : Number(currentProduct.reviews || 0);
   const ratingValue = Number(currentProduct.stars || currentProduct.rating || stars || 0);
-  const selectedSizeIndex = sizes.findIndex((size) => size === selectedSize);
-  const selectedSizeDimensions = ["12 x 9 inches", "15.8 x 12 inches", "24 x 18 inches"][
-    selectedSizeIndex >= 0 ? selectedSizeIndex : 0
-  ];
+  const selectedSizeDimensions = selectedSize?.dimensions || defaultSizes[0].dimensions;
   const cartReadyProduct = {
     ...currentProduct,
     colors,
     image: images,
   };
-  const recommendedProducts = localProducts
+  const recommendedProducts = catalogProducts
     .filter((product) => product.category === currentProduct.category && product.id !== currentProduct.id)
     .slice(0, 2);
-  const similarProducts = localProducts
+  const similarProducts = catalogProducts
     .filter((product) => product.id !== currentProduct.id)
     .map((product) => ({
       ...product,
@@ -281,30 +342,24 @@ const SingleProduct = () => {
                   <div className="size-options">
                     {sizes.map((size) => (
                       <button
-                        key={size}
+                        key={size.label}
                         type="button"
-                        className={selectedSize === size ? "size-chip active" : "size-chip"}
+                        className={selectedSize?.label === size.label ? "size-chip active" : "size-chip"}
                         onClick={() => setSelectedSize(size)}
                       >
-                        <span>{size}</span>
-                        <small>
-                          {size === "Small"
-                            ? "12 x 9"
-                            : size === "Medium"
-                            ? "15.8 x 12"
-                            : "24 x 18"}
-                        </small>
+                        <span>{size.label}</span>
+                        <small>{size.dimensions.replace(" inches", "")}</small>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {stock > 0 && <AddToCart product={{ ...cartReadyProduct, selectedSize }} />}
+                {stock > 0 && <AddToCart product={{ ...cartReadyProduct, selectedSize: selectedSize?.label }} />}
 
                 <div className="selected-spec">
                   <div className="spec-card">
                     <span>Selected size</span>
-                    <strong>{selectedSize}</strong>
+                    <strong>{selectedSize?.label}</strong>
                     <p>{selectedSizeDimensions}</p>
                   </div>
                   <div className="spec-card">
@@ -383,7 +438,7 @@ const SingleProduct = () => {
                     <li>Category: {category || "Anime Metal Prints"}</li>
                     <li>Brand: {company || "PosterTown"}</li>
                     <li>Finish: Premium matte / gloss look</li>
-                    <li>Selected size: {selectedSize}</li>
+                    <li>Selected size: {selectedSize?.label}</li>
                   </ul>
                 </details>
               </div>
@@ -453,7 +508,7 @@ const SingleProduct = () => {
                         <span>{review.date}</span>
                       </div>
                       <div className="review-rating">
-                        {"★".repeat(Math.max(1, Math.min(5, Math.round(review.rating || 0))))}
+                        {"*".repeat(Math.max(1, Math.min(5, Math.round(review.rating || 0))))}
                       </div>
                     </div>
                     <p>{review.comment}</p>
@@ -1349,11 +1404,63 @@ const Wrapper = styled.section`
   }
 
   .page_loading {
-    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.4rem;
+    text-align: center;
+    font-size: 2rem;
+    color: #3b312b;
+    position: relative;
+  }
+
+  .page_loading_shell {
+    min-height: calc(100vh - 18rem);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 3rem;
+    padding: 4rem 2.4rem 6rem;
+  }
+
+  .page_loading p {
+    font-size: 1.55rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7d6d61;
+  }
+
+  .page_loading_text_only {
+    font-size: 2.4rem;
+    font-weight: 700;
+  }
+
+  .loader-orb {
+    width: 7.6rem;
+    height: 7.6rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff7ef 0%, #f2c7a3 36%, #d86b35 68%, #8e3b1f 100%);
+    box-shadow: 0 18px 36px rgba(142, 59, 31, 0.24);
+    animation: pulseGlow 1.4s ease-in-out infinite;
+    position: relative;
+  }
+
+  .loader-ring {
+    position: absolute;
+    border: 1px solid rgba(216, 107, 53, 0.25);
+    border-radius: 999px;
+    animation: rippleOut 1.9s ease-out infinite;
+  }
+
+  .loader-ring-one {
+    width: 11rem;
+    height: 11rem;
+  }
+
+  .loader-ring-two {
+    width: 15rem;
+    height: 15rem;
+    animation-delay: 0.42s;
   }
 
   @keyframes pageRise {
@@ -1388,6 +1495,35 @@ const Wrapper = styled.section`
 
     50% {
       transform: translateY(-2px);
+    }
+  }
+
+  @keyframes pulseGlow {
+    0%,
+    100% {
+      transform: scale(1);
+      box-shadow: 0 18px 36px rgba(142, 59, 31, 0.24);
+    }
+
+    50% {
+      transform: scale(1.06);
+      box-shadow: 0 22px 42px rgba(142, 59, 31, 0.32);
+    }
+  }
+
+  @keyframes rippleOut {
+    0% {
+      opacity: 0;
+      transform: scale(0.72);
+    }
+
+    25% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      transform: scale(1.16);
     }
   }
 
@@ -1443,3 +1579,4 @@ const Wrapper = styled.section`
 `;
 
 export default SingleProduct;
+

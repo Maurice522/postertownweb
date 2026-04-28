@@ -266,6 +266,7 @@ const Wrapper = styled.section`
     display: flex;
     gap: 1rem;
     align-items: stretch;
+    padding: 0.4rem 0;
   }
 
   .thumb-scroll-btn {
@@ -293,9 +294,9 @@ const Wrapper = styled.section`
     grid-auto-columns: minmax(10rem, 13rem);
     gap: 1rem;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     width: 100%;
-    padding-bottom: 0.4rem;
+    padding: 0.4rem 0.2rem 0.8rem;
   }
 
   .grid::-webkit-scrollbar {
@@ -315,6 +316,7 @@ const Wrapper = styled.section`
     transition: border-color 0.2s ease, transform 0.25s ease, box-shadow 0.25s ease;
     text-align: left;
     cursor: pointer;
+    position: relative;
   }
 
   .thumb-frame span {
