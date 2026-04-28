@@ -22,6 +22,14 @@ const PAYMENT_STORAGE_KEY = "postertown_payment_info";
 const ORDERS_STORAGE_KEY = "postertown_orders";
 const UPI_ID = "mauricerana@okicici";
 const UPI_PAYEE = "Poster Town";
+const GST_RATE = 18;
+const emptyPaymentInfo = {
+  payerName: "",
+  transactionId: "",
+  screenshotName: "",
+  screenshotDataUrl: "",
+  note: "",
+};
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -40,13 +48,7 @@ const Cart = () => {
     state: "",
     pincode: "",
   });
-  const [paymentInfo, setPaymentInfo] = useState({
-    payerName: "",
-    transactionId: "",
-    screenshotName: "",
-    screenshotDataUrl: "",
-    note: "",
-  });
+  const [paymentInfo, setPaymentInfo] = useState(emptyPaymentInfo);
   const hasUserDetails = Boolean(isAuthenticated && (user?.name || user?.email));
   const hasAddress = Boolean(
     shippingInfo.addressLine1 &&
@@ -55,6 +57,8 @@ const Cart = () => {
       shippingInfo.pincode
   );
   const visibleShippingFee = hasAddress ? shipping_fee : 0;
+  const productSubtotalExGst = Math.round((total_price / (100 + GST_RATE)) * 100);
+  const gstAmount = Math.max(total_price - productSubtotalExGst, 0);
   const orderTotal = total_price + visibleShippingFee;
   const canCheckout = hasAddress;
   const shippingRecipient = shippingInfo.fullName || user?.name || "Shipping address";
@@ -211,6 +215,8 @@ const Cart = () => {
         ...item,
       })),
       totals: {
+        subtotalExGst: productSubtotalExGst,
+        gst: gstAmount,
         subtotal: total_price,
         shipping: visibleShippingFee,
         total: orderTotal,
@@ -229,11 +235,12 @@ const Cart = () => {
       const existingOrders = JSON.parse(window.localStorage.getItem(ORDERS_STORAGE_KEY) || "[]");
       const nextOrders = Array.isArray(existingOrders) ? [orderRecord, ...existingOrders] : [orderRecord];
       window.localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(nextOrders));
-      window.localStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(paymentInfo));
+      window.localStorage.removeItem(PAYMENT_STORAGE_KEY);
     }
 
     clearCart();
     setPlacedOrder(orderRecord);
+    setPaymentInfo(emptyPaymentInfo);
     setIsPaymentModalOpen(false);
   };
 
@@ -402,6 +409,18 @@ const Cart = () => {
                 <div>
                   <span>Subtotal</span>
                   <strong>
+                    <FormatPrice price={productSubtotalExGst} />
+                  </strong>
+                </div>
+                <div>
+                  <span>GST ({GST_RATE}%)</span>
+                  <strong>
+                    <FormatPrice price={gstAmount} />
+                  </strong>
+                </div>
+                <div>
+                  <span>Products total</span>
+                  <strong>
                     <FormatPrice price={total_price} />
                   </strong>
                 </div>
@@ -498,8 +517,7 @@ const Cart = () => {
                   <div className="verification-note">
                     <FiCheckCircle />
                     <span>
-                      Payment can be confirmed by matching the transaction ID, amount, and incoming credit
-                      received on <strong>{UPI_ID}</strong>.
+                      We use these details to confirm payment.
                     </span>
                   </div>
                 </div>
