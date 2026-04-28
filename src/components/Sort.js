@@ -4,44 +4,32 @@ import { BsFillGridFill, BsList } from "react-icons/bs";
 import { useFilterContext } from "../context/filter_context";
 
 const Sort = () => {
-  const { filter_products, grid_view, setGridView, setListView, sorting } =
-    useFilterContext();
+  const { filter_products, grid_view, setGridView, setListView, sorting } = useFilterContext();
+
   return (
-    <Wrapper className="sort-section">
-      {/* 1st column  */}
-      <div className="sorting-list--grid">
-        <button
-          className={grid_view ? "active sort-btn" : "sort-btn"}
-          onClick={setGridView}>
+    <Wrapper>
+      <div className="view-toggle">
+        <button className={grid_view ? "active sort-btn" : "sort-btn"} onClick={setGridView}>
           <BsFillGridFill className="icon" />
         </button>
 
-        <button
-          className={!grid_view ? "active sort-btn" : " sort-btn"}
-          onClick={setListView}>
+        <button className={!grid_view ? "active sort-btn" : "sort-btn"} onClick={setListView}>
           <BsList className="icon" />
         </button>
       </div>
-      {/* 2nd column  */}
-      <div className="product-data">
-        <p>{`${filter_products.length} Product Available`}</p>
+
+      <div className="result-copy">
+        <strong>{filter_products.length}</strong>
+        <span>products available</span>
       </div>
 
-      {/* 3rd column  */}
       <div className="sort-selection">
-        <form action="#">
-          <label htmlFor="sort"></label>
-          <select
-            name="sort"
-            id="sort"
-            className="sort-selection--style"
-            onChange={sorting}>
-            <option value="lowest">Price: Lowest First</option>
-            <option value="highest">Price: Highest First</option>
-            <option value="a-z">Name: A to Z</option>
-            <option value="z-a">Name: Z to A</option>
-          </select>
-        </form>
+        <select name="sort" id="sort" className="sort-selection--style" onChange={sorting}>
+          <option value="lowest">Price: Lowest First</option>
+          <option value="highest">Price: Highest First</option>
+          <option value="a-z">Name: A to Z</option>
+          <option value="z-a">Name: Z to A</option>
+        </select>
       </div>
     </Wrapper>
   );
@@ -51,69 +39,78 @@ const Wrapper = styled.section`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 5rem;
+  gap: 1.2rem;
   flex-wrap: wrap;
-  gap: 1rem;
+  background: rgba(255, 250, 243, 0.96);
+  border: 1px solid #eadfce;
+  border-radius: 1.8rem;
+  padding: 1.2rem 1.4rem;
+  box-shadow: 0 10px 22px rgba(61, 41, 22, 0.05);
 
-  .sorting-list--grid {
+  .view-toggle {
     display: flex;
-    gap: 0.5rem;
-
-    .sort-btn {
-      padding: 0.8rem 1rem;
-      border: 1px solid #ccc;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      background: transparent;
-      transition: all 0.3s;
-      &:hover {
-        background-color: #f0f0f0;
-        color: black;
-      }
-    }
-
-    .icon {
-      font-size: 1.6rem;
-    }
-    .active {
-      background-color: ${({ theme }) => theme.colors.btn};
-      color: #fff;
-      border-color: ${({ theme }) => theme.colors.btn};
-    }
+    gap: 0.6rem;
   }
 
-  .product-data {
-    flex: 1;
-    text-align: center;
-    p {
-      font-size: 1.4rem;
-      color: #666;
-    }
-  }
-
-  .sort-selection .sort-selection--style {
-    padding: 0.7rem 1.5rem;
+  .sort-btn {
+    width: 4.1rem;
+    height: 4.1rem;
+    border: 1px solid #dfd1c2;
+    border-radius: 1.2rem;
+    display: grid;
+    place-items: center;
     cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    background: white;
-    font-size: 1.4rem;
-    color: #333;
-    min-width: 180px;
-    transition: all 0.3s;
+    background: #fff;
+    transition: all 0.2s ease;
+  }
 
-    &:hover, &:focus {
-      border-color: ${({ theme }) => theme.colors.btn};
-      outline: none;
+  .sort-btn:hover,
+  .sort-btn.active {
+    background: #231f20;
+    color: #fff;
+    border-color: #231f20;
+  }
+
+  .icon {
+    font-size: 1.6rem;
+  }
+
+  .result-copy {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    color: #685d54;
+  }
+
+  .result-copy strong {
+    font-size: 1.9rem;
+    color: #231f20;
+  }
+
+  .sort-selection--style {
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    border: 1px solid #dfd1c2;
+    border-radius: 1.2rem;
+    background: #fff;
+    font-size: 1.35rem;
+    color: #2d241e;
+    min-width: 20rem;
+  }
+
+  .sort-selection--style:focus {
+    outline: none;
+    border-color: #cf6d3f;
+  }
+
+  @media (max-width: ${({ theme }) => theme.media.mobile}) {
+    .sort-selection,
+    .sort-selection--style {
+      width: 100%;
     }
 
-    .sort-select--option {
-      padding: 0.5rem 0;
-      cursor: pointer;
-      height: 2rem;
-      padding: 10px;
+    .sort-selection--style {
+      min-width: 0;
     }
   }
 `;

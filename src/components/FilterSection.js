@@ -1,10 +1,6 @@
 import styled from "styled-components";
+import { FiSearch, FiX } from "react-icons/fi";
 import { useFilterContext } from "../context/filter_context";
-import { FaCheck } from "react-icons/fa";
-import { FiSearch } from "react-icons/fi";
-import { FiX } from "react-icons/fi";
-import FormatPrice from "../Helpers/FormatPrice";
-import { Button } from "../styles/Button";
 
 const FilterSection = () => {
   const {
@@ -15,15 +11,13 @@ const FilterSection = () => {
   } = useFilterContext();
 
   const getUniqueData = (data, attr) => {
-    let newVal = data.map((curElem) => {
-      return curElem[attr];
-    });
+    let newVal = data.map((curElem) => curElem[attr]);
 
     if (attr === "colors") {
       newVal = newVal.flat();
     }
 
-    return (newVal = ["all", ...new Set(newVal)]);
+    return ["all", ...new Set(newVal)];
   };
 
   const categoryData = getUniqueData(all_products, "category");
@@ -31,343 +25,290 @@ const FilterSection = () => {
 
   return (
     <Wrapper>
-      <div className="filter-search">
-        <form onSubmit={(e) => e.preventDefault()}>
-          <input
-            type="text"
-            name="text"
-            placeholder="Search"
-            value={text}
-            onChange={updateFilterValue}
-          />
-          <button type="submit" className="search-btn">
-            <FiSearch />
+      <div className="filter-card">
+        <div className="filter-top">
+          <div>
+            <span className="eyebrow">Filter</span>
+            <h2>Refine Results</h2>
+          </div>
+          <button className="clear-btn" onClick={clearFilters}>
+            <FiX />
+            Reset
           </button>
-        </form>
-      </div>
-
-      <div className="filter-clear-top">
-        <button className="clear-btn" onClick={clearFilters}>
-          <FiX />
-          <span className="btn-text">Clear Filters</span>
-        </button>
-      </div>
-
-      <div className="filter-category">
-        <h3>Category</h3>
-        <div>
-          <button
-            type="button"
-            name="category"
-            value="all"
-            className={categories.length === 0 ? "active" : ""}
-            onClick={updateFilterValue}>
-            All
-          </button>
-          {categoryData.map((curElem, index) => {
-            if (curElem === "all") return null;
-            return (
-              <button
-                key={index}
-                type="button"
-                name="category"
-                value={curElem}
-                className={categories.includes(curElem) ? "active" : ""}
-                onClick={updateFilterValue}>
-                {curElem}
-              </button>
-            );
-          })}
         </div>
-      </div>
 
-      <div className="filter-colors colors">
-        <h3>Colors</h3>
-
-        <div className="filter-color-style">
-          <button
-            type="button"
-            value="all"
-            name="color"
-            className={colors.length === 0 ? "color-all--style active" : "color-all--style"}
-            onClick={updateFilterValue}>
-            <span className="color-dot" style={{ backgroundColor: "#888", border: "none" }}></span>
-            All
-          </button>
-          {colorData.map((curColor, index) => {
-            if (curColor === "all") return null;
-            const isWhite = curColor === "white";
-            return (
-              <button
-                key={index}
-                type="button"
-                value={curColor}
-                name="color"
-                title={curColor}
-                className={colors.includes(curColor) ? "active" : ""}
-                onClick={updateFilterValue}>
-                <span className="color-dot" style={{ backgroundColor: curColor, border: isWhite ? "1px solid #ccc" : "none" }}></span>
-                {curColor}
-              </button>
-            );
-          })}
+        <div className="filter-search">
+          <form onSubmit={(e) => e.preventDefault()}>
+            <input
+              type="text"
+              name="text"
+              placeholder="Search posters"
+              value={text}
+              onChange={updateFilterValue}
+            />
+            <button type="submit" className="search-btn">
+              <FiSearch />
+            </button>
+          </form>
         </div>
-      </div>
 
-      <div className="filter_price">
-        <h3>Price</h3>
-        <div className="price-input-group">
-          <span className="currency-symbol">₹</span>
-          <input
-            type="number"
-            name="price"
-            min={100}
-            max={5000}
-            step="100"
-            value={price}
-            onChange={updateFilterValue}
-            className="price-input"
-          />
-          <p>{price >= 5000 ? "and above" : "and below"}</p>
+        <div className="filter-group">
+          <h3>Category</h3>
+          <div className="chip-group">
+            <button
+              type="button"
+              name="category"
+              value="all"
+              className={categories.length === 0 ? "active" : ""}
+              onClick={updateFilterValue}
+            >
+              All
+            </button>
+            {categoryData.map((curElem, index) => {
+              if (curElem === "all") return null;
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  name="category"
+                  value={curElem}
+                  className={categories.includes(curElem) ? "active" : ""}
+                  onClick={updateFilterValue}
+                >
+                  {curElem}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <input
-          type="range"
-          name="price"
-          min={100}
-          max={5000}
-          step="100"
-          defaultValue={5000}
-          value={price || 5000}
-          onChange={updateFilterValue}
-        />
+
+        <div className="filter-group">
+          <h3>Colors</h3>
+          <div className="color-group">
+            <button
+              type="button"
+              value="all"
+              name="color"
+              className={colors.length === 0 ? "color-chip active" : "color-chip"}
+              onClick={updateFilterValue}
+            >
+              <span className="color-dot neutral" />
+              All
+            </button>
+            {colorData.map((curColor, index) => {
+              if (curColor === "all") return null;
+
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  value={curColor}
+                  name="color"
+                  title={curColor}
+                  className={colors.includes(curColor) ? "color-chip active" : "color-chip"}
+                  onClick={updateFilterValue}
+                >
+                  <span
+                    className={`color-dot ${curColor === "white" ? "is-white" : ""}`}
+                    style={{ backgroundColor: curColor }}
+                  />
+                  {curColor}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="filter-group">
+          <h3>Price</h3>
+          <div className="price-box">
+            <div className="price-top">
+              <span className="price-value">Rs. {Number(price).toLocaleString("en-IN")}</span>
+              <span className="price-note">{price >= 5000 ? "and above" : "and below"}</span>
+            </div>
+            <input
+              type="range"
+              name="price"
+              min={100}
+              max={5000}
+              step="100"
+              value={price || 5000}
+              onChange={updateFilterValue}
+            />
+          </div>
+        </div>
       </div>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.section`
-  padding: 4rem 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-
-  h3 {
-    padding: 1.5rem 0;
-    font-size: bold;
+  .filter-card {
+    background: rgba(255, 250, 243, 0.96);
+    border: 1px solid #eadfce;
+    border-radius: 2rem;
+    padding: 2rem 1.8rem;
+    box-shadow: 0 14px 28px rgba(61, 41, 22, 0.06);
   }
 
-  .filter-clear-top {
+  .filter-top {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+    margin-bottom: 1.8rem;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    background: #f8ebdc;
+    color: #8a5c43;
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+
+  h2 {
+    font-size: 2.4rem;
+    font-weight: 700;
+  }
+
+  .clear-btn {
+    border: none;
+    background: #fff;
+    color: #6f6258;
+    border: 1px solid #eadfce;
+    border-radius: 999px;
+    padding: 0.8rem 1.1rem;
+    display: inline-flex;
     align-items: center;
-    margin: 0.5rem 0;
-    
-    .clear-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 0.5rem 1rem;
-      border-radius: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1rem;
-      color: #666;
-      transition: all 0.2s;
-      
-      &:hover {
-        background: ${({ theme }) => theme.colors.btn};
-        color: white;
-      }
-      
-      .btn-text {
-        display: inline;
-      }
-    }
+    gap: 0.5rem;
+    cursor: pointer;
   }
 
   .filter-search {
+    margin-bottom: 1.8rem;
+
     form {
       display: flex;
       align-items: center;
       position: relative;
     }
-    
+
     input {
-      padding: 0.6rem 1rem;
       width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 0.5rem;
-      
-      &:focus {
-        outline: none;
-        border-color: ${({ theme }) => theme.colors.btn};
-      }
+      padding: 1.1rem 4.2rem 1.1rem 1.3rem;
+      border: 1px solid #dfd1c2;
+      border-radius: 1.4rem;
+      background: #fff;
+      box-shadow: none;
+      text-transform: none;
     }
-    
+
     .search-btn {
       position: absolute;
-      right: 8px;
-      background: none;
+      right: 1rem;
       border: none;
+      background: transparent;
       cursor: pointer;
-      padding: 0.3rem;
-      display: flex;
-      align-items: center;
-      font-size: 1.2rem;
-      color: #666;
-      
-      &:hover {
-        color: ${({ theme }) => theme.colors.btn};
-      }
+      color: #7a6c62;
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
     }
   }
 
-  .filter-category {
-    div {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-
-      button {
-        border: 1px solid #ccc;
-        background-color: transparent;
-        text-transform: capitalize;
-        cursor: pointer;
-        padding: 0.4rem 1rem;
-        border-radius: 1.5rem;
-        transition: all 0.2s;
-
-        &:hover {
-          background-color: #f0f0f0;
-          color: black;
-        }
-      }
-
-      .active {
-        background-color: ${({ theme }) => theme.colors.btn};
-        color: white;
-        border-color: ${({ theme }) => theme.colors.btn};
-      }
-    }
+  .filter-group + .filter-group {
+    margin-top: 1.8rem;
+    padding-top: 1.8rem;
+    border-top: 1px solid #efe4d8;
   }
 
-  .filter-color-style {
+  h3 {
+    font-size: 1.55rem;
+    margin-bottom: 1rem;
+  }
+
+  .chip-group,
+  .color-group {
     display: flex;
     flex-wrap: wrap;
     gap: 0.8rem;
   }
 
-  .color-all--style {
-    background-color: transparent;
-    text-transform: capitalize;
-    border: 1px solid #ccc;
-    padding: 0.4rem 1rem;
-    border-radius: 1.5rem;
+  .chip-group button,
+  .color-chip {
+    border: 1px solid #dfd1c2;
+    background: #fff;
+    color: #2d241e;
+    border-radius: 999px;
+    padding: 0.75rem 1.1rem;
     cursor: pointer;
-    transition: all 0.2s;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    &:hover {
-      background-color: #f0f0f0;
-    }
-
-    &.active {
-      background-color: ${({ theme }) => theme.colors.btn};
-      color: white;
-      border-color: ${({ theme }) => theme.colors.btn};
-    }
-  }
-  
-  button[name="color"] {
-    border: 1px solid #ccc;
-    background-color: transparent;
-    padding: 0.5rem 1.2rem;
-    border-radius: 1.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.1rem;
     text-transform: capitalize;
-
-    .color-dot {
-      width: 1.3rem;
-      height: 1.3rem;
-      border-radius: 50%;
-    }
-
-    &:hover {
-      background-color: #f0f0f0;
-    }
-
-    &.active {
-      background-color: ${({ theme }) => theme.colors.btn};
-      color: white;
-      border-color: ${({ theme }) => theme.colors.btn};
-    }
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
   }
 
-  .checkStyle {
-    font-size: 1rem;
+  .chip-group button:hover,
+  .color-chip:hover,
+  .chip-group .active,
+  .color-chip.active {
+    background: #231f20;
     color: #fff;
-    font-weight: bold;
-    text-shadow: 0 0 2px #000;
+    border-color: #231f20;
   }
 
-  .filter_price {
-    .price-input-group {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-      
-      .price-input {
-        padding: 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 0.5rem;
-        width: 120px;
-        font-size: 1.2rem;
-
-        &:focus {
-          outline: none;
-          border-color: ${({ theme }) => theme.colors.btn};
-        }
-      }
-      
-      .currency-symbol {
-        font-size: 1.4rem;
-        font-weight: bold;
-      }
-      
-      p {
-        font-size: 1.1rem;
-        color: #666;
-      }
-    }
-    
-    input[type="range"] {
-      margin: 0.5rem 0 1rem 0;
-      padding: 0;
-      box-shadow: none;
-      cursor: pointer;
-      width: 100%;
-    }
+  .color-dot {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    flex-shrink: 0;
   }
 
-  .filter-shipping {
+  .color-dot.neutral {
+    background: #7d7268;
+  }
+
+  .color-dot.is-white {
+    border-color: #c9b9a9;
+  }
+
+  .price-box {
+    background: #fff;
+    border: 1px solid #eadfce;
+    border-radius: 1.6rem;
+    padding: 1.3rem 1.2rem;
+  }
+
+  .price-top {
     display: flex;
-    align-items: center;
+    justify-content: space-between;
     gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
   }
 
-  .filter-clear .btn {
-    background-color: #ec7063;
-    color: #000;
+  .price-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #cf6d3f;
+  }
+
+  .price-note {
+    color: #84786d;
+    font-size: 1.2rem;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    padding: 0;
+    box-shadow: none;
+    cursor: pointer;
   }
 `;
 

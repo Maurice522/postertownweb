@@ -56,16 +56,16 @@ export const FilterContextProvider = ({ children }) => {
     dispatch({ type: "CLEAR_FILTERS" });
   };
 
-  // to sort the product
-  useEffect(() => {
-    dispatch({ type: "FILTER_PRODUCTS" });
-    dispatch({ type: "SORTING_PRODUCTS" });
-  }, [products, state.sorting_value, state.filters]);
-
   // to load all the products for grid and list view
   useEffect(() => {
     dispatch({ type: "LOAD_FILTER_PRODUCTS", payload: products });
   }, [products]);
+
+  // to sort the product
+  useEffect(() => {
+    dispatch({ type: "FILTER_PRODUCTS" });
+    dispatch({ type: "SORTING_PRODUCTS" });
+  }, [state.all_products, state.sorting_value, state.filters]);
 
   return (
     <FilterContext.Provider

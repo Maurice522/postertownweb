@@ -4,133 +4,33 @@ import Product from "./Product";
 
 const GridView = ({ products }) => {
   return (
-    <Wrapper className="section">
-      <div className="grid grid-three-column">
-        {products.map((curElem) => {
-          return <Product key={curElem.id} {...curElem} />;
-        })}
+    <Wrapper>
+      <div className="product-grid">
+        {products.map((curElem) => (
+          <Product key={curElem.id} {...curElem} />
+        ))}
       </div>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.section`
-  padding: 6rem 2rem;
-  width: 100%;
-  
-  .grid {
-    gap: 4.5rem;
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
   }
 
-  figure {
-    width: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.5s linear;
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 0%;
-      height: 100%;
-      transition: all 0.2s linear;
-      cursor: pointer;
-    }
-    &:hover::after {
-      width: 100%;
-    }
-    &:hover img {
-      transform: scale(1.2);
-    }
-    img {
-      max-width: 85%;
-      max-height: 420px;
-      margin-top: 1.5rem;
-      border-top-left-radius: 80px 80px;
-      transition: all 0.2s linear;
-    }
-
-    .caption {
-      box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
-      top: 15%;
-      right: 10%;
-      text-transform: uppercase;
-      background-color: ${({ theme }) => theme.colors.navbg};
-      color: ${({ theme }) => theme.colors.red};
-      padding: 0.8rem 2rem;
-      font-size: 1.2rem;
-      border-radius: 2rem;
+  @media (max-width: ${({ theme }) => theme.media.tab}) {
+    .product-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  .card {
-    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
-    background-color: ${({ theme }) => theme.colors.navbg};
-    border-radius: 2rem;
-    padding-bottom: 0.2rem;
-    padding-top: 1rem;
-
-    .card-data {
-      padding: 0 2rem;
-    }
-
-    .card-data-flex {
-      margin: 2rem 0 0.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    h3 {
-      color: white;
-      text-transform: capitalize;
-    }
-
-    .card-data--price {
-      color: ${({ theme }) => theme.colors.red};
-    }
-
-    .card-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-top: 0.8rem;
-      margin-bottom: 1.5rem;
-      justify-content: center;
-    }
-
-    .btn {
-      padding: 0.8rem 1.2rem;
-      border: 0.1rem solid rgb(98 84 243);
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 1.1rem;
-      text-transform: capitalize;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      &.add-to-cart {
-        background-color: white;
-        color: rgb(98 84 243);
-        &:hover {
-          background-color: rgb(98 84 243);
-          color: white;
-        }
-      }
-
-      &.buy-now {
-        background-color: rgb(98 84 243);
-        color: white;
-        &:hover {
-          background-color: white;
-          color: rgb(98 84 243);
-        }
-      }
+  @media (max-width: ${({ theme }) => theme.media.mobile}) {
+    .product-grid {
+      grid-template-columns: 1fr;
+      gap: 1.6rem;
     }
   }
 `;
