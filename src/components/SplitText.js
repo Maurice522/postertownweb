@@ -58,7 +58,7 @@ const SplitText = ({
     <p
       ref={ref}
       className={`split-parent ${className}`}
-      style={{ textAlign, overflow: 'hidden', display: 'inline', whiteSpace: 'normal', wordWrap: 'break-word', fontSize:"40px" }}
+      style={{ textAlign, overflow: 'hidden', display: 'inline', whiteSpace: 'normal', wordWrap: 'break-word' }}
     >
       {words.map((word, wordIndex) => (
         <span key={wordIndex} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
