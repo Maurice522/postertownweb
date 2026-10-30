@@ -2,8 +2,6 @@ import styled from "styled-components";
 import FeatureProduct from "./components/FeatureProduct";
 import HeroSection from "./components/HeroSection";
 import Services from "./components/Services";
-import Trending from "./components/Trending";
-import Trusted from "./components/Trusted";
 import HomeCollection from "./components/HomeCollection";
 import FeatureProductLandscape from "./components/FeatureProductLandscape";
 

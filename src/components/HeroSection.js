@@ -3,13 +3,9 @@ import styled from "styled-components";
 import { Button } from "../styles/Button";
 import SplitText from "./SplitText";
 import Magnet from './Magnet'
-import Aurora from './Aurora';
-import PixelCard from './PixelCard';
-import SpotlightCard from './SpotlightCard';
 import React, { useEffect, useRef } from 'react';
 
 const HeroSection = ({ myData }) => {
-  const { name } = myData;
 
   const handleAnimationComplete = () => {
     console.log('All letters have animated!');
@@ -89,7 +85,7 @@ const HeroSection = ({ myData }) => {
               <img
                 ref={imageRef}
                 src="images/rengokuext.jpg"
-                alt="hero-section-photo"
+                alt="Rengoku metal poster"
                 className="img-style hoverImage"
                 style={{width: "200%" , marginTop:"6%" , marginBottom: "8%"}}
               />

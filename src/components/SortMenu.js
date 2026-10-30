@@ -83,7 +83,6 @@ const SortMenu = ({ value, onChange }) => {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
-        aria-activedescendant={open ? `${listId}-${activeIndex}` : undefined}
         onClick={() => (open ? setOpen(false) : openMenu())}
         onKeyDown={handleKeyDown}>
         <SelectedIcon className="trigger-icon" aria-hidden="true" />
