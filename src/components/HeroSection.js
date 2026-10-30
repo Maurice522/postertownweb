@@ -119,6 +119,7 @@ const Wrapper = styled.section`
   .hero-tagline b {
     padding: 0 0.4rem;
     background: #ffff00;
+    font-family: inherit;
     color: #1d1d1d;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
@@ -133,14 +134,18 @@ const Wrapper = styled.section`
   }
 
   .hero-art {
+    display: flex;
+    justify-content: center;
     perspective: 500px;
   }
 
   .hero-image {
     display: block;
-    width: 100%;
-    aspect-ratio: 23 / 15;
+    width: min(100%, 52rem);
+    /* The artwork is portrait (about 3:4); trim only the bottom so the head stays in. */
+    aspect-ratio: 4 / 5;
     object-fit: cover;
+    object-position: top;
     border-radius: 1.2rem;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 40px 45px, rgba(0, 0, 0, 0.12) 0px -8px 24px, rgba(0, 0, 0, 0.12) 0px 4px 6px;
     transition: transform 0.1s ease-out;
@@ -184,6 +189,7 @@ const Wrapper = styled.section`
     }
 
     .hero-image {
+      width: 100%;
       box-shadow: rgba(0, 0, 0, 0.22) 0px 24px 30px, rgba(0, 0, 0, 0.1) 0px 4px 8px;
     }
   }
