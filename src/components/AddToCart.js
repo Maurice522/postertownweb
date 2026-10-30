@@ -212,23 +212,59 @@ const Wrapper = styled.section`
   }
 
   /* we can use it as a global one too  */
+  .cart-button {
+    margin: 2.4rem 0 1.4rem;
+  }
+
   .amount-toggle {
-    margin-top: 3rem;
-    margin-bottom: 1rem;
-    display: flex;
-    justify-content: space-around;
+    display: inline-flex;
     align-items: center;
-    font-size: 1.4rem;
+    gap: 0.4rem;
+    padding: 0.5rem;
+    border: 1px solid #dfd1c2;
+    border-radius: 999px;
+    background: #fff;
 
     button {
+      width: 4rem;
+      height: 4rem;
+      display: grid;
+      place-items: center;
       border: none;
-      background-color: #fff;
+      border-radius: 50%;
+      background: #f6eee4;
+      color: #231f20;
+      font-size: 1.3rem;
       cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: #ead9c6;
+    }
+
+    button:active {
+      transform: scale(0.94);
     }
 
     .amount-style {
-      font-size: 2.4rem;
-      color: ${({ theme }) => theme.colors.btn};
+      min-width: 4.4rem;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #231f20;
+    }
+
+    @media (max-width: ${({ theme }) => theme.media.mobile}) {
+      button {
+        width: 5rem;
+        height: 5rem;
+        font-size: 1.5rem;
+      }
+
+      .amount-style {
+        font-size: 2.2rem;
+      }
     }
   }
 
