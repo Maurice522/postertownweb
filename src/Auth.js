@@ -2,21 +2,58 @@ import { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FiArrowLeft, FiEye, FiEyeOff, FiLock, FiMail, FiUser } from "react-icons/fi";
+import { useCartContext } from "./context/cart_context";
 import { useUserContext } from "./context/user_context";
+import GoogleSignInButton from "./components/GoogleSignInButton";
+import { pickHeroGif } from "./data/heroGifs";
 
 const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, isLoading } = useUserContext();
+  const {
+    login,
+    loginWithGoogle,
+    startRegistration,
+    verifyRegistration,
+    requestPasswordReset,
+    resetPassword,
+    isLoading,
+    error,
+  } = useUserContext();
+  const { cart } = useCartContext();
+  const [welcomeGif] = useState(pickHeroGif);
   const [mode, setMode] = useState(location.state?.mode === "signup" ? "signup" : "login");
   const [showPassword, setShowPassword] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [devOtp, setDevOtp] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
+    otp: "",
+    newPassword: "",
   });
 
-  const redirectTo = useMemo(() => location.state?.redirectTo || "/", [location.state]);
+  const redirectTo = useMemo(
+    () => location.state?.redirectTo || (cart.length > 0 ? "/cart" : "/products"),
+    [cart.length, location.state]
+  );
+  const isOtpMode = mode === "verifySignup" || mode === "reset";
+  const isPasswordMode = mode === "login" || mode === "signup";
+  const heading = {
+    login: "Welcome back.",
+    signup: "Create your account.",
+    verifySignup: "Verify your email.",
+    forgot: "Reset your password.",
+    reset: "Create a new password.",
+  }[mode];
+  const intro = {
+    login: "Log in to keep your cart, shipping details, and checkout flow connected.",
+    signup: "Sign up and verify your email so checkout stays connected to your account.",
+    verifySignup: "Enter the OTP we sent to your email. Once verified, we will take you back to shopping or your cart.",
+    forgot: "Enter your account email and we will send a password reset OTP.",
+    reset: "Enter the reset OTP and choose a new password. We will log you in right after.",
+  }[mode];
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -26,16 +63,68 @@ const Auth = () => {
     }));
   };
 
+  const changeMode = (nextMode) => {
+    setMode(nextMode);
+    setNotice("");
+    setDevOtp("");
+  };
+
+  const handleAuthSuccess = () => {
+    navigate(redirectTo);
+  };
+
+  const handleGoogleCredential = async (credential) => {
+    setNotice("");
+    setDevOtp("");
+    try {
+      await loginWithGoogle(credential);
+      handleAuthSuccess();
+    } catch {
+      // The error is shown from the user context.
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setNotice("");
+    setDevOtp("");
 
-    if (mode === "login") {
-      await login(form.email, form.password);
-    } else {
-      await register(form.name, form.email, form.password);
+    try {
+      if (mode === "login") {
+        await login(form.email, form.password);
+        handleAuthSuccess();
+        return;
+      }
+
+      if (mode === "signup") {
+        const response = await startRegistration(form.name, form.email, form.password);
+        setNotice("We sent an OTP to your email.");
+        setDevOtp(response?.devOtp || "");
+        setMode("verifySignup");
+        return;
+      }
+
+      if (mode === "verifySignup") {
+        await verifyRegistration(form.email, form.otp);
+        handleAuthSuccess();
+        return;
+      }
+
+      if (mode === "forgot") {
+        const response = await requestPasswordReset(form.email);
+        setNotice("If this email exists, a reset OTP has been sent.");
+        setDevOtp(response?.devOtp || "");
+        setMode("reset");
+        return;
+      }
+
+      if (mode === "reset") {
+        await resetPassword(form.email, form.otp, form.newPassword);
+        handleAuthSuccess();
+      }
+    } catch {
+      setNotice("");
     }
-
-    navigate(redirectTo);
   };
 
   return (
@@ -49,17 +138,17 @@ const Auth = () => {
         <div className="auth-layout">
           <section className="auth-copy">
             <span className="eyebrow">Poster Town account</span>
-            <h1>{mode === "login" ? "Welcome back." : "Create your account."}</h1>
-            <p>
-              {mode === "login"
-                ? "Log in to keep your cart, shipping details, and checkout flow connected."
-                : "Sign up so you can save your details and move through checkout with less friction."}
-            </p>
+            <h1>{heading}</h1>
+            <p>{intro}</p>
 
             <div className="benefit-list">
               <span>Saved cart</span>
               <span>Faster checkout</span>
               <span>Shipping details ready</span>
+            </div>
+
+            <div className="auth-gif">
+              <img src={welcomeGif} alt="" loading="lazy" />
             </div>
           </section>
 
@@ -68,16 +157,28 @@ const Auth = () => {
               <button
                 type="button"
                 className={mode === "login" ? "mode-btn active" : "mode-btn"}
-                onClick={() => setMode("login")}>
+                onClick={() => changeMode("login")}>
                 Log in
               </button>
               <button
                 type="button"
                 className={mode === "signup" ? "mode-btn active" : "mode-btn"}
-                onClick={() => setMode("signup")}>
+                onClick={() => changeMode("signup")}>
                 Sign up
               </button>
             </div>
+
+            {isPasswordMode && process.env.REACT_APP_GOOGLE_CLIENT_ID ? (
+              <div className="social-login">
+                <GoogleSignInButton
+                  onCredential={handleGoogleCredential}
+                  text={mode === "signup" ? "signup_with" : "continue_with"}
+                />
+                <div className="auth-divider">
+                  <span>or use your email</span>
+                </div>
+              </div>
+            ) : null}
 
             <form className="auth-form" onSubmit={handleSubmit}>
               {mode === "signup" ? (
@@ -97,47 +198,143 @@ const Auth = () => {
                 </label>
               ) : null}
 
-              <label>
-                <span>Email</span>
-                <div className="field-shell">
-                  <FiMail />
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="you@example.com"
-                    required
-                  />
-                </div>
-              </label>
+              {mode !== "reset" ? (
+                <label>
+                  <span>Email</span>
+                  <div className="field-shell">
+                    <FiMail />
+                    <input
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="you@example.com"
+                      required
+                      readOnly={mode === "verifySignup"}
+                    />
+                  </div>
+                </label>
+              ) : (
+                <label>
+                  <span>Email</span>
+                  <div className="field-shell">
+                    <FiMail />
+                    <input
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="you@example.com"
+                      required
+                      readOnly={Boolean(form.email)}
+                    />
+                  </div>
+                </label>
+              )}
 
-              <label>
-                <span>Password</span>
-                <div className="field-shell">
-                  <FiLock />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Enter password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowPassword((current) => !current)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}>
-                    {showPassword ? <FiEyeOff /> : <FiEye />}
-                    <span>{showPassword ? "Hide" : "Show"}</span>
-                  </button>
-                </div>
-              </label>
+              {isOtpMode ? (
+                <label>
+                  <span>OTP</span>
+                  <div className="field-shell">
+                    <FiLock />
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      name="otp"
+                      value={form.otp}
+                      onChange={handleChange}
+                      placeholder="6 digit code"
+                      required
+                    />
+                  </div>
+                </label>
+              ) : null}
+
+              {isPasswordMode ? (
+                <label>
+                  <span>Password</span>
+                  <div className="field-shell">
+                    <FiLock />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={form.password}
+                      onChange={handleChange}
+                      placeholder="Enter password"
+                      minLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowPassword((current) => !current)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}>
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                      <span>{showPassword ? "Hide" : "Show"}</span>
+                    </button>
+                  </div>
+                </label>
+              ) : null}
+
+              {mode === "reset" ? (
+                <label>
+                  <span>New password</span>
+                  <div className="field-shell">
+                    <FiLock />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="newPassword"
+                      value={form.newPassword}
+                      onChange={handleChange}
+                      placeholder="New password"
+                      minLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowPassword((current) => !current)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}>
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                      <span>{showPassword ? "Hide" : "Show"}</span>
+                    </button>
+                  </div>
+                </label>
+              ) : null}
+
+              {notice ? <p className="auth-message">{notice}</p> : null}
+              {devOtp ? <p className="auth-message dev-otp">Development OTP: {devOtp}</p> : null}
+              {error ? <p className="auth-error">{error}</p> : null}
 
               <button type="submit" className="submit-btn" disabled={isLoading}>
-                {isLoading ? "Please wait..." : mode === "login" ? "Log in" : "Create account"}
+                {isLoading
+                  ? "Please wait..."
+                  : {
+                      login: "Log in",
+                      signup: "Send OTP",
+                      verifySignup: "Verify account",
+                      forgot: "Send reset OTP",
+                      reset: "Reset password",
+                    }[mode]}
               </button>
+
+              {mode === "login" ? (
+                <button type="button" className="helper-link" onClick={() => changeMode("forgot")}>
+                  Forgot password? Reset it
+                </button>
+              ) : null}
+
+              {mode === "verifySignup" ? (
+                <button type="button" className="helper-link" onClick={() => changeMode("signup")}>
+                  Change signup details
+                </button>
+              ) : null}
+
+              {mode === "forgot" || mode === "reset" ? (
+                <button type="button" className="helper-link" onClick={() => changeMode("login")}>
+                  Back to login
+                </button>
+              ) : null}
             </form>
           </section>
         </div>
@@ -237,6 +434,25 @@ const Wrapper = styled.section`
     margin-top: 2.1rem;
   }
 
+  /* Same rotating banner and same box as the products page hero (.hero-media). */
+  .auth-gif {
+    width: min(100%, 43rem);
+    height: 14rem;
+    margin-top: 2.4rem;
+    border-radius: 2.4rem;
+    overflow: hidden;
+    background: linear-gradient(135deg, #241f1d 0%, #4a352b 100%);
+    border: 1px solid #e3d5c5;
+    box-shadow: 0 18px 34px rgba(61, 41, 22, 0.12);
+  }
+
+  .auth-gif img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   .benefit-list span {
     background: #fff;
     border: 1px solid #eadfce;
@@ -258,6 +474,29 @@ const Wrapper = styled.section`
   .auth-card {
     padding: 2.6rem;
     animation: riseIn 620ms ease-out;
+  }
+
+  .social-login {
+    margin-bottom: 1.6rem;
+  }
+
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-top: 1.6rem;
+    color: #8a7c70;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .auth-divider::before,
+  .auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e6d8c8;
   }
 
   .mode-switch {
@@ -344,6 +583,45 @@ const Wrapper = styled.section`
 
   .password-toggle svg {
     font-size: 1.5rem;
+  }
+
+  .helper-link {
+    border: none;
+    background: transparent;
+    color: #8a5c43;
+    font-size: 1.25rem;
+    font-weight: 700;
+    cursor: pointer;
+    justify-self: center;
+    padding: 0.4rem 0;
+  }
+
+  .auth-message,
+  .auth-error {
+    border-radius: 1.3rem;
+    padding: 1rem 1.2rem;
+    font-size: 1.22rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .auth-message {
+    background: #eef8ef;
+    border: 1px solid #c8e8ce;
+    color: #23733b;
+  }
+
+  .auth-message.dev-otp {
+    background: #fff5e6;
+    border-color: #f0d0a4;
+    color: #8a4b16;
+    font-weight: 700;
+  }
+
+  .auth-error {
+    background: #fff0ec;
+    border: 1px solid #f0c2b1;
+    color: #9f3e1d;
   }
 
   .field-shell input:focus {
@@ -443,6 +721,12 @@ const Wrapper = styled.section`
     .auth-card {
       padding: 2rem;
       border-radius: 2.4rem;
+    }
+
+    .auth-gif {
+      width: 100%;
+      height: 18rem;
+      margin-top: 1.8rem;
     }
   }
 `;

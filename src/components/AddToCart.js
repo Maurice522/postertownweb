@@ -4,17 +4,19 @@ import CartAmountToggle from "./CartAmountToggle";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../styles/Button";
 import { useCartContext } from "../context/cart_context";
-import { FiShoppingCart } from "react-icons/fi";
+import { FiCheckCircle, FiShoppingCart } from "react-icons/fi";
 
 const AddToCart = ({ product }) => {
-  const { addToCart } = useCartContext();
+  const { addToCart, cart } = useCartContext();
   const navigate = useNavigate();
 
   const { id, colors = [], color, stock, selectedSize = "Small" } = product;
   const purchaseVariant = selectedSize || colors[0] || color || "default";
+  const itemKey = `${id}-${purchaseVariant}`;
   const [amount, setAmount] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const addToCartWords = useMemo(() => ["Add", "To", "Cart"], []);
+  const isAddedToCart = cart.some((item) => item.id === itemKey);
 
   useEffect(() => {
     if (!isAdding) {
@@ -37,6 +39,10 @@ const AddToCart = ({ product }) => {
   };
 
   const handleAddToCart = () => {
+    if (isAddedToCart) {
+      return;
+    }
+
     setIsAdding(true);
     addToCart(id, purchaseVariant, amount, product);
   };
@@ -55,18 +61,31 @@ const AddToCart = ({ product }) => {
       />
 
       <div className="purchase-actions">
-        <Button className={isAdding ? "btn secondary-btn is-adding" : "btn secondary-btn"} onClick={handleAddToCart}>
-          <span className="btn-icon-wrap" aria-hidden="true">
-            <FiShoppingCart className="btn-icon trail-icon" />
-            <FiShoppingCart className="btn-icon moving-icon" />
-          </span>
-          <span className="btn-label" aria-label="Add To Cart">
-            {addToCartWords.map((word) => (
-              <span key={word} className="btn-word">
-                {word}
+        <Button
+          className={isAdding ? "btn secondary-btn is-adding" : "btn secondary-btn"}
+          onClick={handleAddToCart}
+          disabled={isAddedToCart && !isAdding}
+        >
+          {isAddedToCart && !isAdding ? (
+            <>
+              <FiCheckCircle />
+              Added to Cart
+            </>
+          ) : (
+            <>
+              <span className="btn-icon-wrap" aria-hidden="true">
+                <FiShoppingCart className="btn-icon trail-icon" />
+                <FiShoppingCart className="btn-icon moving-icon" />
               </span>
-            ))}
-          </span>
+              <span className="btn-label" aria-label="Add To Cart">
+                {addToCartWords.map((word) => (
+                  <span key={word} className="btn-word">
+                    {word}
+                  </span>
+                ))}
+              </span>
+            </>
+          )}
         </Button>
         <Button className="btn primary-btn" onClick={handleBuyNow}>
           Buy Now
@@ -77,6 +96,9 @@ const AddToCart = ({ product }) => {
 };
 
 const Wrapper = styled.section`
+  /* Fill the product details column instead of shrinking to the buttons' text. */
+  width: 100%;
+
   .purchase-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -125,6 +147,13 @@ const Wrapper = styled.section`
     background: #fff;
     color: #1f1d1d;
     border: 1px solid #d7c1aa;
+  }
+
+  .secondary-btn:disabled {
+    cursor: default;
+    background: #231f20;
+    color: #fff;
+    border-color: #231f20;
   }
 
   .btn-icon-wrap {

@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import About from "./About";
 import Home from "./Home";
 import Products from "./Products";
+import Collections from "./Collections";
+import CollectionPage from "./CollectionPage";
 import Orders from "./Orders";
 import Cart from "./Cart";
 import Auth from "./Auth";
@@ -66,6 +68,8 @@ const App = () => {
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/products" element={<Products />} />
+                  <Route path="/collections" element={<Collections />} />
+                  <Route path="/collections/:slug" element={<CollectionPage />} />
                   <Route path="/orders" element={<Orders />} />
                   <Route path="/contact" element={<Orders />} />
                   <Route path="/auth" element={<Auth />} />

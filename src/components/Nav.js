@@ -39,7 +39,7 @@ const Nav = () => {
       <div className={menuOpen ? "navbar active" : "navbar"}>
         <ul className="navbar-lists">
           <li>
-            <NavLink to="/" className="navbar-link" onClick={closeMenu}>
+            <NavLink to="/" end className="navbar-link" onClick={closeMenu}>
               Home
             </NavLink>
           </li>
@@ -51,6 +51,11 @@ const Nav = () => {
           <li>
             <NavLink to="/products" className="navbar-link" onClick={closeMenu}>
               Products
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/collections" className="navbar-link" onClick={closeMenu}>
+              Collections
             </NavLink>
           </li>
           <li>
@@ -83,16 +88,17 @@ const Nav = () => {
               Log in
             </NavLink>
           )}
-
-          <NavLink
-            to="/cart"
-            className={cartAnimated ? "cart-trolley--link cart-bump" : "cart-trolley--link"}
-            onClick={closeMenu}
-            aria-label="Cart">
-            <FiShoppingCart className="cart-trolley" />
-            <span className="cart-total--item">{total_item || 0}</span>
-          </NavLink>
         </div>
+
+        {/* Outside the collapsible menu so the cart stays visible on phones. */}
+        <NavLink
+          to="/cart"
+          className={cartAnimated ? "cart-trolley--link cart-bump" : "cart-trolley--link"}
+          onClick={closeMenu}
+          aria-label="Cart">
+          <FiShoppingCart className="cart-trolley" />
+          <span className="cart-total--item">{total_item || 0}</span>
+        </NavLink>
 
         <button
           type="button"
@@ -333,7 +339,8 @@ const NavWrap = styled.nav`
     }
 
     .nav-actions {
-      top: calc(8.8rem + 24rem);
+      /* Sits right under the five-link list above. */
+      top: calc(8.8rem + 28.1rem);
       display: flex;
       flex-direction: column;
       align-items: stretch;
@@ -354,15 +361,14 @@ const NavWrap = styled.nav`
       transform: translateY(0);
     }
 
-    .navbar-link,
-    .auth-button,
-    .cart-trolley--link {
-      width: 100%;
-      justify-content: center;
+    .navbar {
+      gap: 1rem;
     }
 
-    .cart-trolley--link {
-      height: 5rem;
+    .navbar-link,
+    .auth-button {
+      width: 100%;
+      justify-content: center;
     }
 
     .user-login--name {

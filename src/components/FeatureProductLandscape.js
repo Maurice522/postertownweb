@@ -1,81 +1,30 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { FiArrowRight } from "react-icons/fi";
 import Product from "./Product";
-import RotatingText from "./RotatingText";
+import { useProductContext } from "../context/productcontex";
 
 const FeatureProductLandscape = () => {
+  const { products } = useProductContext();
+  const isBestseller = (product) => (product.badges || product.tags || []).some((badge) => /bestseller/i.test(String(badge)));
+  const wide = products.filter((product) => product.orientation === "landscape");
   const productList = [
-    {
-      id: "poster-001",
-      name: "Solo Leveling",
-      image: "images/sololeveling.jpeg",
-      price: 999,
-      category: "Anime",
-      stock: 50,
-      color: "black",
-    },
-    {
-      id: "poster-002",
-      name: "Luffy Gear 5",
-      image: "images/luffyland.jpg",
-      price: 999,
-      category: "Anime",
-      stock: 30,
-      color: "orange",
-    },
-    {
-      id: "poster-004",
-      name: "Demon Slayer",
-      image: "images/demonslayerall.jpg",
-      price: 999,
-      category: "Anime",
-      stock: 25,
-      color: "blue",
-    },
-    {
-      id: "poster-007",
-      name: "Rengoku",
-      image: "images/rengoku.jpg",
-      price: 999,
-      category: "Anime",
-      stock: 18,
-      color: "red",
-    },
-    {
-      id: "poster-003",
-      name: "Naruto Shippuden",
-      image: "images/naruto.jpg",
-      price: 899,
-      category: "Anime",
-      stock: 0,
-      color: "orange",
-    },
-    {
-      id: "poster-005",
-      name: "Dragon Ball Z",
-      image: "images/broly.jpg",
-      price: 799,
-      category: "Anime",
-      stock: 40,
-      color: "yellow",
-    },
-  ];
+    ...wide,
+    ...products.filter((product) => product.orientation !== "landscape" && isBestseller(product)),
+  ].slice(0, 6);
 
   return (
     <Wrapper className="section">
       <div className="container">
-        <div className="common-heading">
-          <RotatingText
-            texts={["Landscape", "Awesome"]}
-            mainClassName="landscape-rotator"
-            staggerFrom="last"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "-120%" }}
-            staggerDuration={0.025}
-            splitLevelClassName=""
-            transition={{ type: "spring", damping: 30, stiffness: 400 }}
-            rotationInterval={2000}
-          />
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">Fan favourites</span>
+            <h2>Posters made for big walls.</h2>
+            <p>Wide prints and statement pieces our customers keep coming back for.</p>
+          </div>
+          <Link to="/collections" className="section-link">
+            Browse collections <FiArrowRight />
+          </Link>
         </div>
 
         <div className="product-grid">
@@ -89,42 +38,65 @@ const FeatureProductLandscape = () => {
 };
 
 const Wrapper = styled.section`
-  padding: 9rem 0;
+  /* Starts on the colour the section above ends on, so there is no visible seam. */
+  padding: 5rem 0 9rem;
   background: linear-gradient(180deg, #f1e7da 0%, #f8f5ef 100%);
 
+  /* Same width and side padding as the "Why Poster Town" cards above. */
   .container {
+    width: min(100%, 132rem);
     max-width: 132rem;
+    margin: 0 auto;
+    padding: 0 2.4rem;
   }
 
-  .common-heading {
-    margin-bottom: 4rem;
+  .section-head {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2rem;
+    margin-bottom: 3.2rem;
   }
 
-  .landscape-rotator {
-    width: auto;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
-    padding: 0;
+  .eyebrow {
+    display: inline-block;
+    color: #8a5c43;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
   }
 
-  .landscape-rotator .text-rotate {
-    background: transparent;
-    width: auto;
-    padding: 0;
-    justify-content: center;
+  .section-head h2 {
+    color: #231f20;
+    font-size: clamp(3rem, 3.6vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.12;
+    text-transform: none;
+    margin-bottom: 0.8rem;
   }
 
-  .landscape-rotator .text-rotate-word,
-  .landscape-rotator .text-rotate-element,
-  .landscape-rotator .text-rotate-space {
-    color: #2d241e;
-    font-size: clamp(3rem, 4vw, 5rem);
+  .section-head p {
+    color: #6a5e54;
+    font-size: 1.6rem;
+    line-height: 1.7;
+  }
+
+  .section-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+    color: #cf6d3f;
+    font-size: 1.5rem;
     font-weight: 700;
-    letter-spacing: 0;
+    text-decoration: none;
+    transition: gap 0.2s ease;
+  }
+
+  .section-link:hover {
+    gap: 1rem;
   }
 
   .product-grid {
@@ -144,10 +116,16 @@ const Wrapper = styled.section`
   }
 
   @media (max-width: ${({ theme }) => theme.media.mobile}) {
-    padding: 6rem 0;
+    padding: 3rem 0 6rem;
 
-    .common-heading {
-      margin-bottom: 3rem;
+    .container {
+      padding: 0 1.6rem;
+    }
+
+    .section-head {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 2.4rem;
     }
 
     .product-grid {

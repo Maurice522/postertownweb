@@ -3,26 +3,46 @@ import { NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import FormatPrice from "../Helpers/FormatPrice";
 import { useCartContext } from "../context/cart_context";
-import { FiShoppingCart, FiShoppingBag } from "react-icons/fi";
+import { FiCheckCircle, FiShoppingCart, FiShoppingBag, FiX } from "react-icons/fi";
 import { normalizeProduct } from "../utils/productHelpers";
 
 const Product = (curElem) => {
   const normalizedProduct = normalizeProduct(curElem);
   const { id, name, image, price, category, stock = 10, color, cardStyle = "portrait" } = normalizedProduct;
-  const { addToCart } = useCartContext();
+  const { addToCart, cart } = useCartContext();
   const navigate = useNavigate();
   const imageUrl = image;
   const [isAdding, setIsAdding] = useState(false);
-  const defaultSize = normalizedProduct.sizes?.[0]?.type || "Small";
+  const [artShape, setArtShape] = useState("tall");
+  const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
+  const sizeOptions = useMemo(
+    () =>
+      normalizedProduct.sizes?.length
+        ? normalizedProduct.sizes
+        : [
+            {
+              type: "Small",
+              inches: "12 x 9",
+              price,
+              stock,
+            },
+          ],
+    [normalizedProduct.sizes, price, stock]
+  );
+  const defaultSize = sizeOptions[0];
   const addToCartWords = useMemo(() => ["Add", "to", "Cart"], []);
+  const isProductInCart = cart.some(
+    (item) => item.productId === id || item.id === id || String(item.id).startsWith(`${id}-`)
+  );
 
-  const cartPayload = {
+  const getCartPayload = (selectedSize = defaultSize) => ({
     ...normalizedProduct,
     image: [{ url: imageUrl, filename: name }],
     colors: normalizedProduct.colors?.length ? normalizedProduct.colors : [color || "#212121"],
-    stock,
-    selectedSize: defaultSize,
-  };
+    stock: selectedSize?.stock ?? stock,
+    price: selectedSize?.price ?? price,
+    selectedSize: selectedSize?.type || "Small",
+  });
 
   useEffect(() => {
     if (!isAdding) {
@@ -36,60 +56,139 @@ const Product = (curElem) => {
     return () => window.clearTimeout(timer);
   }, [isAdding]);
 
+  const addSelectedSizeToCart = (selectedSize = defaultSize) => {
+    setIsAdding(true);
+    addToCart(id, selectedSize?.type || color || "#212121", 1, getCartPayload(selectedSize));
+    setIsSizeModalOpen(false);
+  };
+
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsAdding(true);
-    addToCart(id, color || "#212121", 1, cartPayload);
+
+    if (isProductInCart) {
+      return;
+    }
+
+    if (sizeOptions.length > 1) {
+      setIsSizeModalOpen(true);
+      return;
+    }
+
+    addSelectedSizeToCart(defaultSize);
   };
 
   const handleBuyNow = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(id, color || "#212121", 1, cartPayload);
+    addToCart(id, defaultSize?.type || color || "#212121", 1, getCartPayload(defaultSize));
     navigate("/cart");
   };
 
   return (
-    <CardLink to={`/singleproduct/${id}`} $cardStyle={cardStyle}>
-      <article className={`product-card ${cardStyle === "landscape" ? "landscape-card" : ""}`}>
-        <div className={`image-shell ${cardStyle === "landscape" ? "landscape-shell" : ""}`}>
-          <span className="category-badge">{category}</span>
-          <img src={imageUrl} alt={name} />
-        </div>
-
-        <div className="card-copy">
-          <div className="title-row">
-            <h3>{name}</h3>
-            <p className="card-price">
-              <FormatPrice price={price} />
-            </p>
+    <>
+      <CardLink to={`/singleproduct/${id}`} $cardStyle={cardStyle}>
+        <article className={`product-card ${cardStyle === "landscape" ? "landscape-card" : ""}`}>
+          <div className={`image-shell ${cardStyle === "landscape" ? "landscape-shell" : ""}`}>
+            <span className="category-badge">{category}</span>
+            <img
+              src={imageUrl}
+              alt={name}
+              className={`${artShape}-art`}
+              onLoad={(e) => setArtShape(e.currentTarget.naturalWidth > e.currentTarget.naturalHeight ? "wide" : "tall")}
+            />
           </div>
 
-          <p className="sub-copy">Premium wall-ready print with a clean finish and bold detail.</p>
+          <div className="card-copy">
+            <div className="title-row">
+              <h3>{name}</h3>
+              <p className="card-price">
+                <FormatPrice price={price} />
+              </p>
+            </div>
 
-          <div className="card-actions">
-            <button className={isAdding ? "card-btn secondary is-adding" : "card-btn secondary"} onClick={handleAddToCart}>
-              <span className="btn-icon-wrap" aria-hidden="true">
-                <FiShoppingCart className="btn-icon trail-icon" />
-                <FiShoppingCart className="btn-icon moving-icon" />
-              </span>
-              <span className="btn-label" aria-label="Add to Cart">
-                {addToCartWords.map((word) => (
-                  <span key={word} className="btn-word">
-                    {word}
+            <p className="sub-copy">Premium wall-ready print with a clean finish and bold detail.</p>
+
+            <div className="card-actions">
+              <button
+                className={isAdding ? "card-btn secondary is-adding" : "card-btn secondary"}
+                onClick={handleAddToCart}
+                disabled={isProductInCart}
+              >
+                {isProductInCart ? (
+                  <>
+                    <FiCheckCircle />
+                    Added to Cart
+                  </>
+                ) : (
+                  <>
+                    <span className="btn-icon-wrap" aria-hidden="true">
+                      <FiShoppingCart className="btn-icon trail-icon" />
+                      <FiShoppingCart className="btn-icon moving-icon" />
+                    </span>
+                    <span className="btn-label" aria-label="Add to Cart">
+                      {addToCartWords.map((word) => (
+                        <span key={word} className="btn-word">
+                          {word}
+                        </span>
+                      ))}
+                    </span>
+                  </>
+                )}
+              </button>
+              <button className="card-btn primary" onClick={handleBuyNow}>
+                <FiShoppingBag />
+                Buy Now
+              </button>
+            </div>
+          </div>
+        </article>
+      </CardLink>
+
+      {isSizeModalOpen && (
+        <ModalOverlay
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={`size-modal-title-${id}`}
+          onClick={() => setIsSizeModalOpen(false)}
+        >
+          <div className="size-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-top">
+              <div>
+                <span className="modal-kicker">Choose size</span>
+                <h3 id={`size-modal-title-${id}`}>{name}</h3>
+              </div>
+              <button type="button" className="modal-close" onClick={() => setIsSizeModalOpen(false)}>
+                <FiX />
+              </button>
+            </div>
+
+            <div className="modal-size-grid">
+              {sizeOptions.map((size) => (
+                <button
+                  key={size.id || size.type}
+                  type="button"
+                  className="size-option"
+                  disabled={(size.stock ?? stock) <= 0}
+                  onClick={() => addSelectedSizeToCart(size)}
+                >
+                  <span>
+                    <strong>{size.type}</strong>
+                    <small>
+                      {size.paper ? `${size.paper} · ` : ""}
+                      {size.inches} inches
+                    </small>
                   </span>
-                ))}
-              </span>
-            </button>
-            <button className="card-btn primary" onClick={handleBuyNow}>
-              <FiShoppingBag />
-              Buy Now
-            </button>
+                  <span className="size-price">
+                    <FormatPrice price={size.price ?? price} />
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </article>
-    </CardLink>
+        </ModalOverlay>
+      )}
+    </>
   );
 };
 
@@ -102,7 +201,7 @@ const CardLink = styled(NavLink)`
     height: 100%;
     background: linear-gradient(180deg, #fffaf3 0%, #f6ecdf 100%);
     border: 1px solid #eadfce;
-    border-radius: 2.2rem;
+    border-radius: 1.6rem;
     overflow: hidden;
     box-shadow: 0 16px 28px rgba(60, 38, 22, 0.08);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -115,21 +214,30 @@ const CardLink = styled(NavLink)`
 
   .image-shell {
     position: relative;
-    min-height: 34rem;
     display: grid;
     place-items: center;
     background: radial-gradient(circle at top, #fff 0%, #f7ecdf 58%, #edd9c6 100%);
-    padding: 2rem;
+    /* Fixed-height frame so every card in a row lines up, whatever the art's shape. */
+    height: 31rem;
+    grid-template-rows: 100%;
+    padding: 2.4rem 1.5rem;
     overflow: hidden;
   }
 
+  /* Posters are A-size sheets (1 : 1.414); show the whole print at that ratio,
+     sized to fit the frame both ways. */
   .image-shell img {
-    width: 100%;
-    max-width: 24rem;
-    height: 30rem;
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1 / 1.414;
     object-fit: cover;
-    border-radius: 1.6rem;
-    box-shadow: 0 24px 26px rgba(0, 0, 0, 0.18);
+    /* If the art doesn't match the frame, keep the top and trim from the bottom. */
+    object-position: top;
+    border-radius: 0.4rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16), 0 18px 30px rgba(60, 38, 22, 0.24);
     transition: transform 0.35s ease;
   }
 
@@ -137,32 +245,31 @@ const CardLink = styled(NavLink)`
     transform: scale(1.04);
   }
 
-  .landscape-shell {
-    min-height: 26rem;
+  .image-shell img.wide-art {
+    aspect-ratio: 1.414 / 1;
   }
 
-  .landscape-shell img {
-    max-width: 100%;
-    width: 100%;
-    height: 22rem;
-    object-fit: cover;
+  .landscape-shell {
+    height: 30rem;
+    padding: 2rem 1.5rem;
   }
 
   .category-badge {
     position: absolute;
+    z-index: 1;
     top: 1.4rem;
     right: 1.4rem;
     background: rgba(35, 31, 32, 0.94);
     color: #fff;
     border-radius: 999px;
-    padding: 0.55rem 0.95rem;
-    font-size: 1.1rem;
+    padding: 0.45rem 0.8rem;
+    font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
 
   .card-copy {
-    padding: 1.8rem;
+    padding: 1.25rem;
   }
 
   .title-row {
@@ -170,11 +277,11 @@ const CardLink = styled(NavLink)`
     gap: 1rem;
     justify-content: space-between;
     align-items: start;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
   }
 
   h3 {
-    font-size: 2rem;
+    font-size: 1.65rem;
     line-height: 1.3;
     color: #231f20;
   }
@@ -182,33 +289,42 @@ const CardLink = styled(NavLink)`
   .card-price {
     color: #cf6d3f;
     font-weight: 700;
-    font-size: 1.9rem;
+    font-size: 1.55rem;
     white-space: nowrap;
   }
 
   .sub-copy {
     color: #6a5f56;
-    font-size: 1.4rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    line-height: 1.45;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
+  /* Side by side when both labels fit, otherwise each button wraps to its own row. */
   .card-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .card-actions .card-btn {
+    flex: 1 1 auto;
   }
 
   .card-btn {
     border: none;
-    border-radius: 1.2rem;
-    padding: 1.1rem 1rem;
+    border-radius: 1rem;
+    padding: 0.9rem 0.8rem;
     cursor: pointer;
     display: inline-flex;
     justify-content: center;
     align-items: center;
     gap: 0.55rem;
-    font-size: 1.25rem;
+    font-size: 1.12rem;
     font-weight: 600;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
@@ -224,6 +340,13 @@ const CardLink = styled(NavLink)`
     background: #fff;
     color: #2a241f;
     border: 1px solid #dcc7b2;
+  }
+
+  .card-btn.secondary:disabled {
+    cursor: default;
+    background: #231f20;
+    color: #fff;
+    border-color: #231f20;
   }
 
   .btn-icon-wrap {
@@ -250,8 +373,8 @@ const CardLink = styled(NavLink)`
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    min-width: 8.8rem;
     justify-content: center;
+    white-space: nowrap;
   }
 
   .btn-word {
@@ -315,27 +438,120 @@ const CardLink = styled(NavLink)`
   }
 
   @media (max-width: ${({ theme }) => theme.media.mobile}) {
+    /* html drops to 1rem = 8px on phones, so the frames are given more rem. */
     .image-shell {
-      min-height: 30rem;
-    }
-
-    .image-shell img {
-      max-width: 20rem;
-      height: 26rem;
+      height: 46rem;
+      padding: 3rem;
     }
 
     .landscape-shell {
-      min-height: 22rem;
+      height: 36rem;
     }
+  }
+`;
 
-    .landscape-shell img {
-      max-width: 100%;
-      height: 18rem;
-    }
+const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(21, 17, 15, 0.48);
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  backdrop-filter: blur(3px);
 
-    .card-actions {
-      grid-template-columns: 1fr;
-    }
+  .size-modal {
+    width: min(100%, 42rem);
+    background: #fffaf3;
+    border: 1px solid #eadfce;
+    border-radius: 1.8rem;
+    padding: 1.8rem;
+    box-shadow: 0 26px 70px rgba(0, 0, 0, 0.24);
+  }
+
+  .modal-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.2rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .modal-kicker {
+    color: #8a5c43;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    font-size: 2rem;
+    line-height: 1.25;
+    margin-top: 0.35rem;
+  }
+
+  .modal-close {
+    width: 3.6rem;
+    height: 3.6rem;
+    border: 1px solid #dfd1c2;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    color: #332923;
+  }
+
+  .modal-size-grid {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .size-option {
+    border: 1px solid #dfd1c2;
+    border-radius: 1.2rem;
+    background: #fff;
+    padding: 1.1rem 1.2rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.2rem;
+    text-align: left;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .size-option:hover {
+    transform: translateY(-2px);
+    border-color: #231f20;
+    box-shadow: 0 14px 24px rgba(61, 41, 22, 0.1);
+  }
+
+  .size-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.52;
+  }
+
+  .size-option strong,
+  .size-option small {
+    display: block;
+  }
+
+  .size-option strong {
+    font-size: 1.55rem;
+  }
+
+  .size-option small {
+    color: #766b61;
+    font-size: 1.2rem;
+    margin-top: 0.25rem;
+  }
+
+  .size-price {
+    color: #cf6d3f;
+    font-size: 1.65rem;
+    font-weight: 700;
+    white-space: nowrap;
   }
 `;
 

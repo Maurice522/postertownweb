@@ -3,8 +3,42 @@ import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { FiArrowRight, FiMail, FiPhone } from "react-icons/fi";
+import { useMemo } from "react";
+import { useProductContext } from "../context/productcontex";
+import { buildCollections } from "../data/collections";
+
+// Franchise collections first, then the broad ones; empty collections drop out.
+const FOOTER_COLLECTIONS = ["demon-slayer", "dragon-ball-z", "one-piece", "naruto", "superheroes", "villains", "gaming", "cars"];
+const pickFooterCollections = (products) =>
+  buildCollections(products)
+    .filter((collection) => FOOTER_COLLECTIONS.includes(collection.slug))
+    .sort((a, b) => FOOTER_COLLECTIONS.indexOf(a.slug) - FOOTER_COLLECTIONS.indexOf(b.slug))
+    .slice(0, 6);
+
+const navGroups = [
+  {
+    title: "Shop",
+    links: [
+      { to: "/collections", label: "Collections" },
+      { to: "/products", label: "All posters" },
+      { to: "/collections/bestsellers", label: "Bestsellers" },
+      { to: "/collections/new-arrivals", label: "New arrivals" },
+    ],
+  },
+  {
+    title: "Poster Town",
+    links: [
+      { to: "/", label: "Home" },
+      { to: "/about", label: "About us" },
+      { to: "/orders", label: "Your orders" },
+      { to: "/cart", label: "Cart" },
+    ],
+  },
+];
 
 const Footer = () => {
+  const { products } = useProductContext();
+  const footerCollections = useMemo(() => pickFooterCollections(products), [products]);
   return (
     <Wrapper>
       <footer>
@@ -19,9 +53,21 @@ const Footer = () => {
             </div>
 
             <div className="footer-cta">
-              <span>Start browsing</span>
-              <NavLink to="/products" className="cta-link">
-                Explore collection
+              <span>Shop by collection</span>
+              <div className="collection-pills">
+                {footerCollections.map((collection) => (
+                  <NavLink
+                    key={collection.slug}
+                    to={`/collections/${collection.slug}`}
+                    className="collection-pill"
+                    style={{ "--accent": collection.accent }}>
+                    <i aria-hidden="true" />
+                    {collection.title}
+                  </NavLink>
+                ))}
+              </div>
+              <NavLink to="/collections" className="cta-link">
+                All collections
                 <FiArrowRight />
               </NavLink>
             </div>
@@ -29,12 +75,21 @@ const Footer = () => {
 
           <section className="footer-grid">
             <div className="footer-card">
-              <span className="footer-label">Navigate</span>
-              <div className="footer-links">
-                <NavLink to="/">Home</NavLink>
-                <NavLink to="/about">About</NavLink>
-                <NavLink to="/products">Products</NavLink>
-                <NavLink to="/orders">Orders</NavLink>
+              <div className="footer-nav">
+                {navGroups.map((group) => (
+                  <div key={group.title}>
+                    <span className="footer-label">{group.title}</span>
+                    <ul className="footer-links">
+                      {group.links.map((link) => (
+                        <li key={link.to}>
+                          <NavLink to={link.to} end>
+                            {link.label}
+                          </NavLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -66,7 +121,7 @@ const Footer = () => {
           </section>
 
           <section className="footer-bottom">
-            <p>@{new Date().getFullYear()} Poster Town. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Poster Town. All rights reserved.</p>
             <div className="footer-bottom-links">
               <span>Privacy Policy</span>
               <span>Terms & Conditions</span>
@@ -142,9 +197,41 @@ const Wrapper = styled.section`
     border: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.4rem;
     align-self: stretch;
     justify-content: space-between;
+  }
+
+  .collection-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .collection-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 1.3rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff8f1;
+    font-size: 1.35rem;
+    font-weight: 600;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .collection-pill i {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .collection-pill:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: color-mix(in srgb, var(--accent) 60%, transparent);
   }
 
   .cta-link {
@@ -179,19 +266,39 @@ const Wrapper = styled.section`
     margin-top: 1.1rem;
   }
 
-  .footer-links {
+  .footer-nav {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, max-content));
-    column-gap: 2.2rem;
-    row-gap: 1rem;
-    align-items: start;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
   }
 
-  .footer-links a,
+  .footer-links {
+    list-style: none;
+    padding: 0;
+    gap: 0.2rem;
+  }
+
+  .footer-links a {
+    display: inline-block;
+    padding: 0.35rem 0;
+    color: rgba(255, 241, 231, 0.78);
+    font-size: 1.45rem;
+    font-weight: 500;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .footer-links a:hover {
+    transform: translateX(3px);
+  }
+
+  .footer-links a.active {
+    color: #fff8f1;
+  }
+
   .footer-stack a {
     color: #fff8f1;
-    font-size: 1.55rem;
-    transition: color 0.22s ease, transform 0.22s ease;
+    font-size: 1.45rem;
+    transition: color 0.22s ease;
   }
 
   .footer-stack a {

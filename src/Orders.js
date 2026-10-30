@@ -5,19 +5,214 @@ import { FiBox, FiCheckCircle, FiClock, FiPhone, FiTruck } from "react-icons/fi"
 import { FaWhatsapp } from "react-icons/fa";
 import PageNavigation from "./components/PageNavigation";
 import FormatPrice from "./Helpers/FormatPrice";
+import { useUserContext } from "./context/user_context";
+import { createCustomerUserId, getStoredOrders, saveStoredOrders } from "./utils/orderStorage";
 
-const ORDERS_STORAGE_KEY = "postertown_orders";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 const PRATHAM_PHONE = "919953749307";
 const ORDER_STATUS_META = {
   payment_verification: { label: "Payment Verification", tone: "verification", icon: "clock" },
+  payment_not_verified: { label: "Payment Not Verified", tone: "alert", icon: "clock" },
   active: { label: "Active", tone: "active", icon: "check" },
+  packing: { label: "Active", tone: "active", icon: "check" },
+  product_packing: { label: "Active", tone: "active", icon: "check" },
+  sending_to_transit: { label: "Active", tone: "active", icon: "check" },
+  in_transit: { label: "Active", tone: "active", icon: "check" },
+  product_dispatched: { label: "Active", tone: "active", icon: "check" },
+  dispatched: { label: "Active", tone: "active", icon: "check" },
+  completed: { label: "Active", tone: "active", icon: "check" },
+  delivered: { label: "Active", tone: "active", icon: "check" },
   cancel_requested: { label: "Cancel Requested", tone: "alert", icon: "clock" },
+  return_requested: { label: "Return Requested", tone: "alert", icon: "clock" },
+  returned: { label: "Cancelled", tone: "alert", icon: "clock" },
+  return_in_transit: { label: "Cancelled", tone: "alert", icon: "clock" },
+  transit: { label: "Cancelled", tone: "alert", icon: "clock" },
+  pickup: { label: "Cancelled", tone: "alert", icon: "clock" },
+  pickup_in_transit: { label: "Cancelled", tone: "alert", icon: "clock" },
+  refund: { label: "Refunded", tone: "alert", icon: "check" },
   refund_requested: { label: "Refund Requested", tone: "alert", icon: "clock" },
   cancelled: { label: "Cancelled", tone: "muted", icon: "clock" },
   refunded: { label: "Refunded", tone: "muted", icon: "check" },
 };
+const CURRENT_STATE_META = {
+  payment_verification: { label: "Payment Verification", tone: "verification", icon: "clock" },
+  payment_not_verified: { label: "Payment Not Verified", tone: "alert", icon: "clock" },
+  active: { label: "Packing", tone: "active", icon: "clock" },
+  packing: { label: "Packing", tone: "active", icon: "clock" },
+  product_packing: { label: "Product Packing", tone: "active", icon: "clock" },
+  sending_to_transit: { label: "Sending to Transit", tone: "active", icon: "clock" },
+  in_transit: { label: "In Transit", tone: "active", icon: "clock" },
+  product_dispatched: { label: "Dispatched", tone: "active", icon: "clock" },
+  dispatched: { label: "Dispatched", tone: "active", icon: "clock" },
+  completed: { label: "Completed", tone: "completed", icon: "check" },
+  delivered: { label: "Delivered", tone: "completed", icon: "check" },
+  cancel_requested: { label: "Requested Return", tone: "alert", icon: "clock" },
+  return_requested: { label: "Requested Return", tone: "alert", icon: "clock" },
+  cancelled: { label: "Requested Return", tone: "alert", icon: "clock" },
+  returned: { label: "Requested Return", tone: "alert", icon: "clock" },
+  return_in_transit: { label: "Product Pickup", tone: "alert", icon: "clock" },
+  transit: { label: "Product Pickup", tone: "alert", icon: "clock" },
+  pickup: { label: "Product Pickup", tone: "alert", icon: "clock" },
+  pickup_in_transit: { label: "Product Pickup", tone: "alert", icon: "clock" },
+  refund: { label: "Refund", tone: "alert", icon: "check" },
+  refund_requested: { label: "Refund", tone: "alert", icon: "clock" },
+  refunded: { label: "Refund", tone: "alert", icon: "check" },
+};
+
+const RETURN_JOURNEY_STATES = [
+  "cancel_requested",
+  "return_requested",
+  "cancelled",
+  "returned",
+  "return_in_transit",
+  "transit",
+  "pickup",
+  "pickup_in_transit",
+  "refund",
+  "refund_requested",
+  "refunded",
+];
+
+const getCurrentState = (order) => {
+  if (RETURN_JOURNEY_STATES.includes(order.status)) {
+    return order.status;
+  }
+
+  return (
+    order.currentState ||
+    order.fulfillmentStatus ||
+    order.shippingStatus ||
+    (order.status === "active" ? "packing" : order.status)
+  );
+};
+
+const isReturnJourney = (order) => {
+  const currentState = getCurrentState(order);
+
+  return Boolean(order.actions?.returnRequested) ||
+    RETURN_JOURNEY_STATES.includes(currentState) ||
+    RETURN_JOURNEY_STATES.includes(order.status);
+};
+
+const getCurrentStateMeta = (order) => {
+  const currentState = getCurrentState(order);
+
+  return CURRENT_STATE_META[currentState] || {
+    label: currentState ? String(currentState).replace(/_/g, " ") : "Payment Verification",
+    tone: "verification",
+    icon: "clock",
+  };
+};
+
+const getStatusSubtitle = (order) => {
+  const currentState = getCurrentState(order);
+
+  if (isReturnJourney(order)) {
+    return ["refund", "refund_requested", "refunded"].includes(currentState) || ["refund", "refund_requested", "refunded"].includes(order.status)
+      ? "Refunded"
+      : "Cancelled";
+  }
+
+  if (
+    ["packing", "product_packing", "sending_to_transit", "in_transit", "product_dispatched", "dispatched", "active"].includes(currentState) ||
+    ["packing", "product_packing", "sending_to_transit", "in_transit", "product_dispatched", "dispatched", "active"].includes(order.status)
+  ) {
+    return "Active";
+  }
+
+  if (["completed", "delivered"].includes(currentState) || ["completed", "delivered"].includes(order.status)) {
+    return "Delivered";
+  }
+
+  return "Verification";
+};
+
+const getJourneySteps = (order) => {
+  const currentState = getCurrentState(order);
+  const status = order.status;
+  const terminalState = currentState || status;
+
+  if (isReturnJourney(order)) {
+    const returnProgressIndexByState = {
+      cancel_requested: 0,
+      return_requested: 0,
+      cancelled: 0,
+      returned: 0,
+      return_in_transit: 1,
+      transit: 1,
+      pickup: 1,
+      pickup_in_transit: 1,
+      refund: 2,
+      refund_requested: 2,
+      refunded: 2,
+    };
+    const progressIndex = returnProgressIndexByState[terminalState] ?? returnProgressIndexByState[status] ?? 0;
+
+    return ["Requested Return", "Product Pickup", "Refund"].map((label, index) => ({
+      label,
+      state: index < progressIndex ? "complete" : index === progressIndex ? "current" : "pending",
+    }));
+  }
+
+  const progressIndexByState = {
+    payment_verification: 0,
+    active: 1,
+    packing: 1,
+    product_packing: 1,
+    sending_to_transit: 1,
+    in_transit: 2,
+    product_dispatched: 2,
+    dispatched: 2,
+    completed: 3,
+    delivered: 3,
+  };
+  const progressIndex = progressIndexByState[terminalState] ?? progressIndexByState[status] ?? 0;
+
+  return ["Payment Verification", "Packed", "Dispatched", "Delivered"].map((label, index) => ({
+    label,
+    state: index < progressIndex ? "complete" : index === progressIndex ? "current" : "pending",
+  }));
+};
+
+const formatPlacedDate = (value) =>
+  new Date(value).toLocaleString("en-IN", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+const getDeliveryCompletedDate = (order) => {
+  const completedValue = order.deliveredAt || order.completedAt || order.deliveryCompletedAt;
+
+  if (completedValue) {
+    return new Date(completedValue);
+  }
+
+  if (["completed", "delivered"].includes(getCurrentState(order)) || ["completed", "delivered"].includes(order.status)) {
+    return new Date(order.updatedAt || order.createdAt);
+  }
+
+  return null;
+};
+
+const isReturnWindowOpen = (order) => {
+  const deliveryDate = getDeliveryCompletedDate(order);
+
+  if (!deliveryDate || Number.isNaN(deliveryDate.getTime())) {
+    return false;
+  }
+
+  const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+  const elapsed = Date.now() - deliveryDate.getTime();
+
+  return elapsed >= 0 && elapsed <= sevenDaysInMs;
+};
 
 const Orders = () => {
+  const { isAuthenticated, user } = useUserContext();
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
@@ -25,33 +220,102 @@ const Orders = () => {
       return;
     }
 
-    const storedOrders = window.localStorage.getItem(ORDERS_STORAGE_KEY);
-    if (!storedOrders) {
-      setOrders([]);
+    const storedOrders = getStoredOrders(isAuthenticated);
+    setOrders(storedOrders);
+    const controller = new AbortController();
+
+    if (!isAuthenticated) {
+      const guestUserIds = [...new Set(storedOrders.map((order) => order.userId).filter(Boolean))];
+      const orderIds = storedOrders.map((order) => order.id).filter(Boolean);
+
+      if (guestUserIds.length === 0 && orderIds.length === 0) {
+        return;
+      }
+
+      const guestRequests = guestUserIds.length > 0
+        ? guestUserIds.map((userId) =>
+            fetch(`${API_BASE_URL}/api/orders?userId=${encodeURIComponent(userId)}`, {
+              signal: controller.signal,
+            })
+              .then((response) => (response.ok ? response.json() : []))
+              .catch(() => [])
+          )
+        : orderIds.map((orderId) =>
+            fetch(`${API_BASE_URL}/api/orders/${encodeURIComponent(orderId)}`, {
+              signal: controller.signal,
+            })
+              .then((response) => (response.ok ? response.json() : null))
+              .catch(() => null)
+          );
+
+      Promise.all(guestRequests)
+        .then((serverResults) => {
+          const latestOrders = serverResults
+            .flat()
+            .filter(Boolean)
+            .filter((order, index, allOrders) => allOrders.findIndex((item) => item.id === order.id) === index);
+
+          if (latestOrders.length === 0) {
+            return;
+          }
+
+          setOrders(latestOrders);
+          saveStoredOrders(latestOrders, false);
+        })
+        .catch((error) => {
+          if (error.name !== "AbortError") {
+            console.error("Failed to load guest server orders", error);
+          }
+        });
+
+      return () => controller.abort();
+    }
+
+    if (!user?.email) {
       return;
     }
 
-    try {
-      const parsed = JSON.parse(storedOrders);
-      setOrders(Array.isArray(parsed) ? parsed : []);
-    } catch (error) {
-      console.error("Failed to parse orders", error);
-      setOrders([]);
-    }
-  }, []);
+    const userId = createCustomerUserId(user);
+
+    fetch(`${API_BASE_URL}/api/orders?userId=${encodeURIComponent(userId)}`, {
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load orders with ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((serverOrders) => {
+        const nextOrders = Array.isArray(serverOrders) ? serverOrders : [];
+        setOrders(nextOrders);
+        saveStoredOrders(nextOrders, true);
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          console.error("Failed to load server orders", error);
+        }
+      });
+
+    return () => controller.abort();
+  }, [isAuthenticated, user]);
 
   const updateOrderStatus = (orderId, nextStatus) => {
+    const previousOrders = orders;
     const nextOrders = orders.map((order) => {
       if (order.id !== orderId) {
         return order;
       }
 
       const statusMeta = ORDER_STATUS_META[nextStatus] || {};
+      const currentStateMeta = CURRENT_STATE_META[nextStatus] || {};
 
       return {
         ...order,
         status: nextStatus,
         statusLabel: statusMeta.label || nextStatus,
+        currentState: nextStatus,
+        currentStateLabel: currentStateMeta.label || statusMeta.label || nextStatus,
         updatedAt: new Date().toISOString(),
       };
     });
@@ -59,12 +323,36 @@ const Orders = () => {
     setOrders(nextOrders);
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(nextOrders));
+      saveStoredOrders(nextOrders, isAuthenticated);
     }
+
+    fetch(`${API_BASE_URL}/api/orders/${encodeURIComponent(orderId)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: nextStatus,
+        statusLabel: ORDER_STATUS_META[nextStatus]?.label || nextStatus,
+        currentState: nextStatus,
+        currentStateLabel: CURRENT_STATE_META[nextStatus]?.label || ORDER_STATUS_META[nextStatus]?.label || nextStatus,
+        updatedAt: new Date().toISOString(),
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Order update failed with ${response.status}`);
+        }
+      })
+      .catch((error) => {
+        // Put the order back the way it was so the page never shows a request we didn't record.
+        console.error("Failed to update server order status", error);
+        setOrders(previousOrders);
+        saveStoredOrders(previousOrders, isAuthenticated);
+        window.alert("We couldn't send your request. Please try again or message us on WhatsApp.");
+      });
   };
 
   const renderStatusIcon = (status) => {
-    const iconType = ORDER_STATUS_META[status]?.icon;
+    const iconType = ORDER_STATUS_META[status]?.icon || CURRENT_STATE_META[status]?.icon;
     return iconType === "check" ? <FiCheckCircle /> : <FiClock />;
   };
 
@@ -81,7 +369,7 @@ const Orders = () => {
       `Order Total: INR ${order.totals?.total || 0}`,
       `Items: ${itemSummary || "No items found"}`,
       "",
-      "Please help with payment / cancellation / refund support.",
+      "Please help with payment or cancellation support.",
     ];
 
     return encodeURIComponent(lines.join("\n"));
@@ -121,31 +409,64 @@ const Orders = () => {
           </div>
         ) : (
           <div className="orders-list">
-            {orders.map((order) => (
-              <article key={order.id} className="order-card">
-                <div className="order-top">
-                  <div>
-                    <span className="order-label">Order ID</span>
-                    <h2>{order.id}</h2>
-                  </div>
-                  <div className={`status-pill status-${ORDER_STATUS_META[order.status]?.tone || order.status}`}>
-                    {renderStatusIcon(order.status)}
-                    <span>{order.statusLabel || ORDER_STATUS_META[order.status]?.label || order.status}</span>
-                  </div>
-                </div>
+            {orders.map((order) => {
+              const currentState = getCurrentState(order);
+              const currentStateMeta = getCurrentStateMeta(order);
+              const isDelivered = ["completed", "delivered"].includes(currentState);
+              const canReturnOrder = isDelivered && isReturnWindowOpen(order);
+              const isCancellationAvailable = ![
+                "cancel_requested",
+                "cancelled",
+                "completed",
+                "refunded",
+                "refund_requested",
+                "return_requested",
+                "returned",
+                "transit",
+                "pickup",
+                "pickup_in_transit",
+                "refund",
+              ].includes(currentState);
 
-                <div className="order-meta-grid">
-                  <div className="meta-card">
-                    <span>Placed on</span>
-                    <strong>{new Date(order.createdAt).toLocaleString("en-IN")}</strong>
+              return (
+                <article key={order.id} className="order-card">
+                  <div className="order-top">
+                    <div>
+                      <span className="order-label">Order ID</span>
+                      <h2>{order.id}</h2>
+                    </div>
+                    <div className="placed-date">
+                      <span>Placed on</span>
+                      <strong>{formatPlacedDate(order.createdAt)}</strong>
+                    </div>
                   </div>
-                  <div className="meta-card">
+
+                  <div className="order-meta-grid">
+                  <div className="meta-card status-meta-card">
+                    <span className="status-title">
+                      Order status -{" "}
+                      <strong className={`subtitle-${currentStateMeta.tone}`}>{getStatusSubtitle(order)}</strong>
+                    </span>
+                    <div className={`state-pill state-${currentStateMeta.tone}`}>
+                      {renderStatusIcon(getCurrentState(order))}
+                      <span>{isReturnJourney(order) ? currentStateMeta.label : order.currentStateLabel || currentStateMeta.label}</span>
+                    </div>
+                    <div className="journey-track">
+                      {getJourneySteps(order).map((step) => (
+                        <div key={step.label} className={`journey-step journey-${step.state}`}>
+                          <span className="journey-dot" />
+                          <span>{step.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="meta-card metric-card">
                     <span>Total</span>
                     <strong>
                       <FormatPrice price={order.totals?.total || 0} />
                     </strong>
                   </div>
-                  <div className="meta-card">
+                  <div className="meta-card metric-card">
                     <span>Items</span>
                     <strong>{order.items?.length || 0}</strong>
                   </div>
@@ -178,21 +499,28 @@ const Orders = () => {
                     </div>
 
                     <div className="order-actions">
-                      {["payment_verification", "active"].includes(order.status) ? (
+                      {isCancellationAvailable ? (
                         <button
                           type="button"
                           className="order-action-btn secondary"
-                          onClick={() => updateOrderStatus(order.id, "cancel_requested")}>
+                          onClick={() => {
+                            if (window.confirm(`Request cancellation of order ${order.id}?`)) {
+                              updateOrderStatus(order.id, "cancel_requested");
+                            }
+                          }}>
                           Request cancel
                         </button>
                       ) : null}
-
-                      {["active", "cancel_requested", "cancelled"].includes(order.status) ? (
+                      {canReturnOrder ? (
                         <button
                           type="button"
-                          className="order-action-btn"
-                          onClick={() => updateOrderStatus(order.id, "refund_requested")}>
-                          Request refund
+                          className="order-action-btn secondary"
+                          onClick={() => {
+                            if (window.confirm(`Request a return for order ${order.id}?`)) {
+                              updateOrderStatus(order.id, "return_requested");
+                            }
+                          }}>
+                          Return order
                         </button>
                       ) : null}
                     </div>
@@ -230,7 +558,7 @@ const Orders = () => {
                         <FiPhone />
                       </div>
                       <p>
-                        For payment, cancellation, or refund questions, Pratham will help you directly.
+                        For payment or cancellation questions, Pratham will help you directly.
                       </p>
                       <div className="support-actions">
                         <a href="tel:+919953749307" className="support-call-link">+91 9953749307</a>
@@ -247,7 +575,8 @@ const Orders = () => {
                   </aside>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -306,7 +635,7 @@ const Wrapper = styled.section`
   }
 
   .orders-hero-card span,
-  .meta-card span,
+  .meta-card > span,
   .inline-label {
     display: block;
     color: #8a7b6e;
@@ -384,6 +713,76 @@ const Wrapper = styled.section`
     font-size: 2.8rem;
   }
 
+  .placed-date {
+    text-align: right;
+    background: #fff;
+    border: 1px solid #eadfce;
+    border-radius: 1.4rem;
+    padding: 0.9rem 1.2rem;
+    min-width: 18rem;
+  }
+
+  .placed-date span {
+    display: block;
+    color: #8a7b6e;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.25rem;
+  }
+
+  .placed-date strong {
+    color: #231f20;
+    font-size: 1.28rem;
+    white-space: nowrap;
+  }
+
+  .status-meta-card {
+    display: grid;
+    align-content: center;
+    gap: 0.8rem;
+  }
+
+  .status-meta-card > span {
+    color: #a24b22;
+  }
+
+  .status-title {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+  }
+
+  .status-meta-card .status-title strong {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: inherit;
+    line-height: inherit;
+  }
+
+  .status-title .subtitle-active,
+  .status-title .subtitle-completed {
+    color: #2c7a4b;
+  }
+
+  .status-title .subtitle-alert,
+  .status-title .subtitle-muted {
+    color: #b14d29;
+  }
+
+  .status-title .subtitle-verification {
+    color: #9b5c21;
+  }
+
+  .metric-card {
+    display: grid;
+    align-content: center;
+  }
+
+  .metric-card strong {
+    font-size: 2.2rem;
+  }
+
   .status-pill {
     display: inline-flex;
     align-items: center;
@@ -397,25 +796,111 @@ const Wrapper = styled.section`
     letter-spacing: 0.06em;
   }
 
-  .status-payment_verification {
+  .state-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: fit-content;
+    min-height: 3.4rem;
+    padding: 0 1.1rem;
+    border-radius: 999px;
+    font-size: 1.12rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+  }
+
+  .state-pill svg {
+    color: currentColor;
+  }
+
+  .journey-track {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+  }
+
+  .journey-step {
+    position: relative;
+    display: grid;
+    gap: 0.45rem;
+    color: #8a7b6e;
+    font-size: 1.08rem;
+    line-height: 1.35;
+  }
+
+  .journey-step::before {
+    content: "";
+    position: absolute;
+    top: 0.55rem;
+    left: 1.3rem;
+    right: -0.8rem;
+    height: 0.2rem;
+    background: #eadfce;
+  }
+
+  .journey-step:last-child::before {
+    display: none;
+  }
+
+  .journey-dot {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 999px;
+    background: #eadfce;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #ddcbb8;
+    position: relative;
+    z-index: 1;
+  }
+
+  .journey-complete,
+  .journey-current {
+    color: #2c7a4b;
+    font-weight: 700;
+  }
+
+  .journey-complete::before {
+    background: #9dd4ac;
+  }
+
+  .journey-complete .journey-dot,
+  .journey-current .journey-dot {
+    background: #2c7a4b;
+    box-shadow: 0 0 0 1px #9dd4ac;
+  }
+
+  .journey-current .journey-dot {
+    background: #fff;
+    border-color: #2c7a4b;
+  }
+
+  .status-payment_verification,
+  .status-verification,
+  .state-verification {
     background: #fff3e3;
     color: #9b5c21;
     border: 1px solid #f0d2aa;
   }
 
-  .status-active {
+  .status-active,
+  .state-active,
+  .state-completed {
     background: #ebf8ef;
     color: #2c7a4b;
     border: 1px solid #c9e8d2;
   }
 
-  .status-alert {
+  .status-alert,
+  .state-alert {
     background: #fff0ec;
     color: #b14d29;
     border: 1px solid #f0c2b1;
   }
 
-  .status-muted {
+  .status-muted,
+  .state-muted {
     background: #f3efe9;
     color: #7b6f64;
     border: 1px solid #e0d4c7;
@@ -423,7 +908,7 @@ const Wrapper = styled.section`
 
   .order-meta-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 0.7fr) minmax(16rem, 0.7fr);
     gap: 1.2rem;
     margin-bottom: 1.8rem;
   }
@@ -611,6 +1096,15 @@ const Wrapper = styled.section`
   @media (max-width: ${({ theme }) => theme.media.mobile}) {
     .orders-shell {
       padding: 2rem 1.4rem 5rem;
+    }
+
+    .order-top {
+      flex-direction: column;
+    }
+
+    .placed-date {
+      text-align: left;
+      width: 100%;
     }
 
     .order-card,

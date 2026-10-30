@@ -31,6 +31,15 @@ const renderArtwork = (image, className = "") => {
     );
   }
 
+  // Uploaded mockup photos already have their own background and lighting.
+  if (image.variant === "photo") {
+    return (
+      <div className={`scene scene-photo ${className}`}>
+        <img src={image.url} alt={image.label || image.filename} className="photo-image" />
+      </div>
+    );
+  }
+
   if (image.variant === "closeup") {
     return (
       <div className={`scene scene-closeup ${className}`}>
@@ -167,11 +176,27 @@ const Wrapper = styled.section`
     background: radial-gradient(circle at top, #fff 0%, #f8efdf 58%, #edd9c6 100%);
   }
 
-  .poster-image {
+  /* ".scene img" above sets cover; the poster itself must show uncropped. */
+  .scene .poster-image {
+    width: auto;
+    height: auto;
     max-width: 68%;
     max-height: 42rem;
     object-fit: contain;
     filter: drop-shadow(0 24px 26px rgba(0, 0, 0, 0.22));
+  }
+
+  .scene-photo {
+    display: grid;
+    place-items: center;
+    background: #f4f1ec;
+  }
+
+  .scene .photo-image {
+    width: 100%;
+    height: 100%;
+    max-height: 52rem;
+    object-fit: contain;
   }
 
   .scene-closeup {

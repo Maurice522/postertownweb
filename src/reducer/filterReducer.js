@@ -1,3 +1,5 @@
+import { collectionTitlesFor } from "../data/collections";
+
 const filterReducer = (state, action) => {
   switch (action.type) {
     case "LOAD_FILTER_PRODUCTS":
@@ -123,9 +125,22 @@ const filterReducer = (state, action) => {
 
       const { text, categories, colors, price } = state.filters;
 
-      if (text && text.trim()) {
+      // Search the name, subcategory and collections (the catalog collection such as
+      // "Anime Metal Prints" and store collections such as "Villains"). Every word
+      // typed must match somewhere, so "naruto kakashi" finds Kakashi.
+      const words = String(text || "").toLowerCase().split(/\s+/).filter(Boolean);
+      if (words.length) {
         tempFilterProduct = tempFilterProduct.filter((curElem) => {
-          return curElem.name && curElem.name.toLowerCase().includes(text.toLowerCase());
+          const haystack = [
+            curElem.name,
+            curElem.subCategory,
+            curElem.collection,
+            ...collectionTitlesFor(curElem),
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+          return words.every((word) => haystack.includes(word));
         });
       }
 
@@ -136,12 +151,14 @@ const filterReducer = (state, action) => {
       }
 
 if (colors.length > 0) {
-        tempFilterProduct = tempFilterProduct.filter(
-          (curElem) => colors.includes(curElem.color)
+        // A poster matches if any of its colours was picked, not only its main one.
+        tempFilterProduct = tempFilterProduct.filter((curElem) =>
+          (curElem.colors?.length ? curElem.colors : [curElem.color]).some((color) => colors.includes(color))
         );
       }
 
-      if (price > 0 && price < 5000) {
+      // Was a hard-coded 5000, so limits above that never filtered anything.
+      if (price > 0 && price < state.filters.maxPrice) {
         tempFilterProduct = tempFilterProduct.filter(
           (curElem) => curElem.price <= price
         );

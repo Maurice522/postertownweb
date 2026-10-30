@@ -4,10 +4,12 @@ import reducer from "../reducer/productReducer";
 import localProducts from "../data/products.json";
 import { normalizeProducts } from "../utils/productHelpers";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
 const AppContext = createContext();
 
 const initialState = {
-  isLoading: false,
+  isLoading: true,
   isError: false,
   products: [],
   featureProducts: [],
@@ -18,12 +20,18 @@ const initialState = {
 const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // Live catalog from the backend (what the admin console manages). The bundled
+  // products.json is only a fallback for when the API can't be reached.
   const getProducts = async () => {
     dispatch({ type: "SET_LOADING" });
     try {
-      dispatch({ type: "SET_API_DATA", payload: normalizeProducts(localProducts) });
+      // Render's free plan can take ~50s to wake the backend after a quiet spell.
+      const res = await axios.get(`${API_BASE_URL}/api/products`, { timeout: 60000 });
+      const live = Array.isArray(res.data) ? res.data : [];
+      dispatch({ type: "SET_API_DATA", payload: normalizeProducts(live.length ? live : localProducts) });
     } catch (error) {
-      dispatch({ type: "API_ERROR" });
+      console.error("Could not load products from the API; showing the bundled catalog", error);
+      dispatch({ type: "SET_API_DATA", payload: normalizeProducts(localProducts) });
     }
   };
 

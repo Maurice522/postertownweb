@@ -10,17 +10,19 @@ import {
   FiShield,
   FiTrash2,
   FiTruck,
+  FiX,
 } from "react-icons/fi";
 import { QRCodeSVG } from "qrcode.react";
 import { useCartContext } from "./context/cart_context";
 import CartItem from "./components/CartItem";
 import FormatPrice from "./Helpers/FormatPrice";
 import { useUserContext } from "./context/user_context";
+import { createCustomerUserId, prependStoredOrder } from "./utils/orderStorage";
 
 const SHIPPING_STORAGE_KEY = "postertown_shipping_info";
 const PAYMENT_STORAGE_KEY = "postertown_payment_info";
-const ORDERS_STORAGE_KEY = "postertown_orders";
-const UPI_ID = "mauricerana@okicici";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+const UPI_ID = "prathamgupta52043@okhdfcbank";
 const UPI_PAYEE = "Poster Town";
 const GST_RATE = 18;
 const emptyPaymentInfo = {
@@ -31,14 +33,34 @@ const emptyPaymentInfo = {
   note: "",
 };
 
+const INDIAN_STATES = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana",
+  "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana",
+  "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+  // Union territories
+  "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi",
+  "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
+];
+
+const createOrderId = () => `PT-${Date.now().toString().slice(-8)}`;
+
 const Cart = () => {
   const navigate = useNavigate();
   const { cart, clearCart, total_price, shipping_fee, total_item } = useCartContext();
-  const { isAuthenticated, user } = useUserContext();
+  const { isAuthenticated, user, saveAddress } = useUserContext();
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const [addressError, setAddressError] = useState("");
+  const [avatarFailed, setAvatarFailed] = useState(false);
+  // Google accounts store their profile photo as avatarUrl.
+  const userAvatar = user?.avatarUrl || user?.picture || "";
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [copiedField, setCopiedField] = useState("");
   const [placedOrder, setPlacedOrder] = useState(null);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [orderSubmitError, setOrderSubmitError] = useState("");
+  const [pendingOrderId, setPendingOrderId] = useState(createOrderId);
   const [shippingInfo, setShippingInfo] = useState({
     fullName: "",
     phone: "",
@@ -78,11 +100,11 @@ const Cart = () => {
       pn: UPI_PAYEE,
       cu: "INR",
       am: String(orderTotal),
-      tn: `Poster Town order for ${shippingRecipient}`,
+      tn: `Poster Town ${pendingOrderId}`,
     });
 
     return `upi://pay?${params.toString()}`;
-  }, [orderTotal, shippingRecipient]);
+  }, [orderTotal, pendingOrderId]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -121,9 +143,15 @@ const Cart = () => {
       return;
     }
 
+    const savedAddress =
+      user.addresses?.find((address) => address.isDefault) || user.addresses?.[0];
+
     setShippingInfo((current) => ({
       ...current,
-      fullName: current.fullName || user.name || "",
+      ...(savedAddress
+        ? Object.fromEntries(Object.keys(current).map((key) => [key, savedAddress[key] || current[key] || ""]))
+        : {}),
+      fullName: savedAddress?.fullName || current.fullName || user.name || "",
     }));
   }, [isAuthenticated, user]);
 
@@ -144,16 +172,33 @@ const Cart = () => {
     }));
   };
 
-  const handleShippingSubmit = (event) => {
+  const handleShippingSubmit = async (event) => {
     event.preventDefault();
+    setAddressError("");
     if (typeof window !== "undefined") {
       window.localStorage.setItem(SHIPPING_STORAGE_KEY, JSON.stringify(shippingInfo));
     }
+
+    // Logged-in customers get the address saved to their account for next time.
+    if (isAuthenticated && user?.id) {
+      setIsSavingAddress(true);
+      try {
+        await saveAddress(shippingInfo);
+      } catch (error) {
+        setAddressError(error.message);
+        return;
+      } finally {
+        setIsSavingAddress(false);
+      }
+    }
+
     setIsAddressModalOpen(false);
   };
 
   const handlePaymentChange = (event) => {
-    const { name, value } = event.target;
+    const { name } = event.target;
+    // UTRs are 12 digits; drop the spaces some UPI apps show between groups.
+    const value = name === "transactionId" ? event.target.value.replace(/\D/g, "").slice(0, 12) : event.target.value;
     setPaymentInfo((current) => ({
       ...current,
       [name]: value,
@@ -183,12 +228,17 @@ const Cart = () => {
     reader.readAsDataURL(file);
   };
 
-  const handlePaymentSubmit = (event) => {
+  const handlePaymentSubmit = async (event) => {
     event.preventDefault();
+    setOrderSubmitError("");
+    setIsSubmittingOrder(true);
 
-    const orderId = `PT-${Date.now().toString().slice(-8)}`;
+    const orderId = pendingOrderId;
+    const customerUserId = isAuthenticated ? createCustomerUserId(user) : "";
     const orderRecord = {
       id: orderId,
+      userId: customerUserId || undefined,
+      isGuest: !isAuthenticated,
       status: "payment_verification",
       statusLabel: "Payment Verification",
       createdAt: new Date().toISOString(),
@@ -229,31 +279,67 @@ const Cart = () => {
         cancellable: true,
         refundable: true,
       },
+      source: {
+        channel: "web",
+        storage: isAuthenticated ? "account" : "guest_cookie",
+      },
     };
 
-    if (typeof window !== "undefined") {
-      const existingOrders = JSON.parse(window.localStorage.getItem(ORDERS_STORAGE_KEY) || "[]");
-      const nextOrders = Array.isArray(existingOrders) ? [orderRecord, ...existingOrders] : [orderRecord];
-      window.localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(nextOrders));
-      window.localStorage.removeItem(PAYMENT_STORAGE_KEY);
-    }
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderRecord),
+      });
 
-    clearCart();
-    setPlacedOrder(orderRecord);
-    setPaymentInfo(emptyPaymentInfo);
-    setIsPaymentModalOpen(false);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.message || `Order submission failed with ${response.status}`);
+      }
+      const savedOrder = data;
+
+      if (typeof window !== "undefined") {
+        prependStoredOrder(savedOrder, isAuthenticated);
+        window.localStorage.removeItem(PAYMENT_STORAGE_KEY);
+      }
+
+      clearCart();
+      setPendingOrderId(createOrderId());
+      setPlacedOrder(savedOrder);
+      setPaymentInfo(emptyPaymentInfo);
+      setIsPaymentModalOpen(false);
+    } catch (error) {
+      console.error("Failed to save order to API", error);
+      setOrderSubmitError(
+        error.message || "Could not submit the order to the server. Please try again."
+      );
+    } finally {
+      setIsSubmittingOrder(false);
+    }
   };
 
   const handleCopy = async (value, field) => {
-    if (typeof navigator === "undefined" || !navigator.clipboard) {
-      return;
-    }
-
     try {
       await navigator.clipboard.writeText(value);
       setCopiedField(field);
-    } catch (error) {
-      console.error("Clipboard copy failed", error);
+      return;
+    } catch {
+      // Clipboard API is missing or blocked (e.g. some in-app browsers); fall back below.
+    }
+
+    const scratch = document.createElement("textarea");
+    scratch.value = value;
+    scratch.setAttribute("readonly", "");
+    scratch.style.position = "fixed";
+    scratch.style.opacity = "0";
+    document.body.appendChild(scratch);
+    scratch.select();
+    try {
+      if (document.execCommand("copy")) {
+        setCopiedField(field);
+      }
+    } finally {
+      scratch.remove();
     }
   };
 
@@ -374,7 +460,18 @@ const Cart = () => {
         {isAuthenticated && user ? (
           <section className="user-strip">
             <div className="user-chip">
-              <img src={user.picture || user.profile} alt={user.name} />
+              {userAvatar && !avatarFailed ? (
+                <img
+                  src={userAvatar}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  onError={() => setAvatarFailed(true)}
+                />
+              ) : (
+                <span className="user-initial" aria-hidden="true">
+                  {(user.name || user.email || "?").trim().charAt(0).toUpperCase()}
+                </span>
+              )}
               <div>
                 <span>Signed in</span>
                 <strong>{user.name}</strong>
@@ -579,6 +676,10 @@ const Cart = () => {
                     value={shippingInfo.phone}
                     onChange={handleShippingChange}
                     placeholder="10-digit mobile number"
+                    inputMode="numeric"
+                    pattern="[6-9][0-9]{9}"
+                    maxLength={10}
+                    title="10-digit mobile number"
                     required
                   />
                 </label>
@@ -613,13 +714,16 @@ const Cart = () => {
                 </label>
                 <label>
                   State
-                  <input
-                    name="state"
-                    value={shippingInfo.state}
-                    onChange={handleShippingChange}
-                    placeholder="State"
-                    required
-                  />
+                  <select name="state" value={shippingInfo.state} onChange={handleShippingChange} required>
+                    <option value="" disabled>
+                      Select state
+                    </option>
+                    {INDIAN_STATES.map((state) => (
+                      <option key={state} value={state}>
+                        {state}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <label>
                   Pincode
@@ -627,18 +731,27 @@ const Cart = () => {
                     name="pincode"
                     value={shippingInfo.pincode}
                     onChange={handleShippingChange}
-                    placeholder="Pincode"
+                    placeholder="6-digit pincode"
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    title="6-digit pincode"
                     required
                   />
                 </label>
               </div>
 
+              {addressError && <p className="address-error">{addressError}</p>}
+              {!isAuthenticated && (
+                <p className="address-note">Log in to keep this address on your account for next time.</p>
+              )}
+
               <div className="modal-actions">
                 <button type="button" className="helper-btn secondary" onClick={() => setIsAddressModalOpen(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="helper-btn">
-                  Save address
+                <button type="submit" className="helper-btn" disabled={isSavingAddress}>
+                  {isSavingAddress ? "Saving..." : "Save address"}
                 </button>
               </div>
             </form>
@@ -648,142 +761,172 @@ const Cart = () => {
 
       {isPaymentModalOpen ? (
         <div className="modal-overlay" onClick={() => setIsPaymentModalOpen(false)}>
-          <div className="payment-modal" onClick={(event) => event.stopPropagation()}>
-            <div className="modal-top">
+          <div
+            className="payment-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="payment-modal-title"
+            onClick={(event) => event.stopPropagation()}>
+            <div className="payment-head">
               <div>
-                <span className="panel-kicker">Payment</span>
-                <h3>Pay with UPI</h3>
+                <span className="panel-kicker">UPI payment · Order {pendingOrderId}</span>
+                <h3 id="payment-modal-title">
+                  Pay <FormatPrice price={orderTotal} />
+                </h3>
               </div>
-              <button type="button" className="modal-close" onClick={() => setIsPaymentModalOpen(false)}>
-                x
+              <button
+                type="button"
+                className="modal-close"
+                aria-label="Close payment"
+                onClick={() => setIsPaymentModalOpen(false)}>
+                <FiX />
               </button>
             </div>
 
-            <div className="payment-layout">
-              <div className="qr-panel">
-                <div className="qr-shell">
-                  <QRCodeSVG value={upiLink} size={248} includeMargin />
-                </div>
-                <a className="upi-link-btn" href={upiLink}>
-                  Open in UPI app
-                </a>
-              </div>
-
-              <div className="payment-copy">
-                <div className="payment-summary-card">
-                  <span className="shipping-label">Amount to pay</span>
-                  <strong>
-                    <FormatPrice price={orderTotal} />
-                  </strong>
+            <div className="payment-body">
+              <section className="pay-step">
+                <div className="pay-step-title">
+                  <span className="pay-step-number">1</span>
+                  <h4>Pay with any UPI app</h4>
                 </div>
 
-                <div className="copy-row">
-                  <div>
-                    <span className="copy-label">UPI ID</span>
-                    <strong>{UPI_ID}</strong>
+                <div className="pay-now">
+                  <div className="qr-shell">
+                    <QRCodeSVG value={upiLink} size={176} includeMargin={false} />
                   </div>
-                  <button type="button" className="copy-btn" onClick={() => handleCopy(UPI_ID, "upi")}>
-                    <FiCopy />
-                    {copiedField === "upi" ? "Copied" : "Copy"}
-                  </button>
-                </div>
 
-                <div className="copy-row">
-                  <div>
-                    <span className="copy-label">Ship to</span>
-                    <strong>{shippingRecipient}</strong>
-                    <p>{shippingDestination}</p>
-                  </div>
-                </div>
+                  <div className="pay-details">
+                    <p className="pay-hint">
+                      Scan with Google Pay, PhonePe, Paytm or BHIM. The amount and order number are filled in for you.
+                    </p>
 
-                <div className="payment-explainer">
-                  <h4>How payment confirmation works</h4>
-                  <p>
-                    After paying, share the UPI transaction ID and upload the payment screenshot. That gives
-                    a much cleaner manual trail to compare with the incoming payment received on the merchant account.
-                  </p>
-                  <p className="small-note">
-                    For full automatic verification later, we would need a payment gateway or bank webhook.
-                    Right now this is a manual-but-real confirmation path.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <form className="payment-form" onSubmit={handlePaymentSubmit}>
-              <div className="form-grid">
-                <label>
-                  Your name
-                  <input
-                    name="payerName"
-                    value={paymentInfo.payerName}
-                    onChange={handlePaymentChange}
-                    placeholder="Name used while paying"
-                    required
-                  />
-                </label>
-                <label>
-                  UPI transaction ID
-                  <input
-                    name="transactionId"
-                    value={paymentInfo.transactionId}
-                    onChange={handlePaymentChange}
-                    placeholder="Transaction / UTR / reference ID"
-                    required
-                  />
-                </label>
-                <label className="full-width upload-field">
-                  Payment screenshot
-                  <div className="upload-shell">
-                    <input type="file" accept="image/*" onChange={handleScreenshotChange} />
-                    <div className="upload-visual">
-                      <div className="upload-icon">
-                        <FiImage />
+                    <div className="pay-row">
+                      <div>
+                        <span className="copy-label">Amount</span>
+                        <strong className="pay-amount">
+                          <FormatPrice price={orderTotal} />
+                        </strong>
                       </div>
-                      <div className="upload-text">
-                        <strong>{paymentInfo.screenshotName ? "Screenshot attached" : "Upload payment screenshot"}</strong>
-                        <span>
-                          {paymentInfo.screenshotName
-                            ? paymentInfo.screenshotName
-                            : "PNG, JPG, or JPEG from your UPI app receipt"}
+                    </div>
+
+                    <div className="pay-row">
+                      <div>
+                        <span className="copy-label">UPI ID</span>
+                        <strong>{UPI_ID}</strong>
+                      </div>
+                      <button type="button" className="copy-btn" onClick={() => handleCopy(UPI_ID, "upi")}>
+                        <FiCopy />
+                        {copiedField === "upi" ? "Copied" : "Copy"}
+                      </button>
+                    </div>
+
+                    <a className="upi-link-btn" href={upiLink}>
+                      Open UPI app
+                    </a>
+                  </div>
+                </div>
+              </section>
+
+              <form id="payment-form" className="pay-step payment-form" onSubmit={handlePaymentSubmit}>
+                <div className="pay-step-title">
+                  <span className="pay-step-number">2</span>
+                  <h4>Tell us which payment is yours</h4>
+                </div>
+
+                <div className="form-grid">
+                  <label>
+                    UTR number
+                    <input
+                      name="transactionId"
+                      value={paymentInfo.transactionId}
+                      onChange={handlePaymentChange}
+                      placeholder="12-digit number"
+                      inputMode="numeric"
+                      pattern="[0-9]{12}"
+                      title="The 12-digit UTR from your UPI app"
+                      required
+                    />
+                    <small>
+                      In your UPI app, open this payment. Google Pay calls it "UPI transaction ID", PhonePe "UTR", Paytm
+                      "UPI Ref No.".
+                    </small>
+                  </label>
+                  <label>
+                    Name on your UPI account
+                    <input
+                      name="payerName"
+                      value={paymentInfo.payerName}
+                      onChange={handlePaymentChange}
+                      placeholder="As shown in your UPI app"
+                      required
+                    />
+                  </label>
+                  <label className="full-width upload-field">
+                    <span>
+                      Payment screenshot <span className="optional">(optional)</span>
+                    </span>
+                    <div className="upload-shell">
+                      <input type="file" accept="image/*" onChange={handleScreenshotChange} />
+                      <div className="upload-visual">
+                        <div className="upload-icon">
+                          <FiImage />
+                        </div>
+                        <div className="upload-text">
+                          <strong>{paymentInfo.screenshotName ? "Screenshot attached" : "Add a screenshot"}</strong>
+                          <span>
+                            {paymentInfo.screenshotName || "Helps us find your payment faster"}
+                          </span>
+                        </div>
+                        <span className="upload-action">
+                          {paymentInfo.screenshotName ? "Replace" : "Choose file"}
                         </span>
                       </div>
-                      <span className="upload-action">
-                        {paymentInfo.screenshotName ? "Replace" : "Choose file"}
-                      </span>
                     </div>
-                  </div>
-                </label>
-                <label className="full-width">
-                  Note
-                  <input
-                    name="note"
-                    value={paymentInfo.note}
-                    onChange={handlePaymentChange}
-                    placeholder="Optional note for this payment"
-                  />
-                </label>
-              </div>
-
-              {paymentInfo.screenshotDataUrl ? (
-                <div className="payment-proof-preview">
-                  <div className="payment-proof-preview-text">
-                    <span className="copy-label">Attached screenshot</span>
-                    <div className="payment-proof-preview-name">{paymentInfo.screenshotName}</div>
-                  </div>
-                  <img src={paymentInfo.screenshotDataUrl} alt="Uploaded payment screenshot" />
+                  </label>
                 </div>
-              ) : null}
 
-              <div className="modal-actions">
-                <button type="button" className="helper-btn secondary" onClick={() => setIsPaymentModalOpen(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="helper-btn">
-                  Submit payment details
-                </button>
-              </div>
-            </form>
+                {paymentInfo.screenshotDataUrl ? (
+                  <div className="payment-proof-preview">
+                    <div className="payment-proof-preview-text">
+                      <span className="copy-label">Attached screenshot</span>
+                      <div className="payment-proof-preview-name">{paymentInfo.screenshotName}</div>
+                    </div>
+                    <img src={paymentInfo.screenshotDataUrl} alt="Uploaded payment screenshot" />
+                  </div>
+                ) : null}
+              </form>
+
+              <section className="pay-step pay-next">
+                <div className="pay-step-title">
+                  <span className="pay-step-number">3</span>
+                  <h4>What happens next</h4>
+                </div>
+                <ol>
+                  <li>
+                    We check our UPI account for a payment of <FormatPrice price={orderTotal} /> with your UTR.
+                  </li>
+                  <li>
+                    Once we find it, your order is confirmed and you get a "Payment received" email. This usually takes
+                    a few hours.
+                  </li>
+                  <li>If we can't find the payment, we email you before anything is shipped.</li>
+                </ol>
+                <p className="pay-ship-to">
+                  Shipping to <strong>{shippingRecipient}</strong>, {shippingDestination}
+                </p>
+              </section>
+
+              {orderSubmitError ? <div className="submit-error">{orderSubmitError}</div> : null}
+            </div>
+
+            <div className="payment-footer">
+              <button type="button" className="helper-btn secondary" onClick={() => setIsPaymentModalOpen(false)}>
+                Cancel
+              </button>
+              <button type="submit" form="payment-form" className="helper-btn" disabled={isSubmittingOrder}>
+                {isSubmittingOrder ? "Submitting..." : "I've paid, confirm order"}
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
@@ -1138,11 +1281,24 @@ const Wrapper = styled.section`
     box-shadow: 0 10px 20px rgba(61, 41, 22, 0.05);
   }
 
-  .user-chip img {
+  .user-chip img,
+  .user-chip .user-initial {
     width: 4.8rem;
     height: 4.8rem;
     border-radius: 50%;
     object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .user-chip .user-initial {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #231f20 0%, #49372f 100%);
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
   }
 
   .user-chip span {
@@ -1428,6 +1584,11 @@ const Wrapper = styled.section`
     border: 1px solid #e2d3c2;
   }
 
+  .helper-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -1447,15 +1608,155 @@ const Wrapper = styled.section`
     padding: 2.2rem;
   }
 
+  /* Header and footer stay put; only the steps in between scroll. */
   .payment-modal {
-    width: min(100%, 82rem);
-    max-height: min(88vh, 92rem);
+    width: min(100%, 72rem);
+    max-height: min(92vh, 96rem);
+    display: flex;
+    flex-direction: column;
     background: #fffaf3;
     border: 1px solid #eadfce;
-    border-radius: 2.6rem;
+    border-radius: 2.4rem;
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18);
-    padding: 2.2rem;
+    overflow: hidden;
+  }
+
+  .payment-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 1rem;
+    padding: 2rem 2.2rem 1.4rem;
+    border-bottom: 1px solid #efe3d5;
+  }
+
+  .payment-head h3 {
+    font-size: 2.6rem;
+    margin-top: 0.3rem;
+  }
+
+  .payment-head .modal-close {
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+  }
+
+  .payment-body {
+    flex: 1;
     overflow-y: auto;
+    padding: 1.8rem 2.2rem;
+    display: grid;
+    gap: 1.4rem;
+  }
+
+  .payment-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.4rem 2.2rem;
+    border-top: 1px solid #efe3d5;
+    background: #fffaf3;
+  }
+
+  .pay-step {
+    background: #fff;
+    border: 1px solid #eadfce;
+    border-radius: 1.8rem;
+    padding: 1.6rem;
+  }
+
+  .pay-step-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .pay-step-title h4 {
+    font-size: 1.7rem;
+    color: #231f20;
+  }
+
+  .pay-step-number {
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    background: #231f20;
+    color: #fff8f1;
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+
+  .pay-now {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1.8rem;
+    align-items: start;
+  }
+
+  .pay-details {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .pay-hint {
+    color: #5f554d;
+    font-size: 1.4rem;
+    line-height: 1.6;
+  }
+
+  .pay-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 1.2rem;
+    background: #fbf6ef;
+  }
+
+  .pay-row strong {
+    display: block;
+    color: #231f20;
+    font-size: 1.55rem;
+    overflow-wrap: anywhere;
+  }
+
+  .pay-row .pay-amount {
+    font-size: 2.2rem;
+  }
+
+  .form-grid small {
+    color: #7a6c60;
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .form-grid .optional {
+    color: #8a7b6e;
+    font-weight: 500;
+  }
+
+  .pay-next ol {
+    display: grid;
+    gap: 0.9rem;
+    padding-left: 2rem;
+    color: #3f3833;
+    font-size: 1.45rem;
+    line-height: 1.6;
+  }
+
+  .pay-ship-to {
+    margin-top: 1.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #f1e6da;
+    color: #6b5f56;
+    font-size: 1.3rem;
+    line-height: 1.6;
   }
 
   .modal-top {
@@ -1487,27 +1788,13 @@ const Wrapper = styled.section`
     gap: 1.2rem;
   }
 
-  .payment-layout {
-    display: grid;
-    grid-template-columns: 28rem minmax(0, 1fr);
-    gap: 1.8rem;
-    margin-bottom: 1.8rem;
-  }
-
-  .qr-panel {
-    display: grid;
-    gap: 1rem;
-    align-content: start;
-  }
-
   .qr-shell {
     background: #fff;
     border: 1px solid #eadfce;
     border-radius: 2rem;
-    padding: 1.6rem;
+    padding: 1.2rem;
     display: grid;
     place-items: center;
-    min-height: 31rem;
   }
 
   .upi-link-btn {
@@ -1523,34 +1810,6 @@ const Wrapper = styled.section`
     text-decoration: none;
   }
 
-  .payment-copy {
-    display: grid;
-    gap: 1.2rem;
-    align-content: start;
-  }
-
-  .payment-summary-card,
-  .copy-row,
-  .payment-explainer {
-    background: #fff;
-    border: 1px solid #eadfce;
-    border-radius: 1.6rem;
-    padding: 1.4rem;
-  }
-
-  .payment-summary-card strong {
-    display: block;
-    font-size: 2.3rem;
-    color: #231f20;
-  }
-
-  .copy-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: start;
-  }
-
   .copy-label {
     display: block;
     color: #8a7b6e;
@@ -1558,18 +1817,6 @@ const Wrapper = styled.section`
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 0.35rem;
-  }
-
-  .copy-row strong {
-    display: block;
-    color: #231f20;
-    font-size: 1.6rem;
-  }
-
-  .copy-row p {
-    color: #6b5f56;
-    line-height: 1.7;
-    margin-top: 0.5rem;
   }
 
   .copy-btn {
@@ -1587,21 +1834,6 @@ const Wrapper = styled.section`
     font-weight: 700;
   }
 
-  .payment-explainer h4 {
-    font-size: 1.7rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .payment-explainer p {
-    color: #6b5f56;
-    line-height: 1.7;
-  }
-
-  .payment-explainer .small-note {
-    margin-top: 0.9rem;
-    font-size: 1.2rem;
-  }
-
   .form-grid label {
     display: flex;
     flex-direction: column;
@@ -1615,7 +1847,8 @@ const Wrapper = styled.section`
     grid-column: 1 / -1;
   }
 
-  .form-grid input {
+  .form-grid input,
+  .form-grid select {
     max-width: none;
     width: 100%;
     background: #fff;
@@ -1624,6 +1857,28 @@ const Wrapper = styled.section`
     box-shadow: none;
     text-transform: none;
     padding: 1.2rem 1.4rem;
+  }
+
+  .form-grid select {
+    font: inherit;
+    font-weight: 500;
+    color: #231f20;
+    cursor: pointer;
+  }
+
+  .address-error,
+  .address-note {
+    margin-top: 1.2rem;
+    font-size: 1.3rem;
+  }
+
+  .address-error {
+    color: #c0392b;
+    font-weight: 600;
+  }
+
+  .address-note {
+    color: #7a6c60;
   }
 
   .upload-shell {
@@ -1745,6 +2000,17 @@ const Wrapper = styled.section`
     word-break: break-word;
   }
 
+  .submit-error {
+    margin-top: 1.2rem;
+    background: #fff0ec;
+    border: 1px solid #f0c2b1;
+    color: #9f3e1d;
+    border-radius: 1.3rem;
+    padding: 1rem 1.2rem;
+    font-size: 1.28rem;
+    line-height: 1.5;
+  }
+
   .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -1821,8 +2087,24 @@ const Wrapper = styled.section`
       grid-template-columns: 1fr;
     }
 
-    .payment-layout {
+    .payment-head,
+    .payment-body,
+    .payment-footer {
+      padding-left: 1.6rem;
+      padding-right: 1.6rem;
+    }
+
+    .pay-now {
       grid-template-columns: 1fr;
+      justify-items: center;
+    }
+
+    .pay-details {
+      width: 100%;
+    }
+
+    .payment-footer .helper-btn {
+      flex: 1;
     }
 
     .payment-proof-preview {

@@ -3,21 +3,10 @@ import styled from "styled-components";
 import FilterSection from "./components/FilterSection";
 import ProductList from "./components/ProductList";
 import Sort from "./components/Sort";
+import { pickHeroGif } from "./data/heroGifs";
 
 const Products = () => {
-  const heroGif = useMemo(() => {
-    const gifs = [
-      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3J4cnI1NXY3ZWV3ZHVwNHVuMmV4cmt2cTVrMmd6b2Z1cXR1MW92MyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lsUWq3SQ3NLYusKJ4O/giphy.gif",
-      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3J4cnI1NXY3ZWV3ZHVwNHVuMmV4cmt2cTVrMmd6b2Z1cXR1MW92MyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/4ajQEQgTHvKxNWGFCK/giphy.gif",
-      "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bGdxMHE1MGttcmk5YzhvdDZkZGV0M2ptdWJkY3Q1N3c2b2d0a3kxdCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/EjLTU9HAnnskywtJ9j/giphy.gif",
-      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGFvdHhhYzcxZzg4ZXRvMnlscGtldjZhaWo5MDE3MjN3dThzOHJnMCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/h2GpJK6ljDJJnLDWUA/giphy.gif",
-      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmswN3ZkOWVhZmZsMHoxbXg4cDBva25qa3dya2cxZzhhdDNrNGttbyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xLzOrO1e19V3q/giphy.gif",
-      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmswN3ZkOWVhZmZsMHoxbXg4cDBva25qa3dya2cxZzhhdDNrNGttbyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/NeqRhamuUqjjxVGIqh/giphy.gif",
-      "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3MDBpeG13cTU5YXYycjN3NHZ1YzcwNWFlb3BwcGF2dWhkdHFqNWIybCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/pGlDpwgWTLgBi/giphy.gif",
-    ];
-
-    return gifs[Math.floor(Math.random() * gifs.length)];
-  }, []);
+  const heroGif = useMemo(pickHeroGif, []);
 
   return (
     <Wrapper>
@@ -56,9 +45,7 @@ const Products = () => {
 
         <section className="products-outro">
           <div className="products-outro-shell">
-            <span>Browse with ease</span>
-            <p>Refine by category, switch views, and keep exploring without the page ending abruptly before the footer.</p>
-          </div>
+            <span>Browse with ease</span>          </div>
         </section>
       </div>
     </Wrapper>
@@ -88,7 +75,7 @@ const Wrapper = styled.section`
     grid-template-columns: minmax(0, 0.95fr) minmax(42rem, 1fr);
     gap: 3rem;
     align-items: stretch;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
   .eyebrow {
@@ -104,7 +91,7 @@ const Wrapper = styled.section`
   }
 
   h1 {
-    font-size: clamp(3.4rem, 5vw, 5.6rem);
+    font-size: clamp(3rem, 4vw, 4.6rem);
     line-height: 1.08;
     margin-bottom: 1rem;
   }
@@ -116,8 +103,8 @@ const Wrapper = styled.section`
   }
 
   .hero-media {
-    height: 67.2%;
-    min-height: 17.9rem;
+    height: 14rem;
+    min-height: 14rem;
     aspect-ratio: 16 / 6;
     width: min(100%, 43rem);
     justify-self: center;
@@ -139,14 +126,14 @@ const Wrapper = styled.section`
 
   .products-layout {
     display: grid;
-    grid-template-columns: 30rem minmax(0, 1fr);
-    gap: 2.4rem;
+    grid-template-columns: 28rem minmax(0, 1fr);
+    gap: 1.8rem;
     align-items: start;
   }
 
   .products-outro {
-    margin-top: 3.6rem;
-    padding: 0 0 2rem;
+    margin-top: 2.4rem;
+    padding: 0;
   }
 
   .products-outro-shell {
@@ -175,25 +162,13 @@ const Wrapper = styled.section`
 
   .filter-section {
     position: sticky;
-    top: 10rem;
+    top: 8rem;
     align-self: start;
-    max-height: calc(100vh - 12rem);
-    overflow-y: auto;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: #c9aa8d transparent;
   }
 
   .product-view {
     min-width: 0;
-    max-height: calc(100vh - 12rem);
-    overflow-y: auto;
     padding-right: 0.4rem;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: #c9aa8d transparent;
   }
 
   .sort-filter {
@@ -203,22 +178,6 @@ const Wrapper = styled.section`
     z-index: 2;
     background: linear-gradient(180deg, #f6ecde 0%, rgba(246, 236, 222, 0.96) 72%, rgba(246, 236, 222, 0) 100%);
     padding-bottom: 1rem;
-  }
-
-  .filter-section::-webkit-scrollbar,
-  .product-view::-webkit-scrollbar {
-    width: 0.7rem;
-  }
-
-  .filter-section::-webkit-scrollbar-track,
-  .product-view::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .filter-section::-webkit-scrollbar-thumb,
-  .product-view::-webkit-scrollbar-thumb {
-    background: rgba(201, 170, 141, 0.9);
-    border-radius: 999px;
   }
 
   @media (max-width: ${({ theme }) => theme.media.tab}) {
@@ -243,7 +202,7 @@ const Wrapper = styled.section`
   }
 
   @media (max-width: ${({ theme }) => theme.media.mobile}) {
-    padding: 3rem 0 5rem;
+    padding: 2.4rem 0 5rem;
 
     .products-shell {
       padding: 0 1.4rem;

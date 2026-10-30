@@ -1,81 +1,30 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
-import RotatingText from "./RotatingText";
+import { FiArrowRight } from "react-icons/fi";
 import Product from "./Product";
+import { useProductContext } from "../context/productcontex";
 
 const FeatureProduct = () => {
+  const { products } = useProductContext();
+  const isBestseller = (product) => (product.badges || product.tags || []).some((badge) => /bestseller/i.test(String(badge)));
+  const portrait = products.filter((product) => product.orientation !== "landscape");
   const productList = [
-    {
-      id: "poster-006",
-      name: "Giyu Tomoioka",
-      image: "images/giyu.jpg",
-      price: 999,
-      category: "Anime",
-      stock: 15,
-      color: "blue",
-    },
-    {
-      id: "batman-001",
-      name: "Batman",
-      image: "images/batmanneon.jpg",
-      price: 999,
-      category: "DC",
-      stock: 20,
-      color: "black",
-    },
-    {
-      id: "deadpool-001",
-      name: "Deadpool",
-      image: "images/deadpool.jpg",
-      price: 999,
-      category: "Marvel",
-      stock: 25,
-      color: "red",
-    },
-    {
-      id: "movie-001",
-      name: "Optimus Prime",
-      image: "images/optimusprime.jpg",
-      price: 999,
-      category: "Movie",
-      stock: 12,
-      color: "blue",
-    },
-    {
-      id: "car-001",
-      name: "GT3 RS",
-      image: "images/gt3rswhite.jpg",
-      price: 999,
-      category: "Car",
-      stock: 8,
-      color: "white",
-    },
-    {
-      id: "games-001",
-      name: "Modern Warfare 2",
-      image: "images/mw2.jpg",
-      price: 999,
-      category: "Games",
-      stock: 20,
-      color: "black",
-    },
-  ];
+    ...portrait.filter((product) => product.featured || isBestseller(product)),
+    ...portrait.filter((product) => !(product.featured || isBestseller(product))),
+  ].slice(0, 6);
 
   return (
     <Wrapper className="section">
       <div className="container">
-        <div className="common-heading">
-          <RotatingText
-            texts={["Anime", "Artist", "Cars", "Cartoon", "DC", "Games", "Marvel", "Movies", "Scenery", "Sports"]}
-            mainClassName="feature-rotator"
-            staggerFrom="last"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "-120%" }}
-            staggerDuration={0.025}
-            splitLevelClassName=""
-            transition={{ type: "spring", damping: 30, stiffness: 400 }}
-            rotationInterval={2000}
-          />
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">Featured posters</span>
+            <h2>Picks from every fandom.</h2>
+            <p>Anime, comics, movies, games and cars, all printed on 1 mm metal.</p>
+          </div>
+          <Link to="/products" className="section-link">
+            Shop all posters <FiArrowRight />
+          </Link>
         </div>
 
         <div className="product-grid">
@@ -96,35 +45,53 @@ const Wrapper = styled.section`
     max-width: 132rem;
   }
 
-  .common-heading {
+  .section-head {
     display: flex;
-    justify-content: center;
-    margin-bottom: 4rem;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2rem;
+    margin-bottom: 3.2rem;
   }
 
-  .feature-rotator {
-    width: auto;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
-    padding: 0;
+  .eyebrow {
+    display: inline-block;
+    color: #8a5c43;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
   }
 
-  .feature-rotator .text-rotate {
-    background: transparent;
-    width: auto;
-    padding: 0;
-    justify-content: center;
+  .section-head h2 {
+    color: #231f20;
+    font-size: clamp(3rem, 3.6vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.12;
+    text-transform: none;
+    margin-bottom: 0.8rem;
   }
 
-  .feature-rotator .text-rotate-word,
-  .feature-rotator .text-rotate-element,
-  .feature-rotator .text-rotate-space {
-    color: #2d241e;
-    font-size: clamp(3rem, 4vw, 5rem);
+  .section-head p {
+    color: #6a5e54;
+    font-size: 1.6rem;
+    line-height: 1.7;
+  }
+
+  .section-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+    color: #cf6d3f;
+    font-size: 1.5rem;
     font-weight: 700;
-    letter-spacing: 0;
+    text-decoration: none;
+    transition: gap 0.2s ease;
+  }
+
+  .section-link:hover {
+    gap: 1rem;
   }
 
   .product-grid {
@@ -146,8 +113,10 @@ const Wrapper = styled.section`
   @media (max-width: ${({ theme }) => theme.media.mobile}) {
     padding: 6rem 0;
 
-    .common-heading {
-      margin-bottom: 3rem;
+    .section-head {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 2.4rem;
     }
 
     .product-grid {

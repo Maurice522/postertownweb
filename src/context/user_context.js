@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useEffect } from "react";
 
 const UserContext = createContext();
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
 const initialState = {
   user: null,
@@ -21,34 +22,119 @@ const UserProvider = ({ children }) => {
     return initialState;
   };
 
-  const login = (email, password) => {
-    dispatch({ type: "SET_LOADING" });
-    // Simulated login - replace with actual API call
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const user = { email, name: email.split("@")[0] };
-        dispatch({ type: "LOGIN_SUCCESS", payload: user });
-        localStorage.setItem("postertownUser", JSON.stringify(user));
-        resolve(user);
-      }, 500);
+  const requestAuth = async (path, payload) => {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data?.message || "Authentication request failed");
+    }
+
+    return data;
   };
 
-  const register = (name, email, password) => {
+  const saveAuthenticatedUser = (user, actionType = "LOGIN_SUCCESS") => {
+    dispatch({ type: actionType, payload: user });
+    localStorage.setItem("postertownUser", JSON.stringify(user));
+    return user;
+  };
+
+  const login = async (email, password) => {
     dispatch({ type: "SET_LOADING" });
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const user = { name, email };
-        dispatch({ type: "REGISTER_SUCCESS", payload: user });
-        localStorage.setItem("postertownUser", JSON.stringify(user));
-        resolve(user);
-      }, 500);
-    });
+    try {
+      const data = await requestAuth("/api/auth/login", { email, password });
+      return saveAuthenticatedUser(data.user, "LOGIN_SUCCESS");
+    } catch (error) {
+      dispatch({ type: "AUTH_ERROR", payload: error.message });
+      throw error;
+    }
+  };
+
+  // credential is the ID token from Google's sign-in button; the backend verifies it.
+  const loginWithGoogle = async (credential) => {
+    dispatch({ type: "SET_LOADING" });
+    try {
+      const data = await requestAuth("/api/auth/google", { credential });
+      return saveAuthenticatedUser(data.user, "LOGIN_SUCCESS");
+    } catch (error) {
+      dispatch({ type: "AUTH_ERROR", payload: error.message });
+      throw error;
+    }
+  };
+
+  const startRegistration = async (name, email, password) => {
+    dispatch({ type: "SET_LOADING" });
+    try {
+      const data = await requestAuth("/api/auth/signup/start", { name, email, password });
+      dispatch({ type: "REQUEST_SUCCESS" });
+      return data;
+    } catch (error) {
+      dispatch({ type: "AUTH_ERROR", payload: error.message });
+      throw error;
+    }
+  };
+
+  const verifyRegistration = async (email, otp) => {
+    dispatch({ type: "SET_LOADING" });
+    try {
+      const data = await requestAuth("/api/auth/signup/verify", { email, otp });
+      return saveAuthenticatedUser(data.user, "REGISTER_SUCCESS");
+    } catch (error) {
+      dispatch({ type: "AUTH_ERROR", payload: error.message });
+      throw error;
+    }
+  };
+
+  const register = async (name, email, password) => {
+    await startRegistration(name, email, password);
+  };
+
+  const requestPasswordReset = async (email) => {
+    dispatch({ type: "SET_LOADING" });
+    try {
+      const data = await requestAuth("/api/auth/password/forgot", { email });
+      dispatch({ type: "REQUEST_SUCCESS" });
+      return data;
+    } catch (error) {
+      dispatch({ type: "AUTH_ERROR", payload: error.message });
+      throw error;
+    }
+  };
+
+  const resetPassword = async (email, otp, password) => {
+    dispatch({ type: "SET_LOADING" });
+    try {
+      const data = await requestAuth("/api/auth/password/reset", { email, otp, password });
+      return saveAuthenticatedUser(data.user, "LOGIN_SUCCESS");
+    } catch (error) {
+      dispatch({ type: "AUTH_ERROR", payload: error.message });
+      throw error;
+    }
   };
 
   const logout = () => {
     dispatch({ type: "LOGOUT" });
     localStorage.removeItem("postertownUser");
+  };
+
+  // Stores the delivery address on the account so it is there on every login.
+  const saveAddress = async (address) => {
+    const response = await fetch(`${API_BASE_URL}/api/auth/address`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: state.user?.id, email: state.user?.email, address }),
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data?.message || "Could not save your address");
+    }
+
+    return saveAuthenticatedUser(data.user, "RESTORE_USER");
   };
 
   const updateProfile = (updates) => {
@@ -69,8 +155,14 @@ const UserProvider = ({ children }) => {
       value={{
         ...state,
         login,
+        loginWithGoogle,
         register,
+        startRegistration,
+        verifyRegistration,
+        requestPasswordReset,
+        resetPassword,
         logout,
+        saveAddress,
         updateProfile,
       }}>
       {children}
@@ -82,6 +174,8 @@ const reducer = (state, action) => {
   switch (action.type) {
     case "SET_LOADING":
       return { ...state, isLoading: true, error: null };
+    case "REQUEST_SUCCESS":
+      return { ...state, isLoading: false, error: null };
     case "LOGIN_SUCCESS":
     case "REGISTER_SUCCESS":
     case "RESTORE_USER":

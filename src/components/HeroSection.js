@@ -77,9 +77,10 @@ const HeroSection = ({ myData }) => {
             Transform your space with bold, quirky metal posters from Poster Town—where every wall <b className="zain-bold" style={{color:"#1D1D1D", backgroundColor:"#ffff00"}}> Becomes a statement. </b>
             </p>
             <Magnet padding={1000} disabled={false} magnetStrength={50}>
-            <NavLink>
-              <Button>show now</Button>
-            </NavLink>
+            {/* A link styled as the button (a button nested in a link isn't valid HTML). */}
+            <Button as={NavLink} to="/products">
+              Shop now
+            </Button>
             </Magnet>
           </div>
           {/* our homepage image  */}

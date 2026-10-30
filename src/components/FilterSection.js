@@ -2,6 +2,9 @@ import styled from "styled-components";
 import { FiSearch, FiX } from "react-icons/fi";
 import { useFilterContext } from "../context/filter_context";
 
+// "Under" price options, always shown; empty ones are disabled.
+const PRICE_STEPS = [700, 1000, 1500, 2000, 2500];
+
 const FilterSection = () => {
   const {
     filters: { text, categories, colors, price, maxPrice },
@@ -9,6 +12,22 @@ const FilterSection = () => {
     all_products,
     clearFilters,
   } = useFilterContext();
+
+  const productPrices = (all_products || []).map((product) => Number(product.price) || 0);
+  const countUpTo = (limit) => productPrices.filter((value) => value <= limit).length;
+  const priceOptions = [
+    { key: "any", value: maxPrice, label: "Any price", count: productPrices.length },
+    ...PRICE_STEPS.map((limit) => ({
+      key: `under-${limit}`,
+      value: limit,
+      label: `Under ₹${limit.toLocaleString("en-IN")}`,
+      count: countUpTo(limit),
+    })),
+  ];
+  // Highlight the option that was picked. A limit above the dearest poster still
+  // counts as picked (it just shows everything), so "Under ₹2,000" stays selected.
+  const selectedKey = price === maxPrice || !PRICE_STEPS.includes(price) ? "any" : `under-${price}`;
+  const choosePrice = (value) => updateFilterValue({ target: { name: "price", value } });
 
   const getUniqueData = (data, attr) => {
     let newVal = data.map((curElem) => curElem[attr]);
@@ -21,7 +40,8 @@ const FilterSection = () => {
   };
 
   const categoryData = getUniqueData(all_products, "category");
-  const colorData = getUniqueData(all_products, "color");
+  // Every colour any poster has, not just each poster's main colour.
+  const colorData = getUniqueData(all_products, "colors");
 
   return (
     <Wrapper>
@@ -121,20 +141,21 @@ const FilterSection = () => {
 
         <div className="filter-group">
           <h3>Price</h3>
-          <div className="price-box">
-            <div className="price-top">
-              <span className="price-value">Rs. {Number(price).toLocaleString("en-IN")}</span>
-              <span className="price-note">{price >= maxPrice ? "max range" : "and below"}</span>
-            </div>
-            <input
-              type="range"
-              name="price"
-              min={100}
-              max={maxPrice || 5000}
-              step="100"
-              value={price || maxPrice || 5000}
-              onChange={updateFilterValue}
-            />
+          <div className="price-options" role="radiogroup" aria-label="Price">
+            {priceOptions.map((option) => (
+              <button
+                type="button"
+                key={option.key}
+                role="radio"
+                aria-checked={selectedKey === option.key}
+                className={selectedKey === option.key ? "price-option active" : "price-option"}
+                disabled={option.count === 0 && selectedKey !== option.key}
+                onClick={() => choosePrice(option.value)}>
+                <span className="price-radio" aria-hidden="true" />
+                <span className="price-label">{option.label}</span>
+                <span className="price-count">{option.count}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -146,8 +167,8 @@ const Wrapper = styled.section`
   .filter-card {
     background: rgba(255, 250, 243, 0.96);
     border: 1px solid #eadfce;
-    border-radius: 2rem;
-    padding: 2rem 1.8rem;
+    border-radius: 1.6rem;
+    padding: 1.4rem;
     box-shadow: 0 14px 28px rgba(61, 41, 22, 0.06);
   }
 
@@ -156,7 +177,7 @@ const Wrapper = styled.section`
     justify-content: space-between;
     gap: 1rem;
     align-items: start;
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.2rem;
   }
 
   .eyebrow {
@@ -164,15 +185,19 @@ const Wrapper = styled.section`
     background: #f8ebdc;
     color: #8a5c43;
     border-radius: 999px;
-    padding: 0.45rem 0.9rem;
+    padding: 0;
     font-size: 1.05rem;
     text-transform: uppercase;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.45rem;
+    background: transparent;
   }
 
   h2 {
-    font-size: 2.4rem;
+    font-size: 2rem;
     font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    white-space: nowrap;
   }
 
   .clear-btn {
@@ -181,7 +206,7 @@ const Wrapper = styled.section`
     color: #6f6258;
     border: 1px solid #eadfce;
     border-radius: 999px;
-    padding: 0.8rem 1.1rem;
+    padding: 0.65rem 0.95rem;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -189,7 +214,7 @@ const Wrapper = styled.section`
   }
 
   .filter-search {
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.2rem;
 
     form {
       display: flex;
@@ -199,7 +224,7 @@ const Wrapper = styled.section`
 
     input {
       width: 100%;
-      padding: 1.1rem 4.2rem 1.1rem 1.3rem;
+      padding: 0.9rem 4rem 0.9rem 1.1rem;
       border: 1px solid #dfd1c2;
       border-radius: 1.4rem;
       background: #fff;
@@ -221,21 +246,21 @@ const Wrapper = styled.section`
   }
 
   .filter-group + .filter-group {
-    margin-top: 1.8rem;
-    padding-top: 1.8rem;
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
     border-top: 1px solid #efe4d8;
   }
 
   h3 {
-    font-size: 1.55rem;
-    margin-bottom: 1rem;
+    font-size: 1.45rem;
+    margin-bottom: 0.8rem;
   }
 
   .chip-group,
   .color-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.8rem;
+    gap: 0.65rem;
   }
 
   .chip-group button,
@@ -244,7 +269,7 @@ const Wrapper = styled.section`
     background: #fff;
     color: #2d241e;
     border-radius: 999px;
-    padding: 0.75rem 1.1rem;
+    padding: 0.62rem 0.95rem;
     cursor: pointer;
     text-transform: capitalize;
     transition: all 0.2s ease;
@@ -278,37 +303,69 @@ const Wrapper = styled.section`
     border-color: #c9b9a9;
   }
 
-  .price-box {
-    background: #fff;
-    border: 1px solid #eadfce;
-    border-radius: 1.6rem;
-    padding: 1.3rem 1.2rem;
+  .price-options {
+    display: grid;
+    gap: 0.6rem;
   }
 
-  .price-top {
+  .price-option {
     display: flex;
-    justify-content: space-between;
-    gap: 1rem;
     align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  .price-value {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #cf6d3f;
-  }
-
-  .price-note {
-    color: #84786d;
-    font-size: 1.2rem;
-  }
-
-  input[type="range"] {
+    gap: 1rem;
     width: 100%;
-    padding: 0;
-    box-shadow: none;
+    padding: 0.9rem 1.2rem;
+    border-radius: 1.2rem;
+    border: 1px solid #eadfce;
+    background: #fff;
+    color: #3f3833;
+    font-size: 1.4rem;
+    text-align: left;
     cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .price-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .price-option:not(:disabled):hover {
+    border-color: #d8b796;
+  }
+
+  .price-option.active {
+    border-color: #231f20;
+    background: #fbf6ef;
+    color: #231f20;
+    font-weight: 600;
+  }
+
+  .price-radio {
+    width: 1.6rem;
+    height: 1.6rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid #cdbba8;
+    transition: border 0.2s ease;
+  }
+
+  .price-option.active .price-radio {
+    border: 5px solid #231f20;
+  }
+
+  .price-label {
+    flex: 1;
+  }
+
+  .price-count {
+    min-width: 2.4rem;
+    padding: 0.1rem 0.7rem;
+    border-radius: 999px;
+    background: #f4ebe1;
+    color: #7a6c60;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
   }
 `;
 

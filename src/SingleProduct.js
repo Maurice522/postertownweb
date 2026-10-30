@@ -9,16 +9,22 @@ import { Container } from "./styles/Container";
 import FormatPrice from "./Helpers/FormatPrice";
 import Star from "./components/Star";
 import AddToCart from "./components/AddToCart";
-import localProducts from "./data/products.json";
-import { normalizeImagePath, normalizeProducts } from "./utils/productHelpers";
+import { useProductContext } from "./context/productcontex";
+import { normalizeImagePath, paperSizeFor } from "./utils/productHelpers";
 
 const defaultSizes = [
-  { label: "Small", dimensions: "12 x 9 inches" },
-  { label: "Medium", dimensions: "15.8 x 12 inches" },
-  { label: "Large", dimensions: "24 x 18 inches" },
+  { label: "Small", paper: "A4", dimensions: "12 x 9 inches" },
+  { label: "Medium", paper: "A3", dimensions: "15.8 x 12 inches" },
+  { label: "Large", paper: "A2", dimensions: "24 x 18 inches" },
 ];
+
+const toSizeOption = (size) => ({
+  label: size.type,
+  paper: size.paper || paperSizeFor(size),
+  dimensions: `${size.inches} inches`,
+  price: size.price,
+});
 const RECENTLY_VIEWED_KEY = "postertown_recently_viewed";
-const catalogProducts = normalizeProducts(localProducts);
 
 const getProductImages = (product) => {
   if (!product) {
@@ -132,10 +138,15 @@ const SingleProduct = () => {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState(defaultSizes[0]);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const { products: catalogProducts, isLoading: catalogLoading } = useProductContext();
 
   useEffect(() => {
     let isActive = true;
     setIsLoading(true);
+    // Wait for the live catalog before deciding the product doesn't exist.
+    if (catalogLoading) {
+      return undefined;
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     const matchedProduct =
@@ -147,17 +158,9 @@ const SingleProduct = () => {
     );
 
     const nextSelectedSize = matchedSize
-      ? {
-          label: matchedSize.type,
-          dimensions: `${matchedSize.inches} inches`,
-          price: matchedSize.price,
-        }
+      ? toSizeOption(matchedSize)
       : matchedProduct?.sizes?.[0]
-      ? {
-          label: matchedProduct.sizes[0].type,
-          dimensions: `${matchedProduct.sizes[0].inches} inches`,
-          price: matchedProduct.sizes[0].price,
-        }
+      ? toSizeOption(matchedProduct.sizes[0])
       : defaultSizes[0];
 
     const leadImage = getProductImages(matchedProduct)?.[0]?.url;
@@ -175,7 +178,7 @@ const SingleProduct = () => {
     return () => {
       isActive = false;
     };
-  }, [id, location.state]);
+  }, [id, location.state, catalogProducts, catalogLoading]);
 
   useEffect(() => {
     if (!currentProduct || typeof window === "undefined") {
@@ -197,7 +200,7 @@ const SingleProduct = () => {
       .slice(0, 4);
 
     setRecentlyViewed(products);
-  }, [currentProduct]);
+  }, [currentProduct, catalogProducts]);
 
   if (isLoading) {
     return (
@@ -234,15 +237,16 @@ const SingleProduct = () => {
     shipping = true,
   } = currentProduct;
 
-  const price = getProductPrice(currentProduct);
-  const originalPrice = getProductOriginalPrice(currentProduct);
+  // Price follows the chosen size (Small/Medium/Large cost different amounts); the
+  // struck-through price keeps the product's usual discount ratio.
+  const basePrice = getProductPrice(currentProduct);
+  const price = Number(selectedSize?.price) || basePrice;
+  const originalPrice = basePrice > 0
+    ? Math.round((getProductOriginalPrice(currentProduct) * price) / basePrice)
+    : getProductOriginalPrice(currentProduct);
   const savings = originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
   const sizes = currentProduct.sizes?.length
-    ? currentProduct.sizes.map((size) => ({
-        label: size.type,
-        dimensions: `${size.inches} inches`,
-        price: size.price,
-      }))
+    ? currentProduct.sizes.map(toSizeOption)
     : defaultSizes;
   const images = getProductImages(currentProduct);
   const colors = getProductColors(currentProduct);
@@ -250,9 +254,36 @@ const SingleProduct = () => {
     ? currentProduct.reviews.length
     : Number(currentProduct.reviews || 0);
   const ratingValue = Number(currentProduct.stars || currentProduct.rating || stars || 0);
+  const { fullDescription, specifications = {} } = currentProduct;
+  const features = currentProduct.descriptionInfo?.features || [];
+  const specRows = [
+    ["Material", specifications.material],
+    ["Finish", specifications.finish],
+    ["Thickness", specifications.thickness],
+    ["Weight", specifications.weight],
+    ["Orientation", specifications.orientation],
+    ["Mounting", specifications.mountType],
+  ].filter(([, value]) => value);
+  const infoRows = [
+    ["Category", category || "Anime"],
+    ["Series", currentProduct.subCategory],
+    ["Collection", currentProduct.collection],
+    ["Brand", currentProduct.brand || company || "Poster Town"],
+    ["SKU", currentProduct.sku],
+    [
+      "Selected size",
+      `${selectedSize?.label || ""}${selectedSize?.paper ? ` · ${selectedSize.paper}` : ""}`,
+    ],
+  ].filter(([, value]) => value);
+  const careInstructions =
+    Array.isArray(currentProduct.careInstructions) && currentProduct.careInstructions.length > 0
+      ? currentProduct.careInstructions
+      : ["Wipe with a soft dry cloth", "Avoid direct moisture"];
   const selectedSizeDimensions = selectedSize?.dimensions || defaultSizes[0].dimensions;
   const cartReadyProduct = {
     ...currentProduct,
+    price,
+    originalPrice,
     colors,
     image: images,
   };
@@ -270,8 +301,13 @@ const SingleProduct = () => {
     .filter((product) => product.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 4);
+  // Newly uploaded products have no ratings yet; don't show stars or sample reviews for them.
+  const hasRatings = ratingValue > 0;
+  const hasSidebar = recentlyViewed.length > 0 || recommendedProducts.length > 0;
   const reviews = Array.isArray(currentProduct.reviews) && currentProduct.reviews.length > 0
     ? currentProduct.reviews
+    : !hasRatings
+    ? []
     : [
         {
           user: "PosterTown Buyer",
@@ -298,7 +334,7 @@ const SingleProduct = () => {
           <span>Prepaid perks available</span>
         </div>
 
-        <div className="desktop-shell">
+        <div className={hasSidebar ? "desktop-shell" : "desktop-shell no-sidebar"}>
           <div className="product-main">
             <div className="product-layout grid grid-two-column">
               <div className="product_images">
@@ -312,10 +348,12 @@ const SingleProduct = () => {
                 </div>
                 <h1>{name}</h1>
 
-                <div className="product-data-rating">
-                  <Star stars={ratingValue} reviews={reviewCount} />
-                  <p>{Math.max(reviewCount, 1)}+ happy buyers</p>
-                </div>
+                {hasRatings && (
+                  <div className="product-data-rating">
+                    <Star stars={ratingValue} reviews={reviewCount} />
+                    <p>{Math.max(reviewCount, 1)}+ happy buyers</p>
+                  </div>
+                )}
 
                 <div className="product-data-pricing">
                   <p className="product-data-price product-data-old-price">
@@ -348,7 +386,10 @@ const SingleProduct = () => {
                         onClick={() => setSelectedSize(size)}
                       >
                         <span>{size.label}</span>
-                        <small>{size.dimensions.replace(" inches", "")}</small>
+                        <small>
+                          {size.paper ? `${size.paper} · ` : ""}
+                          {size.dimensions.replace(" inches", " in")}
+                        </small>
                       </button>
                     ))}
                   </div>
@@ -359,7 +400,10 @@ const SingleProduct = () => {
                 <div className="selected-spec">
                   <div className="spec-card">
                     <span>Selected size</span>
-                    <strong>{selectedSize?.label}</strong>
+                    <strong>
+                      {selectedSize?.label}
+                      {selectedSize?.paper ? ` · ${selectedSize.paper}` : ""}
+                    </strong>
                     <p>{selectedSizeDimensions}</p>
                   </div>
                   <div className="spec-card">
@@ -412,34 +456,69 @@ const SingleProduct = () => {
               <h2>Product Details</h2>
               <div className="details-grid">
                 <details open className="details-card">
-                  <summary>What is HD Metal Print?</summary>
-                  <p>
-                    Artwork is infused onto coated aluminum for a durable, vivid, and modern wall display
-                    that feels premium from every angle.
-                  </p>
+                  <summary>About this poster</summary>
+                  <p>{fullDescription || description}</p>
+                  {features.length > 0 && (
+                    <ul className="feature-list">
+                      {features.map((feature) => (
+                        <li key={feature}>{feature}</li>
+                      ))}
+                    </ul>
+                  )}
+                </details>
+                <details open className="details-card">
+                  <summary>Specifications</summary>
+                  <dl className="spec-list">
+                    {specRows.map(([label, value]) => (
+                      <div key={label}>
+                        <dt>{label}</dt>
+                        <dd>{value}</dd>
+                      </div>
+                    ))}
+                    {sizes.map((size) => (
+                      <div key={size.label}>
+                        <dt>{size.label}</dt>
+                        <dd>
+                          {size.paper ? `${size.paper} · ` : ""}
+                          {size.dimensions.replace(" inches", " in")}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
                 </details>
                 <details className="details-card">
                   <summary>How to Mount</summary>
                   <p>
-                    Small, medium, and large prints can use sticker plus magnet mounting. Larger sizes can
-                    use a back frame for a stronger wall fit.
+                    {specifications.mountType ? `Comes with ${String(specifications.mountType).toLowerCase()} mounting. ` : ""}
+                    Small and medium prints use the sticker plus magnet setup. Larger sizes can use a back frame for a
+                    stronger wall fit.
                   </p>
+                </details>
+                <details className="details-card">
+                  <summary>Care Instructions</summary>
+                  <ul className="feature-list">
+                    {careInstructions.map((instruction) => (
+                      <li key={instruction}>{instruction}</li>
+                    ))}
+                  </ul>
                 </details>
                 <details className="details-card">
                   <summary>Why Print on Metal?</summary>
                   <p>
-                    You get sharper contrast, stronger durability, and a cleaner contemporary finish than
-                    regular paper posters or lightweight prints.
+                    Artwork is infused onto coated metal for sharper contrast, stronger durability, and a cleaner
+                    finish than regular paper posters or lightweight prints.
                   </p>
                 </details>
                 <details className="details-card">
                   <summary>Product Info</summary>
-                  <ul className="product-meta-list">
-                    <li>Category: {category || "Anime Metal Prints"}</li>
-                    <li>Brand: {company || "PosterTown"}</li>
-                    <li>Finish: Premium matte / gloss look</li>
-                    <li>Selected size: {selectedSize?.label}</li>
-                  </ul>
+                  <dl className="spec-list">
+                    {infoRows.map(([label, value]) => (
+                      <div key={label}>
+                        <dt>{label}</dt>
+                        <dd>{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
                 </details>
               </div>
             </div>
@@ -499,6 +578,9 @@ const SingleProduct = () => {
                 </div>
               </div>
 
+              {reviews.length === 0 && (
+                <p className="reviews-empty">No reviews yet. Be the first to share how it looks on your wall.</p>
+              )}
               <div className="reviews-grid">
                 {reviews.map((review, index) => (
                   <article key={`${review.user}-${index}`} className="review-card">
@@ -572,13 +654,13 @@ const SingleProduct = () => {
             </div>
           </div>
 
+          {hasSidebar && (
           <aside className="recently-viewed-panel">
+            {recentlyViewed.length > 0 && (
+            <>
             <h3>Recently Viewed</h3>
             <div className="recent-list">
-              {recentlyViewed.length === 0 ? (
-                <p className="recent-empty">Start exploring posters and they will show up here.</p>
-              ) : (
-                recentlyViewed.map((product) => (
+              {recentlyViewed.map((product) => (
                   <Link key={product.id} to={`/singleproduct/${product.id}`} className="recent-card">
                     <img src={getProductImageUrl(product)} alt={product.name} />
                     <div>
@@ -593,9 +675,10 @@ const SingleProduct = () => {
                       </p>
                     </div>
                   </Link>
-                ))
-              )}
+                ))}
             </div>
+            </>
+            )}
 
             {recommendedProducts.length > 0 && (
               <div className="you-may-like">
@@ -607,8 +690,10 @@ const SingleProduct = () => {
                     </div>
                     <strong>{product.name}</strong>
                     <span>
-                      {product.orientation === "portrait" ? "12 x 9 inches" : "15.8 x 12 inches"} -
-                      {" "}
+                      {product.sizes?.[0]
+                        ? `${product.sizes[0].paper || paperSizeFor(product.sizes[0])} · ${product.sizes[0].inches} in`
+                        : "A4 · 12 x 9 in"}{" "}
+                      -{" "}
                       <FormatPrice price={product.price} />
                     </span>
                   </Link>
@@ -616,6 +701,7 @@ const SingleProduct = () => {
               </div>
             )}
           </aside>
+          )}
         </div>
       </Container>
     </Wrapper>
@@ -659,12 +745,19 @@ const Wrapper = styled.section`
     align-items: start;
   }
 
+  .desktop-shell.no-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .product-main {
     min-width: 0;
   }
 
   .product-layout {
-    gap: 4rem;
+    /* minmax(0, …) lets both columns shrink; plain 1fr grew to fit long titles and
+       pushed the details under the sidebar. */
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 3.2rem;
     align-items: start;
     background: #fffaf3;
     border: 1px solid #eadfce;
@@ -679,6 +772,7 @@ const Wrapper = styled.section`
   }
 
   .product-data {
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -733,9 +827,11 @@ const Wrapper = styled.section`
   }
 
   h1 {
-    font-size: 3.4rem;
+    font-size: clamp(2.6rem, 2.4vw, 3.4rem);
     line-height: 1.15;
     margin: 0;
+    overflow-wrap: break-word;
+    max-width: 100%;
   }
 
   h2,
@@ -1341,10 +1437,17 @@ const Wrapper = styled.section`
     margin-bottom: 2rem;
   }
 
+  .reviews-empty {
+    color: #6a5e54;
+    font-size: 1.5rem;
+  }
+
   .details-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2rem;
+    /* Collapsed cards keep their own height instead of stretching to an open neighbour. */
+    align-items: start;
   }
 
   .details-card {
@@ -1365,6 +1468,30 @@ const Wrapper = styled.section`
     list-style: none;
     font-size: 1.8rem;
     font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  /* Plus/minus so it's clear the card opens. */
+  .details-card summary::after {
+    content: "+";
+    flex-shrink: 0;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #f6ece0;
+    color: #8a5c43;
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .details-card[open] summary::after {
+    content: "\\2212";
   }
 
   .details-card summary::-webkit-details-marker {
@@ -1378,9 +1505,70 @@ const Wrapper = styled.section`
 
   .details-grid p,
   .product-meta-list {
-    color: #5c544d;
-    font-size: 1.55rem;
+    color: #3f3833;
+    font-size: 1.6rem;
     line-height: 1.7;
+  }
+
+  .details-card .feature-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.2rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .feature-list li {
+    position: relative;
+    padding-left: 2.8rem;
+    color: #3f3833;
+    font-size: 1.55rem;
+    line-height: 1.5;
+  }
+
+  .feature-list li::before {
+    content: "\\2713";
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #f3e3d3;
+    color: #8a5c43;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .spec-list {
+    margin-top: 1rem;
+  }
+
+  .spec-list div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.6rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid #f1e6da;
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .spec-list div:last-child {
+    border-bottom: none;
+  }
+
+  .spec-list dt {
+    color: #6f6257;
+  }
+
+  .spec-list dd {
+    margin: 0;
+    color: #231f20;
+    font-weight: 600;
+    text-align: right;
   }
 
   .product-meta-list {
@@ -1524,6 +1712,40 @@ const Wrapper = styled.section`
     100% {
       opacity: 0;
       transform: scale(1.16);
+    }
+  }
+
+  /* The sidebar only fits beside the product on very wide screens; below that it
+     moves under the product so the details keep their full width. */
+  @media (max-width: 1500px) {
+    .desktop-shell {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .recently-viewed-panel {
+      position: static;
+    }
+
+    .recent-list,
+    .you-may-like {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(26rem, 1fr));
+      gap: 1.2rem;
+    }
+
+    .you-may-like h4 {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* Image above details once two columns would be too narrow. */
+  @media (max-width: 1100px) {
+    .product-layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .product_images {
+      position: static;
     }
   }
 

@@ -4,8 +4,7 @@ import HeroSection from "./components/HeroSection";
 import Services from "./components/Services";
 import Trending from "./components/Trending";
 import Trusted from "./components/Trusted";
-import Collection from "./components/Collection";
-import CollectionDBZ from "./components/CollectionDBZ";
+import HomeCollection from "./components/HomeCollection";
 import FeatureProductLandscape from "./components/FeatureProductLandscape";
 
 const Home = () => {
@@ -16,9 +15,9 @@ const Home = () => {
   return (
     <Wrapper>
       <HeroSection myData={data} />
-      <Collection />
+      <HomeCollection slug="demon-slayer" />
       <FeatureProduct />
-      <CollectionDBZ />
+      <HomeCollection slug="dragon-ball-z" />
       <Services />
       <FeatureProductLandscape />
 

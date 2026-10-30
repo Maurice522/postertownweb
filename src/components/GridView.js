@@ -17,8 +17,14 @@ const GridView = ({ products }) => {
 const Wrapper = styled.section`
   .product-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.4rem;
+  }
+
+  @media (max-width: 1320px) {
+    .product-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: ${({ theme }) => theme.media.tab}) {

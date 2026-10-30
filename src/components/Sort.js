@@ -1,35 +1,44 @@
 import React from "react";
 import styled from "styled-components";
 import { BsFillGridFill, BsList } from "react-icons/bs";
+import SortMenu from "./SortMenu";
 import { useFilterContext } from "../context/filter_context";
 
 const Sort = () => {
-  const { filter_products, grid_view, setGridView, setListView, sorting } = useFilterContext();
+  const { filter_products, grid_view, setGridView, setListView, sorting, sorting_value } = useFilterContext();
 
   return (
     <Wrapper>
       <div className="view-toggle">
-        <button className={grid_view ? "active sort-btn" : "sort-btn"} onClick={setGridView}>
+        <button
+          type="button"
+          className={grid_view ? "active sort-btn" : "sort-btn"}
+          onClick={setGridView}
+          aria-label="Grid view"
+          aria-pressed={grid_view}>
           <BsFillGridFill className="icon" />
         </button>
 
-        <button className={!grid_view ? "active sort-btn" : "sort-btn"} onClick={setListView}>
+        <button
+          type="button"
+          className={!grid_view ? "active sort-btn" : "sort-btn"}
+          onClick={setListView}
+          aria-label="List view"
+          aria-pressed={!grid_view}>
           <BsList className="icon" />
         </button>
       </div>
 
       <div className="result-copy">
         <strong>{filter_products.length}</strong>
-        <span>products available</span>
+        <span>{filter_products.length === 1 ? "product" : "products"} available</span>
       </div>
 
       <div className="sort-selection">
-        <select name="sort" id="sort" className="sort-selection--style" onChange={sorting}>
-          <option value="lowest">Price: Lowest First</option>
-          <option value="highest">Price: Highest First</option>
-          <option value="a-z">Name: A to Z</option>
-          <option value="z-a">Name: Z to A</option>
-        </select>
+        <label className="sort-label" htmlFor="sort">
+          Sort by
+        </label>
+        <SortMenu value={sorting_value} onChange={(value) => sorting({ target: { value } })} />
       </div>
     </Wrapper>
   );
@@ -87,30 +96,24 @@ const Wrapper = styled.section`
     color: #231f20;
   }
 
-  .sort-selection--style {
-    padding: 1rem 1.2rem;
-    cursor: pointer;
-    border: 1px solid #dfd1c2;
-    border-radius: 1.2rem;
-    background: #fff;
-    font-size: 1.35rem;
-    color: #2d241e;
-    min-width: 20rem;
+  .sort-selection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
-  .sort-selection--style:focus {
-    outline: none;
-    border-color: #cf6d3f;
+  .sort-label {
+    color: #8a7c70;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
   @media (max-width: ${({ theme }) => theme.media.mobile}) {
-    .sort-selection,
-    .sort-selection--style {
+    .sort-selection {
       width: 100%;
-    }
-
-    .sort-selection--style {
-      min-width: 0;
     }
   }
 `;
