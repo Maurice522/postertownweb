@@ -1,4 +1,5 @@
 import { useState } from "react";
+import LoadingImage from "./LoadingImage";
 import styled from "styled-components";
 
 // Up to three posters fanned out like prints laid on a table. Each image is
@@ -12,11 +13,12 @@ const PosterFan = ({ images = [], size = "md" }) => {
       {images.slice(0, 3).map((image, index) => {
         const wide = loadedShapes[image.src] ?? image.wide;
         return (
-          <img
+          <LoadingImage
             key={`${image.src}-${index}`}
             src={image.src}
             alt=""
             loading="lazy"
+            overlay={false}
             className={`fan-poster fan-poster-${index}${wide ? " fan-wide" : ""}`}
             onLoad={(event) => {
               const isWide = event.currentTarget.naturalWidth > event.currentTarget.naturalHeight;

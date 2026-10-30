@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import LoadingImage from "./components/LoadingImage";
 import styled from "styled-components";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { MdSecurity } from "react-icons/md";
@@ -544,7 +545,7 @@ const SingleProduct = () => {
                   {similarProducts.map((product) => (
                     <Link key={product.id} to={`/singleproduct/${product.id}`} className="similar-card">
                       <div className="similar-image-shell">
-                        <img src={getProductImageUrl(product)} alt={product.name} />
+                        <LoadingImage src={getProductImageUrl(product)} alt={product.name} />
                         <span className="similar-category">{product.category}</span>
                       </div>
                       <div className="similar-copy">
@@ -662,7 +663,7 @@ const SingleProduct = () => {
             <div className="recent-list">
               {recentlyViewed.map((product) => (
                   <Link key={product.id} to={`/singleproduct/${product.id}`} className="recent-card">
-                    <img src={getProductImageUrl(product)} alt={product.name} />
+                    <LoadingImage overlay={false} src={getProductImageUrl(product)} alt={product.name} />
                     <div>
                       <h4>{product.name}</h4>
                       <p>
@@ -686,7 +687,7 @@ const SingleProduct = () => {
                 {recommendedProducts.map((product) => (
                   <Link key={product.id} to={`/singleproduct/${product.id}`} className="recommend-card">
                     <div className="recommend-image-shell">
-                      <img src={getProductImageUrl(product)} alt={product.name} />
+                      <LoadingImage src={getProductImageUrl(product)} alt={product.name} />
                     </div>
                     <strong>{product.name}</strong>
                     <span>
@@ -1134,6 +1135,7 @@ const Wrapper = styled.section`
   }
 
   .recommend-image-shell {
+    position: relative;
     background: linear-gradient(180deg, #2c2623 0%, #4d3f34 100%);
     border-radius: 1.4rem;
     padding: 1.2rem;

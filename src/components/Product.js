@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import LoadingImage from "./LoadingImage";
 import styled from "styled-components";
 import FormatPrice from "../Helpers/FormatPrice";
 import { useCartContext } from "../context/cart_context";
@@ -91,7 +92,7 @@ const Product = (curElem) => {
         <article className={`product-card ${cardStyle === "landscape" ? "landscape-card" : ""}`}>
           <div className={`image-shell ${cardStyle === "landscape" ? "landscape-shell" : ""}`}>
             <span className="category-badge">{category}</span>
-            <img
+            <LoadingImage
               src={imageUrl}
               alt={name}
               className={`${artShape}-art`}

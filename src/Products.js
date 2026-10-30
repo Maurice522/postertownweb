@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import styled from "styled-components";
+import LoadingImage from "./components/LoadingImage";
 import FilterSection from "./components/FilterSection";
 import ProductList from "./components/ProductList";
 import Sort from "./components/Sort";
@@ -21,7 +22,7 @@ const Products = () => {
           </div>
 
           <div className="hero-media">
-            <img
+            <LoadingImage
               src={heroGif}
               alt="Animated anime showcase"
             />
@@ -103,6 +104,7 @@ const Wrapper = styled.section`
   }
 
   .hero-media {
+    position: relative;
     height: 14rem;
     min-height: 14rem;
     aspect-ratio: 16 / 6;

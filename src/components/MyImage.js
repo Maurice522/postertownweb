@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import LoadingImage from "./LoadingImage";
 import styled from "styled-components";
 import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 
@@ -11,7 +12,7 @@ const renderArtwork = (image, className = "") => {
     return (
       <div className={`scene scene-desk ${className}`}>
         <div className="wall-art desk-art">
-          <img src={image.url} alt={image.filename} />
+          <LoadingImage src={image.url} alt={image.filename} />
         </div>
         <div className="desk-line" />
         <div className="desk-lamp" />
@@ -23,7 +24,7 @@ const renderArtwork = (image, className = "") => {
     return (
       <div className={`scene scene-room ${className}`}>
         <div className="wall-art room-art">
-          <img src={image.url} alt={image.filename} />
+          <LoadingImage src={image.url} alt={image.filename} />
         </div>
         <div className="sofa" />
         <div className="floor-shadow" />
@@ -35,7 +36,7 @@ const renderArtwork = (image, className = "") => {
   if (image.variant === "photo") {
     return (
       <div className={`scene scene-photo ${className}`}>
-        <img src={image.url} alt={image.label || image.filename} className="photo-image" />
+        <LoadingImage src={image.url} alt={image.label || image.filename} className="photo-image" />
       </div>
     );
   }
@@ -43,14 +44,14 @@ const renderArtwork = (image, className = "") => {
   if (image.variant === "closeup") {
     return (
       <div className={`scene scene-closeup ${className}`}>
-        <img src={image.url} alt={image.filename} className="closeup-image" />
+        <LoadingImage src={image.url} alt={image.filename} className="closeup-image" />
       </div>
     );
   }
 
   return (
     <div className={`scene scene-poster ${className}`}>
-      <img src={image.url} alt={image.filename} className="poster-image" />
+      <LoadingImage src={image.url} alt={image.filename} className="poster-image" />
     </div>
   );
 };

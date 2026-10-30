@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import LoadingImage from "./LoadingImage";
 import styled from "styled-components";
 import FormatPrice from "../Helpers/FormatPrice";
 import { normalizeProduct } from "../utils/productHelpers";
@@ -18,7 +19,7 @@ const ListView = ({ products }) => {
             <Link key={id} to={`/singleproduct/${id}`} className="list-card">
               <div className="list-image-shell">
                 <span className="category-badge">{category}</span>
-                <img src={image} alt={name} />
+                <LoadingImage src={image} alt={name} />
               </div>
 
               <div className="list-copy">

@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "../styles/Button";
 import SplitText from "./SplitText";
+import LoadingImage from "./LoadingImage";
 import Magnet from './Magnet'
 import React, { useEffect, useRef } from 'react';
 
@@ -71,7 +72,9 @@ const HeroSection = ({ myData }) => {
           </Magnet>
         </div>
         <div className="hero-art">
-          <img ref={imageRef} src="images/rengokuext.jpg" alt="Rengoku metal poster" className="hero-image" />
+          <div className="hero-frame">
+            <LoadingImage ref={imageRef} src="images/rengokuext.jpg" alt="Rengoku metal poster" className="hero-image" />
+          </div>
         </div>
       </div>
     </Wrapper>
@@ -139,9 +142,15 @@ const Wrapper = styled.section`
     perspective: 500px;
   }
 
+  .hero-frame {
+    position: relative;
+    width: min(100%, 52rem);
+    border-radius: 1.2rem;
+  }
+
   .hero-image {
     display: block;
-    width: min(100%, 52rem);
+    width: 100%;
     /* The artwork is portrait (about 3:4); trim only the bottom so the head stays in. */
     aspect-ratio: 4 / 5;
     object-fit: cover;
@@ -188,8 +197,11 @@ const Wrapper = styled.section`
       padding: 1.6rem 3.6rem;
     }
 
-    .hero-image {
+    .hero-frame {
       width: 100%;
+    }
+
+    .hero-image {
       box-shadow: rgba(0, 0, 0, 0.22) 0px 24px 30px, rgba(0, 0, 0, 0.1) 0px 4px 8px;
     }
   }

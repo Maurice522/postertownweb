@@ -178,4 +178,102 @@ input, textarea{
         }
     }
 
+/* Image loader (components/LoadingImage.js) */
+.pt-img.is-loading:not(.pt-img--self) {
+  opacity: 0;
+}
+
+.pt-img.is-revealing {
+  animation: ptImgReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pt-img--self.is-loading {
+  background: linear-gradient(110deg, #eadccb 30%, #fbf5ee 50%, #eadccb 70%) 100% 0 / 250% 100%;
+  animation: ptShimmer 1.4s linear infinite;
+}
+
+.pt-img-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(110deg, #efe3d4 30%, #fbf6f0 50%, #efe3d4 70%) 100% 0 / 250% 100%;
+  animation: ptShimmer 1.4s linear infinite;
+}
+
+/* A blank metal sheet with a light glint sweeping across it. */
+.pt-img-loader-poster {
+  position: relative;
+  height: min(62%, 22rem);
+  aspect-ratio: 1 / 1.414;
+  border-radius: 0.4rem;
+  overflow: hidden;
+  background: linear-gradient(160deg, #d9cfc4 0%, #b9aca0 45%, #e4dbd1 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 14px 26px rgba(60, 38, 22, 0.18);
+  animation: ptFloat 1.8s ease-in-out infinite;
+}
+
+.pt-img-loader-poster::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -60%;
+  width: 45%;
+  height: 140%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-20deg);
+  animation: ptGlint 1.6s ease-in-out infinite;
+}
+
+@keyframes ptShimmer {
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes ptGlint {
+  0% {
+    left: -60%;
+  }
+  60%,
+  100% {
+    left: 120%;
+  }
+}
+
+@keyframes ptFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.6rem);
+  }
+}
+
+@keyframes ptImgReveal {
+  from {
+    opacity: 0;
+    filter: blur(14px) saturate(0.6);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pt-img-loader,
+  .pt-img-loader-poster,
+  .pt-img-loader-poster::after,
+  .pt-img--self.is-loading,
+  .pt-img.is-revealing {
+    animation: none;
+  }
+}
+
 `;

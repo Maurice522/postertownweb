@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
+import LoadingImage from "./LoadingImage";
 import styled from "styled-components";
 import { FiArrowRight } from "react-icons/fi";
 import FormatPrice from "../Helpers/FormatPrice";
@@ -51,7 +52,7 @@ const HomeCollection = ({ slug }) => {
             poster.to ? (
               <Link key={poster.key} to={poster.to} className="poster-tile">
                 <div className="tile-frame">
-                  <img src={poster.image} alt={poster.name} loading="lazy" />
+                  <LoadingImage src={poster.image} alt={poster.name} loading="lazy" />
                 </div>
                 <div className="tile-copy">
                   <strong>{poster.name}</strong>
@@ -63,7 +64,7 @@ const HomeCollection = ({ slug }) => {
             ) : (
               <div key={poster.key} className="poster-tile is-coming">
                 <div className="tile-frame">
-                  <img src={poster.image} alt={poster.name} loading="lazy" />
+                  <LoadingImage src={poster.image} alt={poster.name} loading="lazy" />
                   <span className="soon-tag">Coming soon</span>
                 </div>
                 <div className="tile-copy">
