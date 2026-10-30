@@ -45,203 +45,148 @@ const HeroSection = ({ myData }) => {
   }, []);
 
   return (
-    <div>
-      {/* <Aurora
-        colorStops={["#017ED5", "#00FF85", "#017ED5"]}
-        blend={0.3}
-        amplitude={1.0}
-        speed={1.0}
-      /> */}
     <Wrapper>
-      
-      <div className="container">
-        <div className="grid grid-two-column">
-          <div className="hero-section-data">
-            <p className="intro-data">Welcome to </p>
-            <SplitText
-              text="Poster Town !"
-              className="logotxt"
-              delay={100}
-              animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
-              animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-              easing="easeOutCubic"
-              threshold={0.2}
-              rootMargin="-50px"
-              onLetterAnimationComplete={handleAnimationComplete}
-            />
-            <p className="zain-bold">
-            Transform your space with bold, quirky metal posters from Poster Town—where every wall <b className="zain-bold" style={{color:"#1D1D1D", backgroundColor:"#ffff00"}}> Becomes a statement. </b>
-            </p>
-            <Magnet padding={1000} disabled={false} magnetStrength={50}>
+      <div className="hero">
+        <div className="hero-copy">
+          <p className="intro-data">Welcome to</p>
+          <SplitText
+            text="Poster Town !"
+            className="logotxt"
+            delay={100}
+            animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+            animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+            easing="easeOutCubic"
+            threshold={0.2}
+            rootMargin="-50px"
+            onLetterAnimationComplete={handleAnimationComplete}
+          />
+          <p className="hero-tagline">
+            Transform your space with bold, quirky metal posters from Poster Town—where every wall <b>becomes a statement.</b>
+          </p>
+          <Magnet padding={1000} disabled={false} magnetStrength={50}>
             {/* A link styled as the button (a button nested in a link isn't valid HTML). */}
-            <Button as={NavLink} to="/products">
+            <Button as={NavLink} to="/products" className="hero-cta">
               Shop now
             </Button>
-            </Magnet>
-          </div>
-          {/* our homepage image  */}
-          <div className="hero-section-image">
-              <div className="hoverImageWrapper">
-              <img
-                ref={imageRef}
-                src="images/rengokuext.jpg"
-                alt="Rengoku metal poster"
-                className="img-style hoverImage"
-                style={{width: "200%" , marginTop:"6%" , marginBottom: "8%"}}
-              />
-              </div>
-          </div>
+          </Magnet>
+        </div>
+        <div className="hero-art">
+          <img ref={imageRef} src="images/rengokuext.jpg" alt="Rengoku metal poster" className="hero-image" />
         </div>
       </div>
     </Wrapper>
-    </div>
   );
 };
 
 const Wrapper = styled.section`
-  padding: 0rem 0;
-  padding-left: 5rem;
-  padding-bottom: 2rem;
-  img {
-    min-width: 10rem;
-    height: 10rem;
-  }
-
-  .hero-section-data {
-    padding-top: 12rem;
-    p {
-      margin: 2rem 0;
-      font-size:26px;
-    }
-    
-    .zain-extralight {
-  font-family: "Zain", sans-serif;
-  font-weight: 200;
-  font-style: normal;
-}
-
-.zain-light {
-  font-family: "Zain", sans-serif;
-  font-weight: 300;
-  font-style: normal;
-}
-
-.zain-regular {
-  font-family: "Zain", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.zain-bold {
-  font-family: "Zain", sans-serif;
-  font-weight: 700;
-  font-style: normal;
-}
-
-.zain-extrabold {
-  font-family: "Zain", sans-serif;
-  font-weight: 800;
-  font-style: normal;
-}
-
-.zain-black {
-  font-family: "Zain", sans-serif;
-  font-weight: 900;
-  font-style: normal;
-}
-
-.zain-light-italic {
-  font-family: "Zain", sans-serif;
-  font-weight: 300;
-  font-style: italic;
-}
-
-.zain-regular-italic {
-  font-family: "Zain", sans-serif;
-  font-weight: 400;
-  font-style: italic;
-}
-
-
-    h1 {
-      text-transform: capitalize;
-      font-weight: bold;
-      color :  ${({ theme }) => theme.colors.charcoal};
-
-    }
-    
-    .logotxt 
-    {
-      font-size: 30px;
-      text-transform: capitalize;
-      font-weight: bold;
-      color :  #1D1D1D};
-
-    }
-
-    .intro-data {
-      margin-bottom: 0;
-      color :  ${({ theme }) => theme.colors.red2};
-    }
-  }
-
-  .hero-section-image {
-    width: 70%;
-    margin-left: 18%;
-    height: auto;
-    display: flex;
-    justify-content: center;
+  .hero {
+    max-width: 132rem;
+    margin: 0 auto;
+    padding: 6rem 4rem 8rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 6rem;
     align-items: center;
-    margin-top:5%;
-    margin-bottom: 5%
   }
-  figure {
-    position: relative;
 
-    &::after {
-      content: "";
-      width: 60%;
-      height: 80%;
-      background-color: rgba(81, 56, 238, 0.4);
-      position: absolute;
-      left: 50%;
-      top: -5rem;
-      z-index: -1;
-    }
+  .intro-data {
+    margin: 0 0 0.8rem;
+    color: ${({ theme }) => theme.colors.red2};
+    font-size: 2.4rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
-  .img-style {
-    width: 200%;
-    height: auto;
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+
+  .logotxt {
+    margin: 0;
+    color: #1d1d1d;
+    font-size: clamp(3.6rem, 4.6vw, 5.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
+  .hero-tagline {
+    max-width: 54rem;
+    margin: 2.4rem 0 3.2rem;
+    color: #3f3a36;
+    font-family: "Zain", sans-serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .hero-tagline b {
+    padding: 0 0.4rem;
+    background: #ffff00;
+    color: #1d1d1d;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .hero-cta {
+    display: inline-block;
+    padding: 1.4rem 3.2rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-art {
+    perspective: 500px;
+  }
+
+  .hero-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 23 / 15;
+    object-fit: cover;
+    border-radius: 1.2rem;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 40px 45px, rgba(0, 0, 0, 0.12) 0px -8px 24px, rgba(0, 0, 0, 0.12) 0px 4px 6px;
+    transition: transform 0.1s ease-out;
+    will-change: transform;
+  }
+
+  @media (max-width: ${({ theme }) => theme.media.tab}) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 4.8rem;
+      padding: 4rem 3.2rem 6rem;
+    }
+
+    .hero-tagline {
+      max-width: none;
+    }
   }
 
   @media (max-width: ${({ theme }) => theme.media.mobile}) {
-    .grid {
-      gap: 10rem;
+    .hero {
+      gap: 4rem;
+      padding: 3.2rem 2rem 5rem;
     }
 
-    figure::after {
-      content: "";
-      width: 50%;
-      height: 100%;
-      left: 0;
-      top: 10%;
-      /* bottom: 10%; */
-      background-color: rgba(81, 56, 238, 0.4);
+    .intro-data {
+      font-size: 2.2rem;
+    }
+
+    .logotxt {
+      font-size: 3.8rem;
+    }
+
+    .hero-tagline {
+      margin: 1.6rem 0 2.8rem;
+      font-size: 2.6rem;
+    }
+
+    .hero-cta {
+      font-size: 1.8rem;
+      padding: 1.6rem 3.6rem;
+    }
+
+    .hero-image {
+      box-shadow: rgba(0, 0, 0, 0.22) 0px 24px 30px, rgba(0, 0, 0, 0.1) 0px 4px 8px;
     }
   }
-  .hoverImageWrapper {
-  display: inline-block;
-  perspective: 500px;
-}
-.hoverImage {
-  height: 480px;           /* Keeps the image height */
-  width: auto;             /* Maintain aspect ratio */
-  border-radius: 10px;
-  object-fit: cover;
-  transition: transform 0.1s ease-out;
-  will-change: transform;
-}
 `;
 
 export default HeroSection;
