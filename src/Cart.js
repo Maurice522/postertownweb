@@ -18,9 +18,35 @@ import CartItem from "./components/CartItem";
 import FormatPrice from "./Helpers/FormatPrice";
 import { useUserContext } from "./context/user_context";
 import { createCustomerUserId, prependStoredOrder } from "./utils/orderStorage";
+import { useProductContext } from "./context/productcontex";
+import { paperSizeFor } from "./utils/productHelpers";
+import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, isDemonSlayer, normalizeCouponCode, priceCart } from "./utils/pricing";
 
 const SHIPPING_STORAGE_KEY = "postertown_shipping_info";
 const PAYMENT_STORAGE_KEY = "postertown_payment_info";
+const COUPON_STORAGE_KEY = "postertown:coupon";
+
+const savedCoupon = () => {
+  try {
+    return localStorage.getItem(COUPON_STORAGE_KEY) || "";
+  } catch {
+    return "";
+  }
+};
+
+// What the pricing rules need to know about a cart line. Prices and sizes come from
+// the live catalog when it has the product, which is what the server charges too.
+const SIZE_PAPER = { Small: "A4", Medium: "A3", Large: "A2" };
+const cartLine = (item, catalogProducts) => {
+  const product = catalogProducts.find((entry) => String(entry.id) === String(item.productId));
+  const size = product?.sizes?.find((entry) => entry.type === item.size);
+  return {
+    unitPrice: Number(size?.price ?? item.price) || 0,
+    quantity: item.amount,
+    paper: size ? paperSizeFor(size) : SIZE_PAPER[item.size] || "",
+    demonSlayer: isDemonSlayer(product?.subCategory, product?.name || item.name),
+  };
+};
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 const UPI_ID = "prathamgupta52043@okhdfcbank";
 const UPI_PAYEE = "Poster Town";
@@ -47,7 +73,14 @@ const createOrderId = () => `PT-${Date.now().toString().slice(-8)}`;
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { cart, clearCart, total_price, shipping_fee, total_item } = useCartContext();
+  const { cart, clearCart, total_item } = useCartContext();
+  const { products: catalogProducts } = useProductContext();
+  const [couponInput, setCouponInput] = useState(savedCoupon);
+  const [couponCode, setCouponCode] = useState(savedCoupon);
+  const pricing = useMemo(
+    () => priceCart(cart.map((item) => cartLine(item, catalogProducts)), couponCode),
+    [cart, catalogProducts, couponCode]
+  );
   const { isAuthenticated, user, saveAddress } = useUserContext();
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [addressError, setAddressError] = useState("");
@@ -78,10 +111,22 @@ const Cart = () => {
       shippingInfo.state &&
       shippingInfo.pincode
   );
-  const visibleShippingFee = hasAddress ? shipping_fee : 0;
-  const productSubtotalExGst = Math.round((total_price / (100 + GST_RATE)) * 100);
-  const gstAmount = Math.max(total_price - productSubtotalExGst, 0);
-  const orderTotal = total_price + visibleShippingFee;
+  const productSubtotalExGst = Math.round((pricing.subtotal / (100 + GST_RATE)) * 100);
+  const gstAmount = Math.max(pricing.subtotal - productSubtotalExGst, 0);
+  const orderTotal = pricing.total;
+  const a4Count = cart.reduce((sum, item) => sum + (cartLine(item, catalogProducts).paper === "A4" ? item.amount : 0), 0);
+
+  const applyCoupon = (code) => {
+    const normalized = normalizeCouponCode(code);
+    setCouponCode(normalized);
+    setCouponInput(normalized);
+    try {
+      if (normalized) localStorage.setItem(COUPON_STORAGE_KEY, normalized);
+      else localStorage.removeItem(COUPON_STORAGE_KEY);
+    } catch {
+      // Not remembered (private mode); still applies on this visit.
+    }
+  };
   const canCheckout = hasAddress;
   const shippingRecipient = shippingInfo.fullName || user?.name || "Shipping address";
   const shippingDestination = [
@@ -264,11 +309,17 @@ const Cart = () => {
       items: cart.map((item) => ({
         ...item,
       })),
+      // The server recalculates these from catalog prices; total lets it spot a mismatch.
+      couponCode: pricing.couponCode,
       totals: {
+        productsTotal: pricing.productsTotal,
+        bundleDiscount: pricing.bundleDiscount,
+        couponCode: pricing.couponCode,
+        couponDiscount: pricing.couponDiscount,
         subtotalExGst: productSubtotalExGst,
         gst: gstAmount,
-        subtotal: total_price,
-        shipping: visibleShippingFee,
+        subtotal: pricing.subtotal,
+        shipping: pricing.shipping,
         total: orderTotal,
       },
       notifications: {
@@ -502,30 +553,54 @@ const Cart = () => {
               <span className="panel-kicker">Order summary</span>
               <h3>Totals</h3>
 
+              {(pricing.itemsToFreeShipping > 0 || (a4Count > 0 && pricing.a4ToNextBundle > 0)) && (
+                <div className="deal-nudges">
+                  {pricing.itemsToFreeShipping > 0 && (
+                    <p>
+                      <FiTruck /> Add {pricing.itemsToFreeShipping} more poster for <strong>free shipping</strong>.
+                    </p>
+                  )}
+                  {a4Count > 0 && pricing.a4ToNextBundle > 0 && (
+                    <p>
+                      <FiCheckCircle /> Add {pricing.a4ToNextBundle} more A4 poster{pricing.a4ToNextBundle > 1 ? "s" : ""} to get{" "}
+                      <strong>
+                        any {A4_BUNDLE_SIZE} A4 for <FormatPrice price={A4_BUNDLE_PRICE} />
+                      </strong>
+                      .
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="summary-lines">
                 <div>
-                  <span>Subtotal</span>
+                  <span>Posters</span>
                   <strong>
-                    <FormatPrice price={productSubtotalExGst} />
+                    <FormatPrice price={pricing.productsTotal} />
                   </strong>
                 </div>
-                <div>
-                  <span>GST ({GST_RATE}%)</span>
-                  <strong>
-                    <FormatPrice price={gstAmount} />
-                  </strong>
-                </div>
-                <div>
-                  <span>Products total</span>
-                  <strong>
-                    <FormatPrice price={total_price} />
-                  </strong>
-                </div>
+                {pricing.bundleDiscount > 0 && (
+                  <div className="discount-line">
+                    <span>
+                      A4 bundle ({pricing.bundles > 1 ? `${pricing.bundles} × ` : ""}
+                      {A4_BUNDLE_SIZE} for <FormatPrice price={A4_BUNDLE_PRICE} />)
+                    </span>
+                    <strong>
+                      −<FormatPrice price={pricing.bundleDiscount} />
+                    </strong>
+                  </div>
+                )}
+                {pricing.couponDiscount > 0 && (
+                  <div className="discount-line">
+                    <span>Coupon {pricing.couponCode}</span>
+                    <strong>
+                      −<FormatPrice price={pricing.couponDiscount} />
+                    </strong>
+                  </div>
+                )}
                 <div>
                   <span>Shipping</span>
-                  <strong>
-                    {hasAddress ? <FormatPrice price={shipping_fee} /> : "Add address to calculate"}
-                  </strong>
+                  <strong>{pricing.shipping ? <FormatPrice price={pricing.shipping} /> : "Free"}</strong>
                 </div>
                 <div className="total-line">
                   <span>Order total</span>
@@ -533,7 +608,44 @@ const Cart = () => {
                     <FormatPrice price={orderTotal} />
                   </strong>
                 </div>
+                <p className="gst-note">
+                  Includes <FormatPrice price={gstAmount} /> GST ({GST_RATE}%)
+                </p>
               </div>
+
+              <form
+                className="coupon-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  applyCoupon(couponInput);
+                }}>
+                <label htmlFor="coupon-code">Coupon code</label>
+                {pricing.couponCode ? (
+                  <div className="coupon-applied">
+                    <span>
+                      <FiCheckCircle /> <strong>{pricing.couponCode}</strong> applied
+                    </span>
+                    <button type="button" aria-label="Remove coupon" onClick={() => applyCoupon("")}>
+                      <FiX />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="coupon-row">
+                    <input
+                      id="coupon-code"
+                      value={couponInput}
+                      onChange={(event) => setCouponInput(event.target.value)}
+                      placeholder="Enter code"
+                      autoComplete="off"
+                      autoCapitalize="characters"
+                    />
+                    <button type="submit" disabled={!couponInput.trim()}>
+                      Apply
+                    </button>
+                  </div>
+                )}
+                {couponCode && pricing.couponError && <p className="coupon-error">{pricing.couponError}</p>}
+              </form>
 
               <button
                 type="button"
@@ -631,7 +743,7 @@ const Cart = () => {
                 </div>
                 <div>
                   <FiCreditCard />
-                  <span>Prepaid perks</span>
+                  <span>Free shipping on 2+ posters</span>
                 </div>
               </div>
             </div>
@@ -1392,6 +1504,121 @@ const Wrapper = styled.section`
   .summary-lines strong {
     color: #231f20;
     font-size: 1.55rem;
+  }
+
+  .deal-nudges {
+    display: grid;
+    gap: 0.8rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .deal-nudges p {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    background: #fff4e5;
+    border: 1px dashed #e2b77f;
+    border-radius: 1.2rem;
+    padding: 1rem 1.2rem;
+    color: #6b4a2b;
+    font-size: 1.35rem;
+    line-height: 1.5;
+  }
+
+  .deal-nudges svg {
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+  }
+
+  .summary-lines .discount-line,
+  .summary-lines .discount-line strong {
+    color: #1f7a4d;
+  }
+
+  .gst-note {
+    color: #8a7c70;
+    font-size: 1.25rem;
+    text-align: right;
+  }
+
+  .coupon-form {
+    display: grid;
+    gap: 0.8rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .coupon-form label {
+    color: #8a7c70;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .coupon-row {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .coupon-row input {
+    flex: 1;
+    min-width: 0;
+    height: 4.4rem;
+    padding: 0 1.2rem;
+    border: 1px solid #dfd1c2;
+    border-radius: 1.2rem;
+    background: #fff;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .coupon-row button {
+    height: 4.4rem;
+    padding: 0 1.8rem;
+    border: none;
+    border-radius: 1.2rem;
+    background: #231f20;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .coupon-row button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .coupon-applied {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #eaf6ef;
+    border: 1px solid #b9e0c9;
+    border-radius: 1.2rem;
+    padding: 0.9rem 1.2rem;
+    color: #1f7a4d;
+    font-size: 1.45rem;
+  }
+
+  .coupon-applied span {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .coupon-applied button {
+    border: none;
+    background: none;
+    color: inherit;
+    font-size: 1.8rem;
+    cursor: pointer;
+    display: grid;
+  }
+
+  .coupon-error {
+    color: #b3261e;
+    font-size: 1.3rem;
   }
 
   .total-line {

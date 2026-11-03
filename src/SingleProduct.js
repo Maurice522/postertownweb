@@ -10,8 +10,11 @@ import { Container } from "./styles/Container";
 import FormatPrice from "./Helpers/FormatPrice";
 import Star from "./components/Star";
 import AddToCart from "./components/AddToCart";
+import ProductReviews from "./components/ProductReviews";
 import { useProductContext } from "./context/productcontex";
 import { normalizeImagePath, paperSizeFor } from "./utils/productHelpers";
+import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS, isDemonSlayer } from "./utils/pricing";
+import { productMeta, usePageMeta } from "./utils/pageMeta";
 
 const defaultSizes = [
   { label: "Small", paper: "A4", dimensions: "12 x 9 inches" },
@@ -140,6 +143,7 @@ const SingleProduct = () => {
   const [selectedSize, setSelectedSize] = useState(defaultSizes[0]);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const { products: catalogProducts, isLoading: catalogLoading } = useProductContext();
+  usePageMeta(productMeta(currentProduct));
 
   useEffect(() => {
     let isActive = true;
@@ -233,7 +237,6 @@ const SingleProduct = () => {
     description,
     company,
     category,
-    stars = 4.8,
     stock = 12,
     shipping = true,
   } = currentProduct;
@@ -251,10 +254,9 @@ const SingleProduct = () => {
     : defaultSizes;
   const images = getProductImages(currentProduct);
   const colors = getProductColors(currentProduct);
-  const reviewCount = Array.isArray(currentProduct.reviews)
-    ? currentProduct.reviews.length
-    : Number(currentProduct.reviews || 0);
-  const ratingValue = Number(currentProduct.stars || currentProduct.rating || stars || 0);
+  // Set by the backend from approved reviews.
+  const reviewCount = Number(currentProduct.ratings?.count || 0);
+  const ratingValue = reviewCount ? Number(currentProduct.ratings?.average || 0) : 0;
   const { fullDescription, specifications = {} } = currentProduct;
   const features = currentProduct.descriptionInfo?.features || [];
   const specRows = [
@@ -302,27 +304,9 @@ const SingleProduct = () => {
     .filter((product) => product.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 4);
-  // Newly uploaded products have no ratings yet; don't show stars or sample reviews for them.
+  // Stars only show once the poster has approved reviews (ratings come from them).
   const hasRatings = ratingValue > 0;
   const hasSidebar = recentlyViewed.length > 0 || recommendedProducts.length > 0;
-  const reviews = Array.isArray(currentProduct.reviews) && currentProduct.reviews.length > 0
-    ? currentProduct.reviews
-    : !hasRatings
-    ? []
-    : [
-        {
-          user: "PosterTown Buyer",
-          comment: "Sharp print quality, clean finish, and the colors look great in person.",
-          rating: Number(currentProduct.stars || currentProduct.rating || 5),
-          date: "2026-04-01",
-        },
-        {
-          user: "Anime Wall Decor Fan",
-          comment: "Looks premium on the wall and arrived in good condition.",
-          rating: 5,
-          date: "2026-03-14",
-        },
-      ];
 
   return (
     <Wrapper>
@@ -332,7 +316,8 @@ const SingleProduct = () => {
         <div className="promo-strip">
           <span>India's premium anime wall art collection</span>
           <span>Fade-resistant finish</span>
-          <span>Prepaid perks available</span>
+          <span>Free shipping on 2+ posters</span>
+          <span>Any 3 A4 for ₹{A4_BUNDLE_PRICE}</span>
         </div>
 
         <div className={hasSidebar ? "desktop-shell" : "desktop-shell no-sidebar"}>
@@ -352,7 +337,9 @@ const SingleProduct = () => {
                 {hasRatings && (
                   <div className="product-data-rating">
                     <Star stars={ratingValue} reviews={reviewCount} />
-                    <p>{Math.max(reviewCount, 1)}+ happy buyers</p>
+                    <p>
+                      {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
+                    </p>
                   </div>
                 )}
 
@@ -365,6 +352,22 @@ const SingleProduct = () => {
                   </p>
                   {savings > 0 && <span className="save-badge">Save {savings}%</span>}
                 </div>
+
+                <ul className="deal-list">
+                  {selectedSize?.paper === "A4" && (
+                    <li>
+                      <strong>Any {A4_BUNDLE_SIZE} A4 for ₹{A4_BUNDLE_PRICE}</strong> — mix any designs, applied in the cart
+                    </li>
+                  )}
+                  {isDemonSlayer(currentProduct.subCategory, name) && (
+                    <li>
+                      <strong>₹200 off in A3</strong> — use code <code>DEMON200</code> at checkout
+                    </li>
+                  )}
+                  <li>
+                    <strong>Free shipping</strong> when you buy {FREE_SHIPPING_MIN_ITEMS} or more posters
+                  </li>
+                </ul>
 
                 <div className="offer-panel">
                   <div>
@@ -441,7 +444,8 @@ const SingleProduct = () => {
 
                 {shipping && (
                   <p className="shipping-copy">
-                    Free shipping available on prepaid orders. Carefully packed for safe delivery.
+                    Free shipping when you buy {FREE_SHIPPING_MIN_ITEMS} or more posters. Carefully packed for safe
+                    delivery.
                   </p>
                 )}
 
@@ -569,36 +573,7 @@ const SingleProduct = () => {
               </div>
             )}
 
-            <div className="reviews-panel">
-              <div className="section-heading">
-                <div>
-                  <h2>Customer Reviews</h2>
-                  <p>
-                    Real feedback from buyers who picked up this <span>{category}</span> design.
-                  </p>
-                </div>
-              </div>
-
-              {reviews.length === 0 && (
-                <p className="reviews-empty">No reviews yet. Be the first to share how it looks on your wall.</p>
-              )}
-              <div className="reviews-grid">
-                {reviews.map((review, index) => (
-                  <article key={`${review.user}-${index}`} className="review-card">
-                    <div className="review-top">
-                      <div>
-                        <h3>{review.user}</h3>
-                        <span>{review.date}</span>
-                      </div>
-                      <div className="review-rating">
-                        {"*".repeat(Math.max(1, Math.min(5, Math.round(review.rating || 0))))}
-                      </div>
-                    </div>
-                    <p>{review.comment}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
+            <ProductReviews product={currentProduct} />
 
             <div className="faq-panel">
               <div className="section-heading">
@@ -882,6 +857,36 @@ const Wrapper = styled.section`
     padding: 0.6rem 1rem;
     font-size: 1.3rem;
     font-weight: 600;
+  }
+
+  .deal-list {
+    list-style: none;
+    display: grid;
+    gap: 0.7rem;
+    margin: 0 0 1.6rem;
+    padding: 1.2rem 1.4rem;
+    background: #fff4e5;
+    border: 1px dashed #e2b77f;
+    border-radius: 1.4rem;
+  }
+
+  .deal-list li {
+    color: #6b4a2b;
+    font-size: 1.4rem;
+    line-height: 1.5;
+  }
+
+  .deal-list strong {
+    color: #3d2a18;
+  }
+
+  .deal-list code {
+    background: #231f20;
+    color: #fff;
+    border-radius: 0.6rem;
+    padding: 0.1rem 0.6rem;
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
   }
 
   .offer-panel {

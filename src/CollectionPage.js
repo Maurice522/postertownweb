@@ -24,7 +24,28 @@ const CollectionPage = () => {
   }, [collection]);
 
   if (!collection && isLoading) {
-    return <Wrapper />;
+    return (
+      <Wrapper>
+        <div className="collection-shell" role="status" aria-label="Loading collection">
+          <span className="back-link">
+            <FiArrowLeft /> All collections
+          </span>
+          <header className="collection-banner banner-skeleton" style={{ "--accent": "#8a5c43" }} aria-hidden="true">
+            <div className="banner-copy">
+              <span className="sk-bar" style={{ width: "9rem", height: "1.2rem" }} />
+              <span className="sk-bar" style={{ width: "min(32rem, 80%)", height: "4.4rem" }} />
+              <span className="sk-bar" style={{ width: "min(44rem, 95%)" }} />
+              <span className="sk-bar" style={{ width: "min(36rem, 75%)" }} />
+              <span className="sk-bar" style={{ width: "22rem", height: "3rem" }} />
+            </div>
+            <div className="banner-art">
+              <span className="sk-poster" />
+            </div>
+          </header>
+          <GridView products={[]} loading />
+        </div>
+      </Wrapper>
+    );
   }
 
   if (!collection) {
@@ -128,6 +149,41 @@ const Wrapper = styled.section`
     font-weight: 600;
     text-decoration: none;
     margin-bottom: 1.8rem;
+  }
+
+  .banner-skeleton .banner-copy {
+    display: grid;
+    gap: 1.4rem;
+  }
+
+  .banner-skeleton .sk-bar,
+  .banner-skeleton .sk-poster {
+    display: block;
+    height: 1.4rem;
+    border-radius: 0.8rem;
+    background: linear-gradient(110deg, rgba(255, 248, 241, 0.08) 30%, rgba(255, 248, 241, 0.2) 50%, rgba(255, 248, 241, 0.08) 70%)
+      100% 0 / 250% 100%;
+    animation: ptShimmer 1.4s linear infinite;
+  }
+
+  .banner-skeleton .banner-art {
+    display: grid;
+    place-items: center;
+    min-height: 28rem;
+  }
+
+  .banner-skeleton .sk-poster {
+    width: min(20rem, 60%);
+    height: auto;
+    aspect-ratio: 3 / 4;
+    border-radius: 1.4rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .banner-skeleton .sk-bar,
+    .banner-skeleton .sk-poster {
+      animation: none;
+    }
   }
 
   .collection-banner {

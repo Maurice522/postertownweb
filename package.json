@@ -32,6 +32,7 @@
     "prebuild": "node scripts/snapshot-catalog.mjs",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "node scripts/product-pages.mjs",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

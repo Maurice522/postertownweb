@@ -4,11 +4,13 @@ import styled from "styled-components";
 import { FiArrowRight } from "react-icons/fi";
 import FormatPrice from "./Helpers/FormatPrice";
 import PosterFan from "./components/PosterFan";
+import { CollectionBandSkeleton } from "./components/Skeletons";
 import { useProductContext } from "./context/productcontex";
 import { buildCollections } from "./data/collections";
 
 const Collections = () => {
-  const { products: catalog } = useProductContext();
+  const { products: catalog, isLoading } = useProductContext();
+  const loading = isLoading && !catalog.length;
   const collections = useMemo(() => buildCollections(catalog), [catalog]);
   const featured = collections.find((collection) => collection.featured) || collections[0];
   const rest = collections.filter((collection) => collection !== featured);
@@ -25,16 +27,23 @@ const Collections = () => {
           </p>
           <div className="hero-stats">
             <span>
-              <strong>{collections.length}</strong> collections
+              <strong>{loading ? "…" : collections.length}</strong> collections
             </span>
             <span>
-              <strong>{catalog.length}</strong> posters
+              <strong>{loading ? "…" : catalog.length}</strong> posters
             </span>
             <span>
               <strong>A4 to A2</strong> sizes
             </span>
           </div>
         </header>
+
+        {loading && (
+          <>
+            <CollectionBandSkeleton />
+            <CollectionBandSkeleton />
+          </>
+        )}
 
         {featured && (
           <Link
