@@ -1,1 +1,4 @@
+# A page file from an older deploy: answer "not found" instead of the app page, so
+# the app notices at once and reloads (see src/components/AppErrorBoundary.js).
+/static/*    /404.html    404
 /*    /index.html   200

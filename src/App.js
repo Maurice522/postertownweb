@@ -1,5 +1,7 @@
 import React, { lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import AppErrorBoundary from "./components/AppErrorBoundary";
+import PageLoader from "./components/PageLoader";
 import Home from "./Home";
 import { GlobalStyle } from "./GlobalStyle";
 import { ThemeProvider } from "styled-components";
@@ -25,8 +27,12 @@ const Cart = lazy(() => import("./Cart"));
 const Auth = lazy(() => import("./Auth"));
 const ErrorPage = lazy(() => import("./ErrorPage"));
 
-// Holds the page's space while its code loads, so the footer doesn't jump up.
-const PageFallback = () => <div style={{ minHeight: "80vh" }} aria-busy="true" />;
+// The page area resets its error when the route changes, so one broken page
+// doesn't stick while customers move on.
+const RouteErrorBoundary = ({ children }) => {
+  const location = useLocation();
+  return <AppErrorBoundary resetKey={location.pathname}>{children}</AppErrorBoundary>;
+};
 
 const App = () => {
   const theme = {
@@ -73,21 +79,23 @@ const App = () => {
                 <GlobalStyle />
                 <RouteScrollReset />
                 <Header />
-                <Suspense fallback={<PageFallback />}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/collections" element={<Collections />} />
-                    <Route path="/collections/:slug" element={<CollectionPage />} />
-                    <Route path="/orders" element={<Orders />} />
-                    <Route path="/contact" element={<Orders />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/singleproduct/:id" element={<SingleProduct />} />
-                    <Route path="/cart" element={<Cart />} />
-                    <Route path="*" element={<ErrorPage />} />
-                  </Routes>
-                </Suspense>
+                <RouteErrorBoundary>
+                  <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/products" element={<Products />} />
+                      <Route path="/collections" element={<Collections />} />
+                      <Route path="/collections/:slug" element={<CollectionPage />} />
+                      <Route path="/orders" element={<Orders />} />
+                      <Route path="/contact" element={<Orders />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/singleproduct/:id" element={<SingleProduct />} />
+                      <Route path="/cart" element={<Cart />} />
+                      <Route path="*" element={<ErrorPage />} />
+                    </Routes>
+                  </Suspense>
+                </RouteErrorBoundary>
                 <ScrollToTop />
                 <Footer />
               </Router>

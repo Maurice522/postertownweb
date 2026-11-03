@@ -19,10 +19,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Chokokutai&family=Permanent+Marker&family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet" />
+    <!-- Loader shown until the app's code arrives (React replaces #root's contents).
+         Matches src/components/PageLoader.js. -->
+    <style>
+      body { margin: 0; background: #f8f5ef; }
+      .pt-boot { min-height: 100vh; display: grid; place-content: center; justify-items: center; gap: 14px;
+        opacity: 0; animation: pt-boot-in 0.3s ease 0.3s forwards; font-family: system-ui, sans-serif; }
+      .pt-boot-ring { width: 44px; height: 44px; border-radius: 50%; border: 4px solid #eadfce;
+        border-top-color: #231f20; animation: pt-boot-spin 0.8s linear infinite; }
+      .pt-boot-label { color: #8a7c70; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+      @keyframes pt-boot-spin { to { transform: rotate(360deg); } }
+      @keyframes pt-boot-in { to { opacity: 1; } }
+    </style>
     <title>Poster Town</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="root"><div class="pt-boot" role="status"><span class="pt-boot-ring"></span><span class="pt-boot-label">Poster Town</span></div></div>
   </body>
 </html>
