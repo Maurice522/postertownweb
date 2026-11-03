@@ -1,13 +1,62 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import LoadingImage from "./components/LoadingImage";
 import FilterSection from "./components/FilterSection";
 import ProductList from "./components/ProductList";
 import Sort from "./components/Sort";
 import { pickHeroGif } from "./data/heroGifs";
+import Pagination from "./components/Pagination";
+import { useFilterContext } from "./context/filter_context";
+import useIsPhone from "./utils/useIsPhone";
+
+const PAGE_SIZES = [40, 50, 60, 70, 80];
+const PAGE_SIZE_KEY = "postertown:page-size";
+
+function savedPageSize() {
+  try {
+    const saved = Number(localStorage.getItem(PAGE_SIZE_KEY));
+    return PAGE_SIZES.includes(saved) ? saved : PAGE_SIZES[0];
+  } catch {
+    return PAGE_SIZES[0];
+  }
+}
 
 const Products = () => {
   const heroGif = useMemo(pickHeroGif, []);
+  const { filter_products, filters, sorting_value } = useFilterContext();
+  // Phones scroll one long list; bigger screens get pages.
+  const isPhone = useIsPhone();
+  const [pageSize, setPageSize] = useState(savedPageSize);
+  const [page, setPage] = useState(1);
+  const viewRef = useRef(null);
+
+  const pageCount = Math.max(1, Math.ceil(filter_products.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const pageProducts = isPhone
+    ? undefined
+    : filter_products.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  // A new search, filter or sort starts again from the first page (a background
+  // catalog refresh doesn't).
+  const filterKey = JSON.stringify(filters);
+  useEffect(() => {
+    setPage(1);
+  }, [filterKey, sorting_value]);
+
+  const changePageSize = (size) => {
+    setPageSize(size);
+    setPage(1);
+    try {
+      localStorage.setItem(PAGE_SIZE_KEY, String(size));
+    } catch {
+      // Not saved (private mode); the choice still applies on this visit.
+    }
+  };
+
+  const changePage = (next) => {
+    setPage(next);
+    viewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <Wrapper>
@@ -35,13 +84,29 @@ const Products = () => {
             <FilterSection />
           </aside>
 
-          <section className="product-view">
+          <section className="product-view" ref={viewRef}>
             <div className="sort-filter">
-              <Sort />
+              <Sort
+                pageSize={pageSize}
+                pageSizeOptions={PAGE_SIZES}
+                onPageSizeChange={isPhone ? undefined : changePageSize}
+                page={currentPage}
+                pageCount={pageCount}
+                onPageChange={isPhone ? undefined : changePage}
+              />
             </div>
             <div className="main-product">
-              <ProductList />
+              <ProductList products={pageProducts} />
             </div>
+            {!isPhone && (
+              <Pagination
+                page={currentPage}
+                pageCount={pageCount}
+                total={filter_products.length}
+                pageSize={pageSize}
+                onPageChange={changePage}
+              />
+            )}
           </section>
         </div>
 

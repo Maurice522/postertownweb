@@ -1,5 +1,6 @@
+import { useState } from "react";
 import styled from "styled-components";
-import { FiSearch, FiX } from "react-icons/fi";
+import { FiChevronDown, FiSearch, FiSliders, FiX } from "react-icons/fi";
 import { useFilterContext } from "../context/filter_context";
 
 // "Under" price options, always shown; empty ones are disabled.
@@ -12,6 +13,8 @@ const FilterSection = () => {
     all_products,
     clearFilters,
   } = useFilterContext();
+  // Phones only: the filter groups start folded away below the search bar.
+  const [open, setOpen] = useState(false);
 
   const productPrices = (all_products || []).map((product) => Number(product.price) || 0);
   const countUpTo = (limit) => productPrices.filter((value) => value <= limit).length;
@@ -28,6 +31,7 @@ const FilterSection = () => {
   // counts as picked (it just shows everything), so "Under ₹2,000" stays selected.
   const selectedKey = price === maxPrice || !PRICE_STEPS.includes(price) ? "any" : `under-${price}`;
   const choosePrice = (value) => updateFilterValue({ target: { name: "price", value } });
+  const activeCount = categories.length + colors.length + (selectedKey === "any" ? 0 : 1);
 
   const getUniqueData = (data, attr) => {
     let newVal = data.map((curElem) => curElem[attr]);
@@ -72,6 +76,19 @@ const FilterSection = () => {
           </form>
         </div>
 
+        <button
+          type="button"
+          className={open ? "filter-toggle is-open" : "filter-toggle"}
+          aria-expanded={open}
+          aria-controls="filter-body"
+          onClick={() => setOpen((current) => !current)}>
+          <FiSliders />
+          <span>{open ? "Hide filters" : "Filters"}</span>
+          {activeCount > 0 && <span className="filter-count">{activeCount}</span>}
+          <FiChevronDown className="filter-chevron" />
+        </button>
+
+        <div id="filter-body" className={open ? "filter-body is-open" : "filter-body"}>
         <div className="filter-group">
           <h3>Category</h3>
           <div className="chip-group">
@@ -158,6 +175,7 @@ const FilterSection = () => {
             ))}
           </div>
         </div>
+        </div>
       </div>
     </Wrapper>
   );
@@ -242,6 +260,60 @@ const Wrapper = styled.section`
       display: grid;
       place-items: center;
       font-size: 1.5rem;
+    }
+  }
+
+  /* The fold-away toggle only exists on phones. */
+  .filter-toggle {
+    display: none;
+  }
+
+  @media (max-width: ${({ theme }) => theme.media.mobile}) {
+    .filter-search {
+      margin-bottom: 1rem;
+    }
+
+    .filter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      width: 100%;
+      padding: 1.1rem 1.4rem;
+      border: 1px solid #dfd1c2;
+      border-radius: 1.4rem;
+      background: #fff;
+      color: #231f20;
+      font-size: 1.6rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .filter-toggle .filter-chevron {
+      margin-left: auto;
+      transition: transform 0.2s ease;
+    }
+
+    .filter-toggle.is-open .filter-chevron {
+      transform: rotate(180deg);
+    }
+
+    .filter-count {
+      min-width: 2.2rem;
+      padding: 0.1rem 0.7rem;
+      border-radius: 999px;
+      background: #231f20;
+      color: #fff;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .filter-body {
+      display: none;
+    }
+
+    .filter-body.is-open {
+      display: block;
+      margin-top: 1.2rem;
     }
   }
 
