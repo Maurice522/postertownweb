@@ -151,6 +151,9 @@ const Wrapper = styled.section`
   .hero-image {
     display: block;
     width: 100%;
+    /* The width/height attributes only reserve space while loading; without auto here
+       the height attribute would win and stretch the image. */
+    height: auto;
     /* The artwork is portrait (about 3:4); trim only the bottom so the head stays in. */
     aspect-ratio: 4 / 5;
     object-fit: cover;
