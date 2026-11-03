@@ -25,3 +25,6 @@ yarn-error.log*
 
 # Local Netlify folder
 .netlify
+
+# Written by scripts/snapshot-catalog.mjs at build time
+/public/catalog-snapshot.json

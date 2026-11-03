@@ -50,13 +50,28 @@ const AppProvider = ({ children }) => {
 
   // Live catalog from the backend (what the admin console manages).
   const getProducts = async () => {
-    const cached = readCachedCatalog();
-    if (!cached) dispatch({ type: "SET_LOADING" });
+    let cached = readCachedCatalog();
+    let gotLive = false;
+    if (!cached) {
+      dispatch({ type: "SET_LOADING" });
+      // First visit in this browser: show the catalog saved at build time while the
+      // live API (possibly waking up) catches up.
+      axios
+        .get("/catalog-snapshot.json", { timeout: 15000 })
+        .then((res) => {
+          const snapshot = res.data?.products;
+          if (gotLive || !Array.isArray(snapshot) || !snapshot.length) return;
+          cached = snapshot;
+          dispatch({ type: "SET_API_DATA", payload: normalizeProducts(snapshot) });
+        })
+        .catch(() => {});
+    }
     try {
       // Render's free plan can take ~50s to wake the backend after a quiet spell.
       const res = await axios.get(`${API_BASE_URL}/api/products`, { timeout: 60000 });
       const live = Array.isArray(res.data) ? res.data : [];
       if (live.length) {
+        gotLive = true;
         saveCachedCatalog(live);
         dispatch({ type: "SET_API_DATA", payload: normalizeProducts(live) });
       } else if (!cached) {
