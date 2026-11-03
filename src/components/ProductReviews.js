@@ -1,8 +1,24 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FiCamera, FiCheckCircle, FiStar, FiX } from "react-icons/fi";
+import { useUserContext } from "../context/user_context";
+import { createCustomerUserId, getStoredOrders } from "../utils/orderStorage";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
+// The order user ids this browser knows: the signed-in account's, plus any guest
+// orders placed here. The server checks which of them has a delivered order of the
+// poster; only those customers can review it.
+const knownUserIds = (isAuthenticated, user) =>
+  [
+    ...new Set(
+      [
+        isAuthenticated ? createCustomerUserId(user) : "",
+        ...getStoredOrders(true).map((order) => order.userId),
+        ...getStoredOrders(false).map((order) => order.userId),
+      ].filter(Boolean)
+    ),
+  ];
 const emptyForm = { name: "", email: "", rating: 0, comment: "", photoDataUrl: "" };
 
 // Phone photos are often 5+ MB; send a 1600px JPEG instead.
@@ -44,6 +60,25 @@ const ProductReviews = ({ product }) => {
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState({ sending: false, error: "", done: "" });
+  // { eligible, orderId, userId } from the server, or alreadyReviewed.
+  const [eligibility, setEligibility] = useState({ eligible: false });
+  const { isAuthenticated, user } = useUserContext();
+  const userIdsKey = knownUserIds(isAuthenticated, user).join(",");
+
+  useEffect(() => {
+    setEligibility({ eligible: false });
+    if (!userIdsKey) return undefined;
+    let active = true;
+    fetch(
+      `${API_BASE_URL}/api/reviews/eligibility?productId=${encodeURIComponent(product.id)}&userIds=${encodeURIComponent(userIdsKey)}`
+    )
+      .then((res) => (res.ok ? res.json() : { eligible: false }))
+      .then((data) => active && setEligibility(data || { eligible: false }))
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [product.id, userIdsKey]);
 
   useEffect(() => {
     let active = true;
@@ -85,12 +120,18 @@ const ProductReviews = ({ product }) => {
       const res = await fetch(`${API_BASE_URL}/api/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, productId: product.id }),
+        body: JSON.stringify({
+          ...form,
+          productId: product.id,
+          orderId: eligibility.orderId,
+          userId: eligibility.userId,
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || "Your review couldn't be sent. Please try again.");
       setForm(emptyForm);
       setFormOpen(false);
+      setEligibility({ eligible: false, alreadyReviewed: true });
       setStatus({ sending: false, error: "", done: data.message });
     } catch (error) {
       setStatus({ sending: false, error: error.message, done: "" });
@@ -108,10 +149,14 @@ const ProductReviews = ({ product }) => {
               {reviews.length === 1 ? "review" : "reviews"}
             </p>
           ) : (
-            <p className="reviews-summary">Bought this poster? Tell other fans how it looks on your wall.</p>
+            <p className="reviews-summary">
+              {eligibility.eligible
+                ? "You've received this poster. Tell other fans how it looks on your wall."
+                : "Reviews come from customers who've received this poster."}
+            </p>
           )}
         </div>
-        {!formOpen && (
+        {eligibility.eligible && !formOpen && (
           <button type="button" className="write-btn" onClick={() => setFormOpen(true)}>
             Write a review
           </button>
@@ -124,7 +169,7 @@ const ProductReviews = ({ product }) => {
         </p>
       )}
 
-      {formOpen && (
+      {eligibility.eligible && formOpen && (
         <form className="review-form" onSubmit={submit}>
           <div className="rating-pick" role="radiogroup" aria-label="Your rating">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -206,7 +251,9 @@ const ProductReviews = ({ product }) => {
       )}
 
       {loaded && reviews.length === 0 && !formOpen && (
-        <p className="reviews-empty">No reviews yet. Be the first to share how it looks on your wall.</p>
+        <p className="reviews-empty">
+          {eligibility.eligible ? "No reviews yet. Be the first to share how it looks on your wall." : "No reviews yet."}
+        </p>
       )}
       <div className="reviews-grid">
         {reviews.map((review) => (
