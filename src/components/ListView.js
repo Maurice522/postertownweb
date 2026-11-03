@@ -3,8 +3,13 @@ import LoadingImage from "./LoadingImage";
 import styled from "styled-components";
 import FormatPrice from "../Helpers/FormatPrice";
 import { normalizeProduct } from "../utils/productHelpers";
+import { ProductListSkeleton } from "./Skeletons";
 
-const ListView = ({ products }) => {
+const ListView = ({ products, loading = false }) => {
+  if (loading) {
+    return <ProductListSkeleton count={4} />;
+  }
+
   return (
     <Wrapper>
       <div className="list-grid">
@@ -19,7 +24,7 @@ const ListView = ({ products }) => {
             <Link key={id} to={`/singleproduct/${id}`} className="list-card">
               <div className="list-image-shell">
                 <span className="category-badge">{category}</span>
-                <LoadingImage src={image} alt={name} />
+                <LoadingImage src={image} alt={name} size={600} />
               </div>
 
               <div className="list-copy">

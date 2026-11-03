@@ -3,9 +3,10 @@ import styled from "styled-components";
 import { FiArrowRight } from "react-icons/fi";
 import Product from "./Product";
 import { useProductContext } from "../context/productcontex";
+import { ProductGridSkeleton } from "./Skeletons";
 
 const FeatureProductLandscape = () => {
-  const { products } = useProductContext();
+  const { products, isLoading } = useProductContext();
   const isBestseller = (product) => (product.badges || product.tags || []).some((badge) => /bestseller/i.test(String(badge)));
   const wide = products.filter((product) => product.orientation === "landscape");
   const productList = [
@@ -27,11 +28,15 @@ const FeatureProductLandscape = () => {
           </Link>
         </div>
 
-        <div className="product-grid">
-          {productList.map((curElem) => (
-            <Product key={curElem.id} {...curElem} cardStyle="landscape" />
-          ))}
-        </div>
+        {isLoading && !productList.length ? (
+          <ProductGridSkeleton count={6} landscape />
+        ) : (
+          <div className="product-grid">
+            {productList.map((curElem) => (
+              <Product key={curElem.id} {...curElem} cardStyle="landscape" />
+            ))}
+          </div>
+        )}
       </div>
     </Wrapper>
   );

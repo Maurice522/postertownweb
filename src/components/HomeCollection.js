@@ -6,14 +6,19 @@ import { FiArrowRight } from "react-icons/fi";
 import FormatPrice from "../Helpers/FormatPrice";
 import { useProductContext } from "../context/productcontex";
 import { buildCollections } from "../data/collections";
+import { CollectionBandSkeleton } from "./Skeletons";
 
 const MAX_POSTERS = 6;
 
 // Home page band for one collection: shoppable posters first, then upcoming
 // designs from the collection's showcase marked "Coming soon".
 const HomeCollection = ({ slug }) => {
-  const { products: catalog } = useProductContext();
+  const { products: catalog, isLoading } = useProductContext();
   const collection = useMemo(() => buildCollections(catalog).find((item) => item.slug === slug), [catalog, slug]);
+
+  if (isLoading && !collection?.products.length) {
+    return <CollectionBandSkeleton tiles={MAX_POSTERS} />;
+  }
 
   if (!collection) {
     return null;
@@ -52,7 +57,7 @@ const HomeCollection = ({ slug }) => {
             poster.to ? (
               <Link key={poster.key} to={poster.to} className="poster-tile">
                 <div className="tile-frame">
-                  <LoadingImage src={poster.image} alt={poster.name} loading="lazy" />
+                  <LoadingImage src={poster.image} alt={poster.name} size={500} />
                 </div>
                 <div className="tile-copy">
                   <strong>{poster.name}</strong>
@@ -64,7 +69,7 @@ const HomeCollection = ({ slug }) => {
             ) : (
               <div key={poster.key} className="poster-tile is-coming">
                 <div className="tile-frame">
-                  <LoadingImage src={poster.image} alt={poster.name} loading="lazy" />
+                  <LoadingImage src={poster.image} alt={poster.name} size={500} />
                   <span className="soon-tag">Coming soon</span>
                 </div>
                 <div className="tile-copy">

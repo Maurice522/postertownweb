@@ -12,6 +12,10 @@
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!-- Open connections to the API and image host early; the catalog and posters come from there. -->
+    <link rel="preconnect" href="%REACT_APP_API_BASE_URL%" crossorigin />
+    <link rel="preconnect" href="https://res.cloudinary.com" />
+    <link rel="preload" as="image" href="%PUBLIC_URL%/images/rengokuext.webp" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Chokokutai&family=Permanent+Marker&family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet" />

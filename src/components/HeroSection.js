@@ -73,7 +73,7 @@ const HeroSection = ({ myData }) => {
         </div>
         <div className="hero-art">
           <div className="hero-frame">
-            <LoadingImage ref={imageRef} src="images/rengokuext.jpg" alt="Rengoku metal poster" className="hero-image" />
+            <LoadingImage ref={imageRef} src="/images/rengokuext.webp" alt="Rengoku metal poster" className="hero-image" loading="eager" fetchpriority="high" width={900} height={1174} />
           </div>
         </div>
       </div>

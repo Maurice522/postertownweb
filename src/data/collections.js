@@ -31,7 +31,7 @@ export const collectionDefinitions = [
     featured: true,
     match: isDemonSlayer,
     // Home page section: background art and upcoming designs shown as "Coming soon".
-    wallImage: "/images/demonslayerall.jpg",
+    wallImage: "/images/demonslayerall.webp",
     showcase: [],
   },
   {
@@ -43,7 +43,7 @@ export const collectionDefinitions = [
       "Broly's fury, Goku's Ultra Instinct and the villains who pushed them there. Over-9000 energy for your wall.",
     accent: "#e8892b",
     match: isDragonBall,
-    wallImage: "/images/dbzwall.jpeg",
+    wallImage: "/images/dbzwall.webp",
     showcase: [{ name: "Goku Ultra Instinct", image: "/images/gokuui.jpg" }],
   },
   {

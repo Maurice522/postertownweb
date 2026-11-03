@@ -3,9 +3,10 @@ import styled from "styled-components";
 import { FiArrowRight } from "react-icons/fi";
 import Product from "./Product";
 import { useProductContext } from "../context/productcontex";
+import { ProductGridSkeleton } from "./Skeletons";
 
 const FeatureProduct = () => {
-  const { products } = useProductContext();
+  const { products, isLoading } = useProductContext();
   const isBestseller = (product) => (product.badges || product.tags || []).some((badge) => /bestseller/i.test(String(badge)));
   const portrait = products.filter((product) => product.orientation !== "landscape");
   const productList = [
@@ -27,11 +28,15 @@ const FeatureProduct = () => {
           </Link>
         </div>
 
-        <div className="product-grid">
-          {productList.map((curElem) => (
-            <Product key={curElem.id} {...curElem} />
-          ))}
-        </div>
+        {isLoading && !productList.length ? (
+          <ProductGridSkeleton count={6} />
+        ) : (
+          <div className="product-grid">
+            {productList.map((curElem) => (
+              <Product key={curElem.id} {...curElem} />
+            ))}
+          </div>
+        )}
       </div>
     </Wrapper>
   );

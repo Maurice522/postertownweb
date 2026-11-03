@@ -10,7 +10,9 @@ const Header = () => {
         <NavLink to="/" className="brand-link" aria-label="Poster Town home">
           <div className="brand-mark">
             <img
-              src="/images/PosterTownc.png"
+              src="/images/postertown-logo-128.webp"
+              width="128"
+              height="128"
               alt="Poster Town logo"
               className="logo"
             />

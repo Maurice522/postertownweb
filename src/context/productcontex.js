@@ -1,37 +1,71 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import axios from "axios";
 import reducer from "../reducer/productReducer";
-import localProducts from "../data/products.json";
 import { normalizeProducts } from "../utils/productHelpers";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
+// The last catalog this browser received. Shown straight away on the next visit while
+// a fresh copy loads, so returning visitors don't wait for the backend to wake up.
+const CATALOG_CACHE_KEY = "postertown:catalog:v1";
+
+function readCachedCatalog() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(CATALOG_CACHE_KEY));
+    return Array.isArray(cached?.products) && cached.products.length ? cached.products : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveCachedCatalog(products) {
+  try {
+    localStorage.setItem(CATALOG_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), products }));
+  } catch {
+    // Storage full or blocked (private mode): the site still works, just uncached.
+  }
+}
+
+// The bundled products.json is only a fallback for when the API can't be reached, so
+// it's loaded on demand instead of being part of every visitor's download.
+async function bundledCatalog() {
+  const module = await import("../data/products.json");
+  return module.default;
+}
+
 const AppContext = createContext();
 
-const initialState = {
-  isLoading: true,
-  isError: false,
-  products: [],
-  featureProducts: [],
-  isSingleLoading: false,
-  singleProduct: {},
-};
-
 const AppProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, undefined, () => {
+    const cached = readCachedCatalog();
+    return {
+      isLoading: !cached,
+      isError: false,
+      products: cached ? normalizeProducts(cached) : [],
+      featureProducts: [],
+      isSingleLoading: false,
+      singleProduct: {},
+    };
+  });
 
-  // Live catalog from the backend (what the admin console manages). The bundled
-  // products.json is only a fallback for when the API can't be reached.
+  // Live catalog from the backend (what the admin console manages).
   const getProducts = async () => {
-    dispatch({ type: "SET_LOADING" });
+    const cached = readCachedCatalog();
+    if (!cached) dispatch({ type: "SET_LOADING" });
     try {
       // Render's free plan can take ~50s to wake the backend after a quiet spell.
       const res = await axios.get(`${API_BASE_URL}/api/products`, { timeout: 60000 });
       const live = Array.isArray(res.data) ? res.data : [];
-      dispatch({ type: "SET_API_DATA", payload: normalizeProducts(live.length ? live : localProducts) });
+      if (live.length) {
+        saveCachedCatalog(live);
+        dispatch({ type: "SET_API_DATA", payload: normalizeProducts(live) });
+      } else if (!cached) {
+        dispatch({ type: "SET_API_DATA", payload: normalizeProducts(await bundledCatalog()) });
+      }
     } catch (error) {
+      if (cached) return;
       console.error("Could not load products from the API; showing the bundled catalog", error);
-      dispatch({ type: "SET_API_DATA", payload: normalizeProducts(localProducts) });
+      dispatch({ type: "SET_API_DATA", payload: normalizeProducts(await bundledCatalog()) });
     }
   };
 

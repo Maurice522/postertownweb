@@ -19,6 +19,7 @@ const PosterFan = ({ images = [], size = "md" }) => {
             alt=""
             loading="lazy"
             overlay={false}
+            size={600}
             className={`fan-poster fan-poster-${index}${wide ? " fan-wide" : ""}`}
             onLoad={(event) => {
               const isWide = event.currentTarget.naturalWidth > event.currentTarget.naturalHeight;

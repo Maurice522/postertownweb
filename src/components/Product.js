@@ -94,6 +94,7 @@ const Product = (curElem) => {
             <span className="category-badge">{category}</span>
             <LoadingImage
               src={imageUrl}
+              size={cardStyle === "landscape" ? 900 : 600}
               alt={name}
               className={`${artShape}-art`}
               onLoad={(e) => setArtShape(e.currentTarget.naturalWidth > e.currentTarget.naturalHeight ? "wide" : "tall")}

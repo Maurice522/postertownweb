@@ -1,24 +1,32 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import About from "./About";
 import Home from "./Home";
-import Products from "./Products";
-import Collections from "./Collections";
-import CollectionPage from "./CollectionPage";
-import Orders from "./Orders";
-import Cart from "./Cart";
-import Auth from "./Auth";
-import SingleProduct from "./SingleProduct";
-import ErrorPage from "./ErrorPage";
 import { GlobalStyle } from "./GlobalStyle";
 import { ThemeProvider } from "styled-components";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import RouteScrollReset from "./components/RouteScrollReset";
 import { AppProvider } from "./context/productcontex";
 import { FilterContextProvider } from "./context/filter_context";
 import { CartProvider } from "./context/cart_context";
 import { UserProvider } from "./context/user_context";
+
+// Every page except Home loads as its own file the first time it's opened, so the
+// home page doesn't wait for the cart, checkout or account code. The pages people
+// usually open next are fetched in the background once the browser is idle.
+const Products = lazy(() => import(/* webpackPrefetch: true */ "./Products"));
+const SingleProduct = lazy(() => import(/* webpackPrefetch: true */ "./SingleProduct"));
+const Collections = lazy(() => import(/* webpackPrefetch: true */ "./Collections"));
+const CollectionPage = lazy(() => import("./CollectionPage"));
+const About = lazy(() => import("./About"));
+const Orders = lazy(() => import("./Orders"));
+const Cart = lazy(() => import("./Cart"));
+const Auth = lazy(() => import("./Auth"));
+const ErrorPage = lazy(() => import("./ErrorPage"));
+
+// Holds the page's space while its code loads, so the footer doesn't jump up.
+const PageFallback = () => <div style={{ minHeight: "80vh" }} aria-busy="true" />;
 
 const App = () => {
   const theme = {
@@ -63,20 +71,23 @@ const App = () => {
             <UserProvider>
               <Router>
                 <GlobalStyle />
+                <RouteScrollReset />
                 <Header />
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/collections" element={<Collections />} />
-                  <Route path="/collections/:slug" element={<CollectionPage />} />
-                  <Route path="/orders" element={<Orders />} />
-                  <Route path="/contact" element={<Orders />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/singleproduct/:id" element={<SingleProduct />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="*" element={<ErrorPage />} />
-                </Routes>
+                <Suspense fallback={<PageFallback />}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/collections" element={<Collections />} />
+                    <Route path="/collections/:slug" element={<CollectionPage />} />
+                    <Route path="/orders" element={<Orders />} />
+                    <Route path="/contact" element={<Orders />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/singleproduct/:id" element={<SingleProduct />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="*" element={<ErrorPage />} />
+                  </Routes>
+                </Suspense>
                 <ScrollToTop />
                 <Footer />
               </Router>

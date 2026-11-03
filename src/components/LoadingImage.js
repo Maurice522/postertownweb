@@ -1,10 +1,15 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { sizedImageUrl } from "../utils/imageUrl";
 
 // An <img> that shows a shimmering poster placeholder until it has loaded, then
 // fades and un-blurs into view. By default the placeholder is an overlay that fills
 // the nearest positioned parent; pass overlay={false} for images that already have
 // their own box, and the shimmer is painted on the image itself.
-const LoadingImage = forwardRef(({ className = "", overlay = true, onLoad, onError, src, alt = "", ...props }, ref) => {
+// size: the width in pixels to request from Cloudinary (about twice the displayed width).
+// Images load lazily unless loading="eager" is passed.
+const LoadingImage = forwardRef(
+  ({ className = "", overlay = true, onLoad, onError, src: originalSrc, size, alt = "", loading: loadingMode = "lazy", ...props }, ref) => {
+  const src = sizedImageUrl(originalSrc, size);
   const imgRef = useRef(null);
   // "loading" | "revealing" (just finished, play the fade-in) | "ready" (was cached).
   const [state, setState] = useState("loading");
@@ -38,6 +43,8 @@ const LoadingImage = forwardRef(({ className = "", overlay = true, onLoad, onErr
         ref={setRefs}
         src={src}
         alt={alt}
+        loading={loadingMode}
+        decoding="async"
         className={classes}
         onLoad={(event) => finish(event, onLoad)}
         onError={(event) => finish(event, onError)}
@@ -50,6 +57,7 @@ const LoadingImage = forwardRef(({ className = "", overlay = true, onLoad, onErr
       )}
     </>
   );
-});
+  }
+);
 
 export default LoadingImage;

@@ -24,6 +24,7 @@ const Products = () => {
           <div className="hero-media">
             <LoadingImage
               src={heroGif}
+              loading="eager"
               alt="Animated anime showcase"
             />
           </div>

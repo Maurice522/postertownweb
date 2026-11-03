@@ -545,7 +545,7 @@ const SingleProduct = () => {
                   {similarProducts.map((product) => (
                     <Link key={product.id} to={`/singleproduct/${product.id}`} className="similar-card">
                       <div className="similar-image-shell">
-                        <LoadingImage src={getProductImageUrl(product)} alt={product.name} />
+                        <LoadingImage src={getProductImageUrl(product)} alt={product.name} size={500} />
                         <span className="similar-category">{product.category}</span>
                       </div>
                       <div className="similar-copy">
@@ -663,7 +663,7 @@ const SingleProduct = () => {
             <div className="recent-list">
               {recentlyViewed.map((product) => (
                   <Link key={product.id} to={`/singleproduct/${product.id}`} className="recent-card">
-                    <LoadingImage overlay={false} src={getProductImageUrl(product)} alt={product.name} />
+                    <LoadingImage overlay={false} src={getProductImageUrl(product)} alt={product.name} size={160} />
                     <div>
                       <h4>{product.name}</h4>
                       <p>
@@ -687,7 +687,7 @@ const SingleProduct = () => {
                 {recommendedProducts.map((product) => (
                   <Link key={product.id} to={`/singleproduct/${product.id}`} className="recommend-card">
                     <div className="recommend-image-shell">
-                      <LoadingImage src={getProductImageUrl(product)} alt={product.name} />
+                      <LoadingImage src={getProductImageUrl(product)} alt={product.name} size={400} />
                     </div>
                     <strong>{product.name}</strong>
                     <span>

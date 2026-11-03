@@ -8,11 +8,15 @@ const renderArtwork = (image, className = "") => {
     return null;
   }
 
+  // Thumbnails are small; the main view is large and on screen right away.
+  const thumb = className.includes("thumb");
+  const sizing = { size: thumb ? 320 : 1400, loading: thumb ? "lazy" : "eager" };
+
   if (image.variant === "desk") {
     return (
       <div className={`scene scene-desk ${className}`}>
         <div className="wall-art desk-art">
-          <LoadingImage src={image.url} alt={image.filename} />
+          <LoadingImage {...sizing} src={image.url} alt={image.filename} />
         </div>
         <div className="desk-line" />
         <div className="desk-lamp" />
@@ -24,7 +28,7 @@ const renderArtwork = (image, className = "") => {
     return (
       <div className={`scene scene-room ${className}`}>
         <div className="wall-art room-art">
-          <LoadingImage src={image.url} alt={image.filename} />
+          <LoadingImage {...sizing} src={image.url} alt={image.filename} />
         </div>
         <div className="sofa" />
         <div className="floor-shadow" />
@@ -36,7 +40,7 @@ const renderArtwork = (image, className = "") => {
   if (image.variant === "photo") {
     return (
       <div className={`scene scene-photo ${className}`}>
-        <LoadingImage src={image.url} alt={image.label || image.filename} className="photo-image" />
+        <LoadingImage {...sizing} src={image.url} alt={image.label || image.filename} className="photo-image" />
       </div>
     );
   }
@@ -44,14 +48,14 @@ const renderArtwork = (image, className = "") => {
   if (image.variant === "closeup") {
     return (
       <div className={`scene scene-closeup ${className}`}>
-        <LoadingImage src={image.url} alt={image.filename} className="closeup-image" />
+        <LoadingImage {...sizing} src={image.url} alt={image.filename} className="closeup-image" />
       </div>
     );
   }
 
   return (
     <div className={`scene scene-poster ${className}`}>
-      <LoadingImage src={image.url} alt={image.filename} className="poster-image" />
+      <LoadingImage {...sizing} src={image.url} alt={image.filename} className="poster-image" />
     </div>
   );
 };
