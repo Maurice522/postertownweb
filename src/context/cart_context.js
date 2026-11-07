@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from "react";
 import reducer from "../reducer/cartReducer";
+import { toGaItem, trackEcommerce } from "../utils/analytics";
 
 const CartContext = createContext();
 
@@ -24,8 +25,10 @@ const initialState = {
 const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // Covers both the product page (AddToCart.js) and the quick-add on cards (Product.js).
   const addToCart = (id, color, amount, product) => {
     dispatch({ type: "ADD_TO_CART", payload: { id, color, amount, product } });
+    trackEcommerce("add_to_cart", [toGaItem({ ...product, id, size: product.selectedSize }, amount)]);
   };
 
   // increment and decrement the product
@@ -40,7 +43,9 @@ const CartProvider = ({ children }) => {
 
   // to remove the individual item from cart
   const removeItem = (id) => {
+    const item = state.cart.find((cartItem) => cartItem.id === id);
     dispatch({ type: "REMOVE_ITEM", payload: id });
+    if (item) trackEcommerce("remove_from_cart", [toGaItem(item)]);
   };
 
   // to clear the cart

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -19,6 +19,7 @@ import FormatPrice from "./Helpers/FormatPrice";
 import { useUserContext } from "./context/user_context";
 import { createCustomerUserId, prependStoredOrder } from "./utils/orderStorage";
 import { useProductContext } from "./context/productcontex";
+import { getGaClientId, toGaItem, trackEcommerce } from "./utils/analytics";
 import { paperSizeFor } from "./utils/productHelpers";
 import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, isDemonSlayer, normalizeCouponCode, priceCart } from "./utils/pricing";
 
@@ -115,6 +116,20 @@ const Cart = () => {
   const gstAmount = Math.max(pricing.subtotal - productSubtotalExGst, 0);
   const orderTotal = pricing.total;
   const a4Count = cart.reduce((sum, item) => sum + (cartLine(item, catalogProducts).paper === "A4" ? item.amount : 0), 0);
+
+  // GA4 view_cart, once when the cart page opens with items in it.
+  const viewedCartRef = useRef(false);
+  useEffect(() => {
+    if (viewedCartRef.current || !cart.length) return;
+    viewedCartRef.current = true;
+    trackEcommerce("view_cart", cart.map((item) => toGaItem(item)));
+  }, [cart]);
+
+  const startCheckout = () => {
+    if (!canCheckout) return;
+    trackEcommerce("begin_checkout", cart.map((item) => toGaItem(item)), { coupon: pricing.couponCode || undefined });
+    setIsPaymentModalOpen(true);
+  };
 
   const applyCoupon = (code) => {
     const normalized = normalizeCouponCode(code);
@@ -334,6 +349,8 @@ const Cart = () => {
         channel: "web",
         storage: isAuthenticated ? "account" : "guest_cookie",
       },
+      // Lets the backend send GA4 refunds for this order as the same visitor.
+      analytics: { gaClientId: getGaClientId() },
     };
 
     try {
@@ -348,6 +365,14 @@ const Cart = () => {
         throw new Error(data?.message || `Order submission failed with ${response.status}`);
       }
       const savedOrder = data;
+      // The server's saved order, not the cart: it recalculates prices and discounts.
+      trackEcommerce("purchase", (savedOrder.items || []).map((item) => toGaItem(item)), {
+        transaction_id: savedOrder.id,
+        value: Number(savedOrder.totals?.total) || 0,
+        tax: Number(savedOrder.totals?.gst) || 0,
+        shipping: Number(savedOrder.totals?.shipping) || 0,
+        coupon: savedOrder.totals?.couponCode || undefined,
+      });
 
       if (typeof window !== "undefined") {
         prependStoredOrder(savedOrder, isAuthenticated);
@@ -651,7 +676,7 @@ const Cart = () => {
                 type="button"
                 className={canCheckout ? "checkout-btn" : "checkout-btn disabled"}
                 disabled={!canCheckout}
-                onClick={() => canCheckout && setIsPaymentModalOpen(true)}>
+                onClick={startCheckout}>
                 Proceed to checkout
               </button>
 

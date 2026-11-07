@@ -6,6 +6,7 @@ import { useCartContext } from "./context/cart_context";
 import { useUserContext } from "./context/user_context";
 import GoogleSignInButton from "./components/GoogleSignInButton";
 import { pickHeroGif } from "./data/heroGifs";
+import { trackAuth } from "./utils/analytics";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -77,7 +78,8 @@ const Auth = () => {
     setNotice("");
     setDevOtp("");
     try {
-      await loginWithGoogle(credential);
+      const { isNewUser } = await loginWithGoogle(credential);
+      trackAuth(isNewUser ? "sign_up" : "login", "google");
       handleAuthSuccess();
     } catch {
       // The error is shown from the user context.
@@ -92,6 +94,7 @@ const Auth = () => {
     try {
       if (mode === "login") {
         await login(form.email, form.password);
+        trackAuth("login", "email");
         handleAuthSuccess();
         return;
       }
@@ -106,6 +109,7 @@ const Auth = () => {
 
       if (mode === "verifySignup") {
         await verifyRegistration(form.email, form.otp);
+        trackAuth("sign_up", "email");
         handleAuthSuccess();
         return;
       }

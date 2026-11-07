@@ -59,7 +59,8 @@ const UserProvider = ({ children }) => {
     dispatch({ type: "SET_LOADING" });
     try {
       const data = await requestAuth("/api/auth/google", { credential });
-      return saveAuthenticatedUser(data.user, "LOGIN_SUCCESS");
+      // isNewUser: this Google login created the account (GA4 counts a sign_up).
+      return { user: saveAuthenticatedUser(data.user, "LOGIN_SUCCESS"), isNewUser: Boolean(data.isNewUser) };
     } catch (error) {
       dispatch({ type: "AUTH_ERROR", payload: error.message });
       throw error;

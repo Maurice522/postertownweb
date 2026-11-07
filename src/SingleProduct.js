@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LoadingImage from "./components/LoadingImage";
 import styled from "styled-components";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -16,6 +16,7 @@ import { useProductContext } from "./context/productcontex";
 import { normalizeImagePath, paperSizeFor } from "./utils/productHelpers";
 import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS, isDemonSlayer } from "./utils/pricing";
 import { productMeta, usePageMeta } from "./utils/pageMeta";
+import { toGaItem, trackEcommerce } from "./utils/analytics";
 import { primaryCollectionFor } from "./data/collections";
 
 const defaultSizes = [
@@ -146,6 +147,21 @@ const SingleProduct = () => {
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const { products: catalogProducts, isLoading: catalogLoading } = useProductContext();
   usePageMeta(productMeta(currentProduct));
+
+  // GA4 view_item, once per product opened (a background catalog refresh swaps in a new
+  // copy of the same product, which shouldn't count again).
+  const viewedProductRef = useRef(null);
+  useEffect(() => {
+    if (!currentProduct || viewedProductRef.current === currentProduct.id) return;
+    viewedProductRef.current = currentProduct.id;
+    trackEcommerce("view_item", [
+      toGaItem({
+        ...currentProduct,
+        price: Number(selectedSize?.price) || currentProduct.price,
+        size: selectedSize?.label,
+      }),
+    ]);
+  }, [currentProduct, selectedSize]);
 
   useEffect(() => {
     let isActive = true;
