@@ -13,6 +13,7 @@ import { AppProvider } from "./context/productcontex";
 import { FilterContextProvider } from "./context/filter_context";
 import { CartProvider } from "./context/cart_context";
 import { UserProvider } from "./context/user_context";
+import CartSync from "./components/CartSync";
 
 // Every page except Home loads as its own file the first time it's opened, so the
 // home page doesn't wait for the cart, checkout or account code. The pages people
@@ -78,6 +79,7 @@ const App = () => {
               <Router>
                 <GlobalStyle />
                 <RouteScrollReset />
+                <CartSync />
                 <Header />
                 <RouteErrorBoundary>
                   <Suspense fallback={<PageLoader />}>
