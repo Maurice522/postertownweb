@@ -2,19 +2,26 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
-const PageNavigation = ({ title }) => {
+// parent: optional { label, to } between Home and the page (e.g. the collection).
+const PageNavigation = ({ title, parent }) => {
   return (
-    <Wrapper>
+    <Wrapper aria-label="Breadcrumb">
       <div className="breadcrumb-shell">
         <NavLink to="/">Home</NavLink>
         <span className="divider">/</span>
+        {parent && (
+          <>
+            <NavLink to={parent.to}>{parent.label}</NavLink>
+            <span className="divider">/</span>
+          </>
+        )}
         <span className="current">{title}</span>
       </div>
     </Wrapper>
   );
 };
 
-const Wrapper = styled.section`
+const Wrapper = styled.nav`
   background: transparent;
   padding: 2rem 0 0;
 

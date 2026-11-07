@@ -9,30 +9,33 @@
 // - build sitemap.xml from the live catalog.
 // Product and collection data comes from the API, cached here for a few minutes, so a
 // product added in the admin console shows up without a new deploy.
-import { buildCollections } from "../src/data/collections.js";
+import { buildCollections, primaryCollectionFor } from "../src/data/collections.js";
+import { collectionSeoFor } from "../src/data/collectionSeo.js";
 import { normalizeProducts } from "../src/utils/productHelpers.js";
 
 const SITE_NAME = "Poster Town";
 const DEFAULT_DESCRIPTION =
-  "Premium 1 mm metal posters of anime, cars, games and movies in A4, A3 and A2. Free shipping on 2+ posters across India.";
+  "Ultra HD metal posters for your wall from Metal Poster Town: anime, Demon Slayer, One Piece, Naruto, Gojo, Batman and more on 1 mm steel. Free shipping on 2+.";
+// Link-preview image for pages without their own (public/og-image.jpg, 1200x630).
+const SHARE_IMAGE_PATH = "/og-image.jpg";
 
 // The catalog is re-read from the API when the cached copy is older than this. Older
 // copies are still served (and refreshed in the background) so pages never wait.
 const CATALOG_FRESH_MS = 5 * 60 * 1000;
 // A sleeping Render backend takes ~25s to answer; don't hold a page for it.
 const API_TIMEOUT_MS = 4000;
-const CATALOG_CACHE_KEY = "https://catalog.internal/seo-index-v1";
+const CATALOG_CACHE_KEY = "https://catalog.internal/seo-index-v2";
 
 const PRIVATE_PATHS = new Set(["/cart", "/orders", "/contact", "/auth"]);
 const STATIC_PAGES = {
   "/": {
-    title: "Metal Posters Online in India – Anime, Car & Gaming Wall Art | Poster Town",
+    title: "Metal Posters for Wall – Ultra HD Anime Metal Posters | Metal Poster Town",
     description: DEFAULT_DESCRIPTION,
   },
   "/products": {
-    title: "Shop All Metal Posters – A4, A3 & A2 | Poster Town",
+    title: "Shop All Metal Posters for Wall – Anime, Superhero & Car | Poster Town",
     description:
-      "Browse every Poster Town metal poster: anime, cars, games, superheroes and movies on 1 mm metal. Any 3 A4 for ₹1599 and free shipping on 2+ posters.",
+      "Browse every Poster Town metal poster: ultra HD anime, superhero, car and gaming designs on 1 mm steel. Any 3 A4 for ₹1599 and free shipping on 2+ posters.",
   },
   "/collections": {
     title: "Metal Poster Collections – Demon Slayer, Dragon Ball & More | Poster Town",
@@ -40,8 +43,9 @@ const STATIC_PAGES = {
       "Curated metal poster collections by fandom: Demon Slayer, Dragon Ball Z, One Piece, Naruto, cars and more. Build a wall that tells one story.",
   },
   "/about": {
-    title: "About Poster Town – Premium Metal Wall Posters",
-    description: "Poster Town prints premium metal wall posters of the anime, games, cars and films you love, shipped across India.",
+    title: "About Metal Poster Town – Ultra HD Metal Poster Company",
+    description:
+      "Metal Poster Town prints ultra HD metal posters of the anime, superheroes, games and cars you love on 1 mm steel, shipped across India.",
   },
 };
 
@@ -72,12 +76,16 @@ function seoIndex(rawProducts) {
       })),
       price: product.price,
       ratings: product.ratings?.count > 0 ? product.ratings : null,
+      collection: (({ slug, title } = {}) => (slug ? { slug, title } : null))(primaryCollectionFor(product) || {}),
     };
   }
   const collections = {};
   for (const collection of buildCollections(products)) {
+    const seo = collectionSeoFor(collection);
     collections[collection.slug] = {
       title: collection.title,
+      seoTitle: seo.title,
+      seoDescription: seo.description,
       description: collection.description,
       count: collection.count,
       fromPrice: collection.fromPrice,
@@ -145,8 +153,16 @@ const escapeHtml = (value = "") =>
 // JSON inside <script>: stop "</script>" in a product name from ending the tag.
 const jsonLd = (data) => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
 
-// A 1200px JPEG: what link previews and Google handle best.
+// Link previews want a 1200x630 JPEG. Posters are portrait, so pad them onto a dark
+// background instead of cropping.
+const SHARE_WIDTH = 1200;
+const SHARE_HEIGHT = 630;
 const shareImage = (url = "") =>
+  url.includes("/upload/")
+    ? url.replace("/upload/", `/upload/c_pad,w_${SHARE_WIDTH},h_${SHARE_HEIGHT},b_rgb:1c1715,f_jpg,q_auto/`)
+    : url;
+// Google wants the full-size images in Product data.
+const largeImage = (url = "") =>
   url.includes("/upload/") ? url.replace("/upload/", "/upload/c_limit,w_1200,f_jpg,q_auto/") : url;
 
 function breadcrumbs(origin, trail) {
@@ -181,7 +197,7 @@ function productSchema(origin, id, product) {
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: [...new Set([product.image, ...product.gallery].filter(Boolean))].map(shareImage),
+    image: [...new Set([product.image, ...product.gallery].filter(Boolean))].map(largeImage),
     ...(product.sku ? { sku: product.sku } : {}),
     ...(product.category ? { category: product.category } : {}),
     brand: { "@type": "Brand", name: SITE_NAME },
@@ -220,11 +236,11 @@ async function pageFor(url, env, ctx) {
             { "@context": "https://schema.org", "@type": "WebSite", name: SITE_NAME, url: origin },
           ]
         : [breadcrumbs(origin, [["Home", "/"], [page.title.split(" – ")[0].split(" | ")[0], pathname]])];
-    return { ...page, canonical, schema };
+    return { ...page, canonical, schema, image: `${origin}${SHARE_IMAGE_PATH}`, imageAlt: "Metal Poster Town – ultra HD metal posters" };
   }
 
   if (PRIVATE_PATHS.has(pathname)) {
-    return { title: SITE_NAME, description: DEFAULT_DESCRIPTION, canonical, noindex: true };
+    return { title: SITE_NAME, description: DEFAULT_DESCRIPTION, canonical, noindex: true, image: `${origin}${SHARE_IMAGE_PATH}` };
   }
 
   const productMatch = pathname.match(/^\/singleproduct\/([\w-]+)$/);
@@ -240,11 +256,18 @@ async function pageFor(url, env, ctx) {
       description: product.description,
       canonical,
       image: shareImage(product.image),
+      imageAlt: product.name,
       type: "product",
       price: product.price,
       schema: [
         productSchema(origin, id, product),
-        breadcrumbs(origin, [["Home", "/"], ["Products", "/products"], [product.name, pathname]]),
+        breadcrumbs(origin, [
+          ["Home", "/"],
+          product.collection
+            ? [product.collection.title, `/collections/${product.collection.slug}`]
+            : ["Products", "/products"],
+          [product.name, pathname],
+        ]),
       ],
     };
   }
@@ -254,12 +277,12 @@ async function pageFor(url, env, ctx) {
     const catalog = await getCatalog(env, ctx, url);
     const collection = catalog.collections[collectionMatch[1]];
     if (!collection) return null;
-    const from = collection.fromPrice > 0 ? ` From ₹${collection.fromPrice}.` : "";
     return {
-      title: `${collection.title} Metal Posters | ${SITE_NAME}`,
-      description: `${collection.description} ${collection.count} designs in A4, A3 and A2.${from}`,
+      title: collection.seoTitle,
+      description: collection.seoDescription,
       canonical,
-      image: shareImage(collection.image),
+      image: collection.image ? shareImage(collection.image) : `${origin}${SHARE_IMAGE_PATH}`,
+      imageAlt: `${collection.title} metal posters`,
       schema: [
         breadcrumbs(origin, [["Home", "/"], ["Collections", "/collections"], [collection.title, pathname]]),
       ],
@@ -280,7 +303,17 @@ function headTags(page) {
     `<meta property="og:locale" content="en_IN" />`,
     `<meta name="twitter:card" content="${page.image ? "summary_large_image" : "summary"}" />`,
   ];
-  if (page.image) tags.push(`<meta property="og:image" content="${escapeHtml(page.image)}" />`);
+  tags.push(`<meta name="twitter:title" content="${escapeHtml(page.title)}" />`);
+  tags.push(`<meta name="twitter:description" content="${escapeHtml(page.description)}" />`);
+  if (page.image) {
+    tags.push(`<meta property="og:image" content="${escapeHtml(page.image)}" />`);
+    tags.push(`<meta property="og:image:secure_url" content="${escapeHtml(page.image)}" />`);
+    tags.push(`<meta property="og:image:type" content="image/jpeg" />`);
+    tags.push(`<meta property="og:image:width" content="${SHARE_WIDTH}" />`);
+    tags.push(`<meta property="og:image:height" content="${SHARE_HEIGHT}" />`);
+    tags.push(`<meta property="og:image:alt" content="${escapeHtml(page.imageAlt || page.title)}" />`);
+    tags.push(`<meta name="twitter:image" content="${escapeHtml(page.image)}" />`);
+  }
   if (page.price) {
     tags.push(`<meta property="product:price:amount" content="${page.price}" />`);
     tags.push(`<meta property="product:price:currency" content="INR" />`);

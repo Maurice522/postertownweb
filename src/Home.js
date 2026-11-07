@@ -5,6 +5,7 @@ import Services from "./components/Services";
 import HomeCollection from "./components/HomeCollection";
 import FeatureProductLandscape from "./components/FeatureProductLandscape";
 import FaqSection from "./components/FaqSection";
+import HomeSeoCopy from "./components/HomeSeoCopy";
 
 const Home = () => {
   const data = {
@@ -19,6 +20,8 @@ const Home = () => {
       <HomeCollection slug="dragon-ball-z" />
       <Services />
       <FeatureProductLandscape />
+
+      <HomeSeoCopy />
 
       <div className="home-faq">
         <FaqSection intro="Everything to know about our metal posters, delivery and offers." />

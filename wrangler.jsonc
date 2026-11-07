@@ -22,5 +22,9 @@
     { "pattern": "metalpostertown.in/*", "zone_name": "metalpostertown.in" },
     { "pattern": "www.metalpostertown.in/*", "zone_name": "metalpostertown.in" }
   ],
+  // Preview versions (`wrangler versions upload`) get their own test address so changes
+  // can be checked before going live. The Worker marks those addresses noindex.
+  "workers_dev": true,
+  "preview_urls": true,
   "observability": { "enabled": true }
 }

@@ -151,6 +151,46 @@ export const collectionDefinitions = [
     match: (product) => product.category === "Car",
   },
   {
+    slug: "black-metal-posters",
+    title: "Black Metal Posters",
+    tagline: "Dark, high-contrast designs",
+    description: "Designs on deep black backgrounds where neon, fire and lightning hit hardest.",
+    accent: "#231f20",
+    // Designs whose palette leads with black, or that are styled dark.
+    match: (product) =>
+      product.filters?.colorPalette?.[0] === "Black" ||
+      (product.filters?.style || []).some((style) => String(style).toLowerCase() === "dark"),
+  },
+  // The next three stay hidden until there are matching posters (empty collections
+  // aren't shown), so the pages are ready when the designs are uploaded.
+  {
+    slug: "attack-on-titan",
+    subCategories: ["Attack on Titan", "Shingeki no Kyojin"],
+    title: "Attack on Titan",
+    tagline: "Beyond the walls",
+    description: "Eren, Levi, Mikasa and the Survey Corps against the Titans.",
+    accent: "#7a6a4f",
+    match: (product) => mentions(product, /\b(attack on titan|shingeki|eren yeager|levi ackerman|mikasa)\b/i),
+  },
+  {
+    slug: "football",
+    subCategories: ["Football", "Lionel Messi", "Messi", "Cristiano Ronaldo"],
+    title: "Football",
+    tagline: "Legends of the beautiful game",
+    description: "Messi, Ronaldo and football's greatest moments for the wall.",
+    accent: "#2f7d4f",
+    match: (product) => mentions(product, /\b(messi|ronaldo|neymar|mbappe|football)\b/i),
+  },
+  {
+    slug: "music",
+    subCategories: ["Music"],
+    title: "Music",
+    tagline: "Artists and albums on metal",
+    description: "Music legends and iconic album art for your room or studio.",
+    accent: "#9b3d8f",
+    match: (product) => product.category === "Music",
+  },
+  {
     slug: "new-arrivals",
     title: "New Arrivals",
     tagline: "Fresh off the press",
@@ -174,6 +214,14 @@ const inCollection = (definition, product) =>
   ) ||
   (Array.isArray(product.collections) && product.collections.includes(definition.slug)) ||
   definition.match(product);
+
+// The one collection a product "belongs" to, for breadcrumbs and links: a series
+// collection (one with its own subCategories, like Jujutsu Kaisen) before broad ones
+// like Anime or Bestsellers. Null when it's in none.
+export const primaryCollectionFor = (product) => {
+  const matches = collectionDefinitions.filter((definition) => inCollection(definition, product));
+  return matches.find((definition) => definition.subCategories?.length) || matches[0] || null;
+};
 
 // Titles of the store collections a product belongs to (used by search).
 export const collectionTitlesFor = (product) =>

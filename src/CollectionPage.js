@@ -7,6 +7,7 @@ import GridView from "./components/GridView";
 import PosterFan from "./components/PosterFan";
 import { useProductContext } from "./context/productcontex";
 import { buildCollections } from "./data/collections";
+import { collectionSeoFor } from "./data/collectionSeo";
 
 const CollectionPage = () => {
   const { slug } = useParams();
@@ -14,10 +15,12 @@ const CollectionPage = () => {
   const collections = useMemo(() => buildCollections(catalog), [catalog]);
   const collection = collections.find((item) => item.slug === slug);
   const others = collections.filter((item) => item.slug !== slug).slice(0, 4);
+  const seo = collection ? collectionSeoFor(collection) : {};
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
-    document.title = collection ? `${collection.title} Collection | Poster Town` : "Poster Town";
+    // Same title the Cloudflare Worker puts in the page (worker/index.js).
+    document.title = collection ? collectionSeoFor(collection).title : "Poster Town";
     return () => {
       document.title = "Poster Town";
     };
@@ -71,7 +74,7 @@ const CollectionPage = () => {
         <header className="collection-banner" style={{ "--accent": collection.accent }}>
           <div className="banner-copy">
             <span className="banner-label">Collection</span>
-            <h1>{collection.title}</h1>
+            <h1>{seo.heading || collection.title}</h1>
             <p>{collection.description}</p>
             <div className="banner-meta">
               <span>{collection.count} {collection.count === 1 ? "poster" : "posters"}</span>
@@ -89,6 +92,13 @@ const CollectionPage = () => {
         </header>
 
         <GridView products={collection.products} />
+
+        {seo.intro && (
+          <section className="collection-about">
+            <h2>About our {seo.heading}</h2>
+            <p>{seo.intro}</p>
+          </section>
+        )}
 
         {others.length > 0 && (
           <section className="more-collections">
@@ -149,6 +159,25 @@ const Wrapper = styled.section`
     font-weight: 600;
     text-decoration: none;
     margin-bottom: 1.8rem;
+  }
+
+  .collection-about {
+    margin-top: 3.2rem;
+    padding: 2.4rem 2.8rem;
+    background: #fffaf3;
+    border: 1px solid #eadfce;
+    border-radius: 2rem;
+  }
+
+  .collection-about h2 {
+    font-size: clamp(2.2rem, 2.6vw, 2.8rem);
+    margin-bottom: 1rem;
+  }
+
+  .collection-about p {
+    color: #645950;
+    line-height: 1.8;
+    max-width: 90rem;
   }
 
   .banner-skeleton .banner-copy {

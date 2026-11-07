@@ -7,9 +7,11 @@ import { useEffect } from "react";
 export const SITE_NAME = "Poster Town";
 export const SITE_URL = "https://metalpostertown.in";
 
+// Matches the home page tags set by the Cloudflare Worker (worker/index.js).
 const DEFAULTS = {
-  title: SITE_NAME,
-  description: "Poster Town - premium metal wall posters of anime, movies, games and cars, shipped across India.",
+  title: "Metal Posters for Wall – Ultra HD Anime Metal Posters | Metal Poster Town",
+  description:
+    "Ultra HD metal posters for your wall from Metal Poster Town: anime, Demon Slayer, One Piece, Naruto, Gojo, Batman and more on 1 mm steel. Free shipping on 2+.",
 };
 
 function setMeta(attribute, key, content) {
@@ -58,8 +60,10 @@ export function productMeta(product) {
       product.descriptionInfo?.short ||
       (typeof product.description === "string" ? product.description : product.description?.short) ||
       DEFAULTS.description,
-    // A 1200px-wide JPEG: what link previews handle best.
-    image: featured.includes("/upload/") ? featured.replace("/upload/", "/upload/c_limit,w_1200,f_jpg,q_auto/") : featured,
+    // 1200x630 JPEG, the poster padded onto a dark background (same as the Worker).
+    image: featured.includes("/upload/")
+      ? featured.replace("/upload/", "/upload/c_pad,w_1200,h_630,b_rgb:1c1715,f_jpg,q_auto/")
+      : featured,
     url: `${SITE_URL}/singleproduct/${product.id}`,
     type: "product",
   };

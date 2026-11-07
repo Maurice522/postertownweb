@@ -67,6 +67,11 @@ const SCENE_VIEWS = [
   { label: "Room mockup", variant: "room" },
 ];
 
+// Image alt text: the poster's name plus what the view shows ("… – held in hand"),
+// so every photo is described for screen readers and image search.
+const imageAlt = (name = "Metal poster", label = "") =>
+  label && !/^view d+$/i.test(label) ? `${name} – ${label.toLowerCase()}` : name;
+
 // Captions saved by the admin for generated mockups: [{ url, label }].
 const getGalleryLabel = (product, url) => {
   const labels = Array.isArray(product?.media?.galleryLabels) ? product.media.galleryLabels : [];
@@ -197,18 +202,22 @@ export const normalizeProduct = (product = {}) => {
       // Generated mockups are real photos: show them as uploaded. Older products repeat
       // the poster image in the gallery, so those still get the styled CSS scenes.
       if (index > 0 && image !== gallery[0]) {
+        const label = galleryLabel || `View ${index + 1}`;
         return {
           url: normalizeImagePath(image),
           filename: `${product.name || "product"}-${index + 1}`,
-          label: galleryLabel || `View ${index + 1}`,
+          label,
+          alt: imageAlt(product.name, label),
           variant: "photo",
         };
       }
 
+      const label = index === 0 ? "Poster" : SCENE_VIEWS[index - 1]?.label || `View ${index + 1}`;
       return {
         url: normalizeImagePath(image),
         filename: `${product.name || "product"}-${index + 1}`,
-        label: index === 0 ? "Poster" : SCENE_VIEWS[index - 1]?.label || `View ${index + 1}`,
+        label,
+        alt: index === 0 ? product.name || "Metal poster" : imageAlt(product.name, label),
         variant: index === 0 ? "poster" : SCENE_VIEWS[index - 1]?.variant || "poster",
       };
     }),

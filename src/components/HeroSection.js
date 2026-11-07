@@ -49,19 +49,22 @@ const HeroSection = ({ myData }) => {
     <Wrapper>
       <div className="hero">
         <div className="hero-copy">
-          <p className="intro-data">Welcome to</p>
-          <SplitText
-            text="Poster Town !"
-            as="h1"
-            className="logotxt"
-            delay={100}
-            animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
-            animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-            easing="easeOutCubic"
-            threshold={0.2}
-            rootMargin="-50px"
-            onLetterAnimationComplete={handleAnimationComplete}
-          />
+          {/* One heading: "Metal posters for your wall by Poster Town !" */}
+          <h1 className="hero-heading">
+            <span className="intro-data">Metal posters for your wall by</span>
+            <SplitText
+              text="Poster Town !"
+              as="span"
+              className="logotxt"
+              delay={100}
+              animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+              animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+              easing="easeOutCubic"
+              threshold={0.2}
+              rootMargin="-50px"
+              onLetterAnimationComplete={handleAnimationComplete}
+            />
+          </h1>
           <p className="hero-tagline">
             Transform your space with bold, quirky metal posters from Poster Town—where every wall <b>becomes a statement.</b>
           </p>
@@ -91,6 +94,21 @@ const Wrapper = styled.section`
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
     gap: 6rem;
     align-items: center;
+  }
+
+  .hero-heading {
+    margin: 0;
+    font: inherit;
+  }
+
+  .hero-heading .intro-data,
+  .hero-heading .logotxt {
+    display: block !important;
+  }
+
+  /* Longer than the old "Welcome to", so a touch smaller to stay on one line. */
+  .hero-heading .intro-data {
+    font-size: clamp(1.5rem, 1.7vw, 2.1rem);
   }
 
   .intro-data {

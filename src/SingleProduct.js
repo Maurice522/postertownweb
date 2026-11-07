@@ -16,6 +16,7 @@ import { useProductContext } from "./context/productcontex";
 import { normalizeImagePath, paperSizeFor } from "./utils/productHelpers";
 import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS, isDemonSlayer } from "./utils/pricing";
 import { productMeta, usePageMeta } from "./utils/pageMeta";
+import { primaryCollectionFor } from "./data/collections";
 
 const defaultSizes = [
   { label: "Small", paper: "A4", dimensions: "12 x 9 inches" },
@@ -268,10 +269,12 @@ const SingleProduct = () => {
     ["Orientation", specifications.orientation],
     ["Mounting", specifications.mountType],
   ].filter(([, value]) => value);
+  const collection = primaryCollectionFor(currentProduct);
   const infoRows = [
     ["Category", category || "Anime"],
     ["Series", currentProduct.subCategory],
-    ["Collection", currentProduct.collection],
+    // Links to the collection page (internal links help it rank for e.g. "gojo metal poster").
+    ["Collection", collection ? <Link to={`/collections/${collection.slug}`}>{collection.title} metal posters</Link> : currentProduct.collection],
     ["Brand", currentProduct.brand || company || "Poster Town"],
     ["SKU", currentProduct.sku],
     [
@@ -311,7 +314,10 @@ const SingleProduct = () => {
 
   return (
     <Wrapper>
-      <PageNavigation title={name} />
+      <PageNavigation
+        title={name}
+        parent={collection && { label: collection.title, to: `/collections/${collection.slug}` }}
+      />
 
       <Container className="single-product-shell">
         <div className="promo-strip">
