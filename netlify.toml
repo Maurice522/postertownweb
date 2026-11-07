@@ -1,0 +1,14 @@
+# Netlify page routing (Cloudflare uses worker/index.js instead). Kept here rather
+# than in public/_redirects, which Cloudflare would also try to read.
+
+# A page file from an older deploy: answer "not found" instead of the app page, so
+# the app notices at once and reloads (see src/components/AppErrorBoundary.js).
+[[redirects]]
+  from = "/static/*"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

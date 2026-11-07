@@ -28,3 +28,6 @@ yarn-error.log*
 
 # Written by scripts/snapshot-catalog.mjs at build time
 /public/catalog-snapshot.json
+
+# Cloudflare local state
+.wrangler

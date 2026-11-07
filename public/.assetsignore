@@ -1,0 +1,3 @@
+# Not uploaded to Cloudflare: the build-time product page copies (Netlify only);
+# pages are rendered by worker/index.js there.
+singleproduct

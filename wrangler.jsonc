@@ -1,0 +1,19 @@
+// Cloudflare Worker for metalpostertown.in: serves the React build (build/) and, for
+// page requests, adds per-page SEO tags and real 404s (see worker/index.js).
+// Deploy with `npm run deploy`.
+{
+  "name": "postertown-web",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./build",
+    "binding": "ASSETS",
+    // Page requests go to the Worker; build files and images are served directly.
+    "run_worker_first": ["/*", "!/static/*", "!/images/*"]
+  },
+  "vars": {
+    "API_BASE_URL": "https://postertown-backend-v2.onrender.com",
+    "SITE_URL": "https://metalpostertown.in"
+  },
+  "observability": { "enabled": true }
+}

@@ -34,7 +34,8 @@
     "build": "react-scripts build",
     "postbuild": "node scripts/product-pages.mjs",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && wrangler deploy"
   },
   "eslintConfig": {
     "extends": [
