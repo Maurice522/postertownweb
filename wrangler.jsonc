@@ -15,5 +15,12 @@
     "API_BASE_URL": "https://postertown-backend-v2.onrender.com",
     "SITE_URL": "https://metalpostertown.in"
   },
+  // The site's DNS records are proxied by Cloudflare, so these routes send every
+  // request for the domain to this Worker (www redirects to the bare domain).
+  // Removing them sends traffic back to the records' origin (Netlify).
+  "routes": [
+    { "pattern": "metalpostertown.in/*", "zone_name": "metalpostertown.in" },
+    { "pattern": "www.metalpostertown.in/*", "zone_name": "metalpostertown.in" }
+  ],
   "observability": { "enabled": true }
 }

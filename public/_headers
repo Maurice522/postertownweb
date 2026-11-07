@@ -1,3 +1,7 @@
+# Browsers only use HTTPS for this site (pages get it from worker/index.js).
+/*
+  Strict-Transport-Security: max-age=31536000
+
 # Build files have a content hash in their name, so a changed file always gets a new
 # URL: browsers can keep them for a year without checking again.
 /static/*

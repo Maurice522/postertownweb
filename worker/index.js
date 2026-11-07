@@ -312,6 +312,7 @@ async function renderApp(request, env, page, status) {
   headers.set("Content-Type", "text/html; charset=utf-8");
   headers.set("Cache-Control", "public, max-age=0, must-revalidate");
   headers.delete("ETag");
+  headers.set("Strict-Transport-Security", "max-age=31536000");
   // The workers.dev test address must never compete with the real domain in search.
   if (head.noindex || new URL(request.url).hostname !== new URL(env.SITE_URL).hostname) {
     headers.set("X-Robots-Tag", "noindex");
@@ -337,6 +338,11 @@ async function sitemap(url, env, ctx) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // Always HTTPS (Netlify used to do this for us).
+    if (url.protocol === "http:" && url.hostname !== "localhost") {
+      url.protocol = "https:";
+      return Response.redirect(url.toString(), 301);
+    }
     // www.metalpostertown.in → metalpostertown.in, one address for search engines.
     if (url.hostname === `www.${new URL(env.SITE_URL).hostname}`) {
       return Response.redirect(`${env.SITE_URL}${url.pathname}${url.search}`, 301);
