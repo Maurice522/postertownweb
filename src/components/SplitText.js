@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 
 const SplitText = ({
   text = '',
+  // Element to render, e.g. "h1" when the text is the page's main heading.
+  as: Tag = 'p',
   className = '',
   delay = 100,
   animationFrom = { opacity: 0, transform: 'translate3d(0,40px,0)' },
@@ -55,7 +57,7 @@ const SplitText = ({
   );
 
   return (
-    <p
+    <Tag
       ref={ref}
       className={`split-parent ${className}`}
       style={{ textAlign, overflow: 'hidden', display: 'inline', whiteSpace: 'normal', wordWrap: 'break-word' }}
@@ -83,7 +85,7 @@ const SplitText = ({
           <span style={{ display: 'inline-block', width: '0.3em' }}>&nbsp;</span>
         </span>
       ))}
-    </p>
+    </Tag>
   );
 };
 

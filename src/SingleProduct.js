@@ -11,6 +11,7 @@ import FormatPrice from "./Helpers/FormatPrice";
 import Star from "./components/Star";
 import AddToCart from "./components/AddToCart";
 import ProductReviews from "./components/ProductReviews";
+import FaqSection from "./components/FaqSection";
 import { useProductContext } from "./context/productcontex";
 import { normalizeImagePath, paperSizeFor } from "./utils/productHelpers";
 import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS, isDemonSlayer } from "./utils/pricing";
@@ -575,43 +576,7 @@ const SingleProduct = () => {
 
             <ProductReviews product={currentProduct} />
 
-            <div className="faq-panel">
-              <div className="section-heading">
-                <div>
-                  <h2>FAQ</h2>
-                  <p>Quick answers before you place the order.</p>
-                </div>
-              </div>
-
-              <div className="faq-list">
-                <details open className="faq-card">
-                  <summary>Will the print look exactly like the photo?</summary>
-                  <p>
-                    The artwork and overall finish stay very close to the product preview. Minor color variation can happen
-                    because of screen brightness and display settings.
-                  </p>
-                </details>
-                <details className="faq-card">
-                  <summary>Is it ready to hang on the wall?</summary>
-                  <p>
-                    Yes. The print is designed for easy wall display, and the recommended mounting style depends on the size
-                    you choose.
-                  </p>
-                </details>
-                <details className="faq-card">
-                  <summary>How long does shipping usually take?</summary>
-                  <p>
-                    Most orders are dispatched within 24 to 48 hours, and delivery timing depends on your location.
-                  </p>
-                </details>
-                <details className="faq-card">
-                  <summary>What if the product arrives damaged?</summary>
-                  <p>
-                    Reach out with photos right away and we can help with a replacement or resolution based on the issue.
-                  </p>
-                </details>
-              </div>
-            </div>
+            <FaqSection className="faq-panel" intro="Quick answers before you place the order." />
 
             <div className="page-outro">
               <div className="page-outro-copy">
@@ -1350,35 +1315,6 @@ const Wrapper = styled.section`
 
   .review-card p {
     color: #5b5047;
-    line-height: 1.7;
-  }
-
-  .faq-list {
-    display: grid;
-    gap: 1.2rem;
-  }
-
-  .faq-card {
-    background: #fff;
-    border: 1px solid #eadfce;
-    border-radius: 1.6rem;
-    padding: 1.6rem 1.8rem;
-  }
-
-  .faq-card summary {
-    cursor: pointer;
-    list-style: none;
-    font-size: 1.65rem;
-    font-weight: 600;
-  }
-
-  .faq-card summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .faq-card p {
-    color: #645950;
-    margin-top: 1rem;
     line-height: 1.7;
   }
 

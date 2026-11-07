@@ -52,6 +52,7 @@ const HeroSection = ({ myData }) => {
           <p className="intro-data">Welcome to</p>
           <SplitText
             text="Poster Town !"
+            as="h1"
             className="logotxt"
             delay={100}
             animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}

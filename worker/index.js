@@ -337,6 +337,10 @@ async function sitemap(url, env, ctx) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // www.metalpostertown.in → metalpostertown.in, one address for search engines.
+    if (url.hostname === `www.${new URL(env.SITE_URL).hostname}`) {
+      return Response.redirect(`${env.SITE_URL}${url.pathname}${url.search}`, 301);
+    }
     if (!["GET", "HEAD"].includes(request.method)) return env.ASSETS.fetch(request);
 
     if (url.pathname === "/sitemap.xml") return sitemap(url, env, ctx);
