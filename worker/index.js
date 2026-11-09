@@ -24,9 +24,9 @@ const SHARE_IMAGE_PATH = "/og-image.jpg";
 const CATALOG_FRESH_MS = 5 * 60 * 1000;
 // A sleeping Render backend takes ~25s to answer; don't hold a page for it.
 const API_TIMEOUT_MS = 4000;
-const CATALOG_CACHE_KEY = "https://catalog.internal/seo-index-v2";
+const CATALOG_CACHE_KEY = "https://catalog.internal/seo-index-v3";
 
-const PRIVATE_PATHS = new Set(["/cart", "/orders", "/contact", "/auth"]);
+const PRIVATE_PATHS = new Set(["/cart", "/orders", "/auth"]);
 const STATIC_PAGES = {
   "/": {
     title: "Metal Posters for Wall – Ultra HD Anime Metal Posters | Metal Poster Town",
@@ -41,6 +41,11 @@ const STATIC_PAGES = {
     title: "Metal Poster Collections – Demon Slayer, Dragon Ball & More | Poster Town",
     description:
       "Curated metal poster collections by fandom: Demon Slayer, Dragon Ball Z, One Piece, Naruto, cars and more. Build a wall that tells one story.",
+  },
+  "/contact": {
+    title: "Contact Metal Poster Town – Orders, Custom Posters & Support",
+    description:
+      "Questions about an order, a custom metal poster or bulk gifting? Contact Metal Poster Town on WhatsApp or call +91 9953749307.",
   },
   "/about": {
     title: "About Metal Poster Town – Ultra HD Metal Poster Company",
@@ -90,6 +95,7 @@ function seoIndex(rawProducts) {
       count: collection.count,
       fromPrice: collection.fromPrice,
       image: collection.products[0]?.media?.featuredImage || "",
+      products: collection.products.slice(0, 40).map((product) => ({ id: product.id, name: product.name })),
     };
   }
   return { savedAt: Date.now(), products: byId, collections };
@@ -214,6 +220,26 @@ function productSchema(origin, id, product) {
   };
 }
 
+// Plain text and links for the page, served inside #root below the loading screen.
+// Search engines read it straight away instead of a near-empty page; shoppers never
+// see it (the loader fills the screen and the app replaces it within a second).
+function crawlerHtml({ heading, paragraphs = [], links = [] }) {
+  const parts = [`<h1>${escapeHtml(heading)}</h1>`];
+  for (const text of paragraphs.filter(Boolean)) parts.push(`<p>${escapeHtml(text)}</p>`);
+  if (links.length) {
+    parts.push(
+      `<ul>${links.map(([label, href]) => `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a></li>`).join("")}</ul>`
+    );
+  }
+  return `<div class="pt-seo">${parts.join("")}</div>`;
+}
+
+const money = (value) => `₹${Number(value || 0).toLocaleString("en-IN")}`;
+
+function collectionLinks(catalog) {
+  return Object.entries(catalog.collections).map(([slug, item]) => [`${item.title} metal posters`, `/collections/${slug}`]);
+}
+
 // What to put in the page's head for this address, or null when it isn't a page.
 async function pageFor(url, env, ctx) {
   const { pathname } = url;
@@ -236,7 +262,15 @@ async function pageFor(url, env, ctx) {
             { "@context": "https://schema.org", "@type": "WebSite", name: SITE_NAME, url: origin },
           ]
         : [breadcrumbs(origin, [["Home", "/"], [page.title.split(" – ")[0].split(" | ")[0], pathname]])];
-    return { ...page, canonical, schema, image: `${origin}${SHARE_IMAGE_PATH}`, imageAlt: "Metal Poster Town – ultra HD metal posters" };
+    const catalog = ["/", "/collections", "/products"].includes(pathname) ? await getCatalog(env, ctx, url) : null;
+    const links =
+      pathname === "/products"
+        ? Object.entries(catalog.products).map(([id, item]) => [item.name, `/singleproduct/${id}`])
+        : catalog
+          ? collectionLinks(catalog)
+          : [["Shop all metal posters", "/products"], ["Collections", "/collections"]];
+    const body = crawlerHtml({ heading: page.title.split(" | ")[0], paragraphs: [page.description], links });
+    return { ...page, canonical, schema, body, image: `${origin}${SHARE_IMAGE_PATH}`, imageAlt: "Metal Poster Town – ultra HD metal posters" };
   }
 
   if (PRIVATE_PATHS.has(pathname)) {
@@ -251,9 +285,23 @@ async function pageFor(url, env, ctx) {
     if (!catalog.products[id]) catalog = await getCatalog(env, ctx, url, { forceFresh: true });
     const product = catalog.products[id];
     if (!product) return null;
+    const prices = product.sizes.map((size) => size.price);
+    const body = crawlerHtml({
+      heading: product.name,
+      paragraphs: [
+        product.description,
+        prices.length ? `Ultra HD metal poster from ${money(Math.min(...prices))}. Sizes: ${product.sizes.map((size) => `${size.name} ${money(size.price)}`).join(", ")}.` : "",
+        product.inStock ? "In stock. Shipped across India; free shipping when you buy 2 or more posters." : "Currently out of stock.",
+      ],
+      links: [
+        ...(product.collection ? [[`More ${product.collection.title} metal posters`, `/collections/${product.collection.slug}`]] : []),
+        ["Shop all metal posters", "/products"],
+      ],
+    });
     return {
       title: product.title,
       description: product.description,
+      body,
       canonical,
       image: shareImage(product.image),
       imageAlt: product.name,
@@ -277,9 +325,15 @@ async function pageFor(url, env, ctx) {
     const catalog = await getCatalog(env, ctx, url);
     const collection = catalog.collections[collectionMatch[1]];
     if (!collection) return null;
+    const body = crawlerHtml({
+      heading: `${collection.title} metal posters`,
+      paragraphs: [collection.seoDescription, collection.description, `${collection.count} posters from ${money(collection.fromPrice)}.`],
+      links: (collection.products || []).map((item) => [item.name, `/singleproduct/${item.id}`]),
+    });
     return {
       title: collection.seoTitle,
       description: collection.seoDescription,
+      body,
       canonical,
       image: collection.image ? shareImage(collection.image) : `${origin}${SHARE_IMAGE_PATH}`,
       imageAlt: `${collection.title} metal posters`,
@@ -339,6 +393,7 @@ async function renderApp(request, env, page, status) {
     .on("title", { element: (el) => el.setInnerContent(head.title) })
     .on('meta[name="description"]', { element: (el) => el.setAttribute("content", head.description) })
     .on("head", { element: (el) => el.append(headTags(head), { html: true }) })
+    .on("#root", { element: (el) => head.body && el.append(head.body, { html: true }) })
     .transform(shell);
 
   const headers = new Headers(rewritten.headers);
@@ -372,14 +427,17 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     // Always HTTPS (Netlify used to do this for us).
+    // http:// and www. both go straight to https://metalpostertown.in in one hop, so
+    // search engines see a single address for every page.
+    const siteHost = new URL(env.SITE_URL).hostname;
+    if (url.hostname === `www.${siteHost}`) {
+      return Response.redirect(`${env.SITE_URL}${url.pathname}${url.search}`, 301);
+    }
     if (url.protocol === "http:" && url.hostname !== "localhost") {
       url.protocol = "https:";
       return Response.redirect(url.toString(), 301);
     }
-    // www.metalpostertown.in → metalpostertown.in, one address for search engines.
-    if (url.hostname === `www.${new URL(env.SITE_URL).hostname}`) {
-      return Response.redirect(`${env.SITE_URL}${url.pathname}${url.search}`, 301);
-    }
+    if (url.pathname === "/index.html") return Response.redirect(`${url.origin}/${url.search}`, 301);
     if (!["GET", "HEAD"].includes(request.method)) return env.ASSETS.fetch(request);
 
     if (url.pathname === "/sitemap.xml") return sitemap(url, env, ctx);
