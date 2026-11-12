@@ -26,7 +26,7 @@ await mkdir(new URL("singleproduct/", buildDir), { recursive: true });
 
 const pageFor = (product) => {
   const url = `${SITE_URL}/singleproduct/${product.id}`;
-  const title = product.seo?.metaTitle || `${product.name} | Poster Town`;
+  const title = product.seo?.metaTitle || `${product.name} | Metal Poster Town`;
   const description =
     product.seo?.metaDescription || product.description?.short || product.subtitle || "Premium metal wall poster from Poster Town.";
   const featured = product.media?.featuredImage || "";
@@ -36,7 +36,7 @@ const pageFor = (product) => {
     `<meta name="description" content="${escapeHtml(description)}" />`,
     `<link rel="canonical" href="${url}" />`,
     `<meta property="og:type" content="product" />`,
-    `<meta property="og:site_name" content="Poster Town" />`,
+    `<meta property="og:site_name" content="Metal Poster Town" />`,
     `<meta property="og:title" content="${escapeHtml(title)}" />`,
     `<meta property="og:description" content="${escapeHtml(description)}" />`,
     `<meta property="og:url" content="${url}" />`,

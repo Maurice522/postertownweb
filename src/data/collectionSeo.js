@@ -8,7 +8,7 @@ const MATERIAL =
 export const collectionSeo = {
   anime: {
     keyword: "anime metal poster",
-    title: "Anime Metal Posters – Ultra HD Anime Wall Art | Poster Town",
+    title: "Anime Metal Posters – Ultra HD Wall Art | Metal Poster Town",
     description:
       "Ultra high definition anime metal posters: Demon Slayer, One Piece, Naruto, Jujutsu Kaisen, Solo Leveling and Dragon Ball on 1 mm steel. Free shipping on 2+.",
     heading: "Ultra HD anime metal posters",
@@ -16,7 +16,7 @@ export const collectionSeo = {
   },
   "demon-slayer": {
     keyword: "demon slayer metal poster",
-    title: "Demon Slayer Metal Posters – Tanjiro, Rengoku & More | Poster Town",
+    title: "Demon Slayer Metal Posters for Wall | Metal Poster Town",
     description:
       "Demon Slayer metal posters of Tanjiro, Zenitsu, Inosuke, Rengoku, Giyu and Akaza in ultra HD on 1 mm steel. A4, A3 and A2. Free shipping on 2+ posters.",
     heading: "Demon Slayer metal posters",
@@ -24,7 +24,7 @@ export const collectionSeo = {
   },
   "one-piece": {
     keyword: "one piece metal poster",
-    title: "One Piece Metal Posters – Luffy Gear 5, Zoro & Shanks | Poster Town",
+    title: "One Piece Metal Posters – Luffy Gear 5 | Metal Poster Town",
     description:
       "One Piece metal posters of Luffy's Gear 5, Zoro, Shanks and the Straw Hat crew in ultra HD on 1 mm steel. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
     heading: "One Piece metal posters",
@@ -32,7 +32,7 @@ export const collectionSeo = {
   },
   naruto: {
     keyword: "naruto metal poster",
-    title: "Naruto Metal Posters – Naruto, Sasuke, Itachi & Madara | Poster Town",
+    title: "Naruto Metal Posters – Itachi & Madara | Metal Poster Town",
     description:
       "Naruto metal posters of Naruto, Sasuke, Itachi, Madara and the Akatsuki in ultra HD on 1 mm steel. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
     heading: "Naruto metal posters",
@@ -40,7 +40,7 @@ export const collectionSeo = {
   },
   "jujutsu-kaisen": {
     keyword: "gojo metal poster",
-    title: "Gojo & Jujutsu Kaisen Metal Posters | Poster Town",
+    title: "Gojo & Jujutsu Kaisen Metal Posters | Metal Poster Town",
     description:
       "Satoru Gojo and Jujutsu Kaisen metal posters in ultra HD on 1 mm steel: neon Gojo, Sukuna and more. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
     heading: "Gojo and Jujutsu Kaisen metal posters",
@@ -48,7 +48,7 @@ export const collectionSeo = {
   },
   "solo-leveling": {
     keyword: "solo leveling metal poster",
-    title: "Solo Leveling Metal Posters – Sung Jinwoo | Poster Town",
+    title: "Solo Leveling Metal Posters – Sung Jinwoo | Metal Poster Town",
     description:
       "Solo Leveling metal posters of Sung Jinwoo and the shadow army in ultra HD on 1 mm steel. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
     heading: "Solo Leveling metal posters",
@@ -56,7 +56,7 @@ export const collectionSeo = {
   },
   superheroes: {
     keyword: "batman metal poster",
-    title: "Batman & Superhero Metal Posters – DC and Marvel | Poster Town",
+    title: "Batman & Superhero Metal Posters | Metal Poster Town",
     description:
       "Batman metal posters and DC and Marvel superhero wall art in ultra HD on 1 mm steel: neon Batman, Deadpool and more. Free shipping on 2+ posters.",
     heading: "Batman and superhero metal posters",
@@ -64,7 +64,7 @@ export const collectionSeo = {
   },
   "black-metal-posters": {
     keyword: "black metal poster",
-    title: "Black Metal Posters – Dark Anime & Neon Wall Art | Poster Town",
+    title: "Black Metal Posters – Dark & Neon Art | Metal Poster Town",
     description:
       "Black metal posters: dark, high-contrast anime, superhero and car designs on 1 mm steel, where neon and fire pop off a black background. Free shipping on 2+.",
     heading: "Black metal posters",
@@ -72,7 +72,7 @@ export const collectionSeo = {
   },
   "attack-on-titan": {
     keyword: "attack on titan metal poster",
-    title: "Attack on Titan Metal Posters – Eren & Levi | Poster Town",
+    title: "Attack on Titan Metal Posters | Metal Poster Town",
     description:
       "Attack on Titan metal posters of Eren, Levi, Mikasa and the Survey Corps in ultra HD on 1 mm steel. Free shipping on 2+ posters.",
     heading: "Attack on Titan metal posters",
@@ -80,14 +80,14 @@ export const collectionSeo = {
   },
   football: {
     keyword: "messi metal poster",
-    title: "Messi & Football Metal Posters | Poster Town",
+    title: "Messi & Football Metal Posters | Metal Poster Town",
     description: "Messi and football metal posters in ultra HD on 1 mm steel. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
     heading: "Messi and football metal posters",
     intro: `Football legends like Lionel Messi, printed on metal for your room, gym or office. ${MATERIAL}`,
   },
   music: {
     keyword: "music metal poster",
-    title: "Music Metal Posters – Artists & Album Art | Poster Town",
+    title: "Music Metal Posters – Album Art | Metal Poster Town",
     description: "Music metal posters of artists and iconic album art in ultra HD on 1 mm steel. Free shipping on 2+ posters.",
     heading: "Music metal posters",
     intro: `Music legends and iconic album art, printed on metal for your room or studio. ${MATERIAL}`,
@@ -96,6 +96,6 @@ export const collectionSeo = {
 
 export const collectionSeoFor = (collection) =>
   collectionSeo[collection.slug] || {
-    title: `${collection.title} Metal Posters | Poster Town`,
+    title: `${collection.title} Metal Posters | Metal Poster Town`,
     description: `${collection.description} Printed on 1 mm metal in A4, A3 and A2 sizes.`,
   };

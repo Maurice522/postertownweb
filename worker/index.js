@@ -14,9 +14,10 @@ import { collectionSeoFor } from "../src/data/collectionSeo.js";
 import { normalizeProducts } from "../src/utils/productHelpers.js";
 import { homeCopyIntro, homeCopySections } from "../src/data/homeCopy.js";
 import { storeFaq } from "../src/data/faq.js";
-import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS } from "../src/utils/pricing.js";
+import { aboutCopy } from "../src/data/aboutCopy.js";
+import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS, SHIPPING_FEE } from "../src/utils/pricing.js";
 
-const SITE_NAME = "Poster Town";
+const SITE_NAME = "Metal Poster Town";
 const DEFAULT_DESCRIPTION =
   "Ultra HD metal posters for your wall from Metal Poster Town: anime, Demon Slayer, One Piece, Naruto, Gojo, Batman and more on 1 mm steel. Free shipping on 2+.";
 // Link-preview image for pages without their own (public/og-image.jpg, 1200x630).
@@ -33,21 +34,21 @@ const CATALOG_CACHE_KEY = "https://catalog.internal/seo-index-v4";
 const PRIVATE_PATHS = new Set(["/cart", "/orders", "/contact", "/auth"]);
 const STATIC_PAGES = {
   "/": {
-    title: "Metal Posters for Wall – Ultra HD Anime Metal Posters | Metal Poster Town",
+    title: "Metal Posters for Wall – Ultra HD Anime Art | Metal Poster Town",
     description: DEFAULT_DESCRIPTION,
   },
   "/products": {
-    title: "Shop All Metal Posters for Wall – Anime, Superhero & Car | Poster Town",
+    title: "All Metal Posters – Anime, Superhero & Cars | Metal Poster Town",
     description:
       "Browse every Poster Town metal poster: ultra HD anime, superhero, car and gaming designs on 1 mm steel. Any 3 A4 for ₹1599 and free shipping on 2+ posters.",
   },
   "/collections": {
-    title: "Metal Poster Collections – Demon Slayer, Dragon Ball & More | Poster Town",
+    title: "Metal Poster Collections by Fandom | Metal Poster Town",
     description:
       "Curated metal poster collections by fandom: Demon Slayer, Dragon Ball Z, One Piece, Naruto, cars and more. Build a wall that tells one story.",
   },
   "/about": {
-    title: "About Metal Poster Town – Ultra HD Metal Poster Company",
+    title: "About Us – Ultra HD Metal Poster Store | Metal Poster Town",
     description:
       "Metal Poster Town prints ultra HD metal posters of the anime, superheroes, games and cars you love on 1 mm steel, shipped across India.",
   },
@@ -189,6 +190,26 @@ function breadcrumbs(origin, trail) {
   };
 }
 
+// The store's published terms (FAQ, Services.js, utils/pricing.js): ₹100 shipping on a
+// single poster (free on 2+), dispatch within 2 days, 3–7 days in transit, and 7 days
+// to report a problem.
+const SHIPPING_DETAILS = {
+  "@type": "OfferShippingDetails",
+  shippingRate: { "@type": "MonetaryAmount", value: SHIPPING_FEE, currency: "INR" },
+  shippingDestination: { "@type": "DefinedRegion", addressCountry: "IN" },
+  deliveryTime: {
+    "@type": "ShippingDeliveryTime",
+    handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 2, unitCode: "DAY" },
+    transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 7, unitCode: "DAY" },
+  },
+};
+const RETURN_POLICY = {
+  "@type": "MerchantReturnPolicy",
+  applicableCountry: "IN",
+  returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+  merchantReturnDays: 7,
+};
+
 function productSchema(origin, id, product) {
   const url = `${origin}/singleproduct/${id}`;
   const offers = (product.sizes.length ? product.sizes : [{ name: "", sku: product.sku, price: product.price, inStock: product.inStock }])
@@ -202,6 +223,8 @@ function productSchema(origin, id, product) {
       availability: `https://schema.org/${size.inStock ? "InStock" : "OutOfStock"}`,
       itemCondition: "https://schema.org/NewCondition",
       url,
+      shippingDetails: SHIPPING_DETAILS,
+      hasMerchantReturnPolicy: RETURN_POLICY,
     }));
   return {
     "@context": "https://schema.org",
@@ -284,10 +307,23 @@ async function pageFor(url, env, ctx) {
               "@context": "https://schema.org",
               "@type": "Organization",
               name: SITE_NAME,
+              alternateName: "Poster Town",
               url: origin,
               logo: `${origin}/logo512.png`,
+              email: "Official@metalpostertown.in",
+              sameAs: [
+                "https://www.instagram.com/metalpostertown/",
+                "https://www.facebook.com/profile.php?id=61566400029644",
+              ],
+              contactPoint: {
+                "@type": "ContactPoint",
+                contactType: "customer service",
+                telephone: "+91-9953749307",
+                email: "Official@metalpostertown.in",
+                areaServed: "IN",
+              },
             },
-            { "@context": "https://schema.org", "@type": "WebSite", name: SITE_NAME, url: origin },
+            { "@context": "https://schema.org", "@type": "WebSite", name: SITE_NAME, alternateName: "Poster Town", url: origin },
           ]
         : [breadcrumbs(origin, [["Home", "/"], [page.title.split(" – ")[0].split(" | ")[0], pathname]])];
     const catalog = ["/", "/collections", "/products"].includes(pathname) ? await getCatalog(env, ctx, url) : null;
@@ -297,11 +333,13 @@ async function pageFor(url, env, ctx) {
         : catalog
           ? collectionLinks(catalog)
           : [["Shop all metal posters", "/products"], ["Collections", "/collections"]];
-    const storeStory = pathname === "/" || pathname === "/about";
     const sections = [];
-    if (storeStory) {
+    if (pathname === "/") {
       sections.push({ heading: homeCopyIntro.heading, paragraphs: [homeCopyIntro.paragraph] });
       for (const section of homeCopySections) sections.push({ heading: section.heading, paragraphs: [section.paragraph] });
+    }
+    if (pathname === "/about") {
+      for (const section of aboutCopy.sections) sections.push({ heading: section.heading, paragraphs: [section.paragraph] });
     }
     if (pathname === "/collections") {
       sections.push({
@@ -313,10 +351,10 @@ async function pageFor(url, env, ctx) {
       });
     }
     const body = crawlerHtml({
-      heading: page.title.split(" | ")[0],
-      paragraphs: [page.description],
+      heading: pathname === "/about" ? aboutCopy.heading : page.title.split(" | ")[0],
+      paragraphs: pathname === "/about" ? [aboutCopy.intro] : [page.description],
       sections,
-      faq: storeStory || pathname === "/collections",
+      faq: ["/", "/about", "/collections"].includes(pathname),
       links: pathname === "/collections" ? [] : links,
     });
     return { ...page, canonical, schema, body, image: `${origin}${SHARE_IMAGE_PATH}`, imageAlt: "Metal Poster Town – ultra HD metal posters" };

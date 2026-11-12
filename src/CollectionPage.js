@@ -21,9 +21,9 @@ const CollectionPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0 });
     // Same title the Cloudflare Worker puts in the page (worker/index.js).
-    document.title = collection ? collectionSeoFor(collection).title : "Poster Town";
+    document.title = collection ? collectionSeoFor(collection).title : "Metal Poster Town";
     return () => {
-      document.title = "Poster Town";
+      document.title = "Metal Poster Town";
     };
   }, [collection]);
 

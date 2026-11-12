@@ -49,11 +49,11 @@ const HeroSection = ({ myData }) => {
     <Wrapper>
       <div className="hero">
         <div className="hero-copy">
-          {/* One heading: "Metal posters for your wall by Poster Town !" */}
+          {/* One heading: "Metal posters for your wall by Poster Town!" */}
           <h1 className="hero-heading">
-            <span className="intro-data">Metal posters for your wall by</span>
+            <span className="intro-data">Metal posters for your wall by</span>{" "}
             <SplitText
-              text="Poster Town !"
+              text="Poster Town!"
               as="span"
               className="logotxt"
               delay={100}
