@@ -1,19 +1,16 @@
+import FaqSection from "./components/FaqSection";
 import HeroSection from "./components/HeroSection";
-import { useProductContext } from "./context/productcontex";
+import HomeSeoCopy from "./components/HomeSeoCopy";
 
-const About = () => {
-  const { myName } = useProductContext();
-
-  const data = {
-    name: "Thapa Ecommerce",
-  };
-
-  return (
-    <>
-      {myName}
-      <HeroSection myData={data} />
-    </>
-  );
-};
+// About the store: the hero, the store's story (the same words as the home page,
+// data/homeCopy.js) and the FAQ. The Cloudflare Worker serves this text to search
+// engines too.
+const About = () => (
+  <>
+    <HeroSection />
+    <HomeSeoCopy />
+    <FaqSection intro="Everything to know about our metal posters, delivery and offers." />
+  </>
+);
 
 export default About;

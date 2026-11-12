@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import FormatPrice from "./Helpers/FormatPrice";
+import FaqSection from "./components/FaqSection";
 import GridView from "./components/GridView";
 import PosterFan from "./components/PosterFan";
 import { useProductContext } from "./context/productcontex";
@@ -99,6 +100,8 @@ const CollectionPage = () => {
             <p>{seo.intro}</p>
           </section>
         )}
+
+        <FaqSection intro={`Common questions about our ${collection.title} metal posters, delivery and offers.`} />
 
         {others.length > 0 && (
           <section className="more-collections">

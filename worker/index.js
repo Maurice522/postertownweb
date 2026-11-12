@@ -12,6 +12,9 @@
 import { buildCollections, primaryCollectionFor } from "../src/data/collections.js";
 import { collectionSeoFor } from "../src/data/collectionSeo.js";
 import { normalizeProducts } from "../src/utils/productHelpers.js";
+import { homeCopyIntro, homeCopySections } from "../src/data/homeCopy.js";
+import { storeFaq } from "../src/data/faq.js";
+import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS } from "../src/utils/pricing.js";
 
 const SITE_NAME = "Poster Town";
 const DEFAULT_DESCRIPTION =
@@ -24,9 +27,10 @@ const SHARE_IMAGE_PATH = "/og-image.jpg";
 const CATALOG_FRESH_MS = 5 * 60 * 1000;
 // A sleeping Render backend takes ~25s to answer; don't hold a page for it.
 const API_TIMEOUT_MS = 4000;
-const CATALOG_CACHE_KEY = "https://catalog.internal/seo-index-v3";
+const CATALOG_CACHE_KEY = "https://catalog.internal/seo-index-v4";
 
-const PRIVATE_PATHS = new Set(["/cart", "/orders", "/auth"]);
+// /contact shows the Orders page (App.js), so it stays out of search like /orders.
+const PRIVATE_PATHS = new Set(["/cart", "/orders", "/contact", "/auth"]);
 const STATIC_PAGES = {
   "/": {
     title: "Metal Posters for Wall – Ultra HD Anime Metal Posters | Metal Poster Town",
@@ -41,11 +45,6 @@ const STATIC_PAGES = {
     title: "Metal Poster Collections – Demon Slayer, Dragon Ball & More | Poster Town",
     description:
       "Curated metal poster collections by fandom: Demon Slayer, Dragon Ball Z, One Piece, Naruto, cars and more. Build a wall that tells one story.",
-  },
-  "/contact": {
-    title: "Contact Metal Poster Town – Orders, Custom Posters & Support",
-    description:
-      "Questions about an order, a custom metal poster or bulk gifting? Contact Metal Poster Town on WhatsApp or call +91 9953749307.",
   },
   "/about": {
     title: "About Metal Poster Town – Ultra HD Metal Poster Company",
@@ -67,6 +66,8 @@ function seoIndex(rawProducts) {
       title: product.seo?.metaTitle || `${product.name} | ${SITE_NAME}`,
       description:
         product.seo?.metaDescription || product.descriptionInfo?.short || product.subtitle || DEFAULT_DESCRIPTION,
+      fullDescription: product.fullDescription || "",
+      features: (product.descriptionInfo?.features || []).slice(0, 8),
       image: product.media?.featuredImage || product.image || "",
       gallery: (product.media?.gallery || []).slice(0, 4),
       sku: product.sku || "",
@@ -95,7 +96,11 @@ function seoIndex(rawProducts) {
       count: collection.count,
       fromPrice: collection.fromPrice,
       image: collection.products[0]?.media?.featuredImage || "",
-      products: collection.products.slice(0, 40).map((product) => ({ id: product.id, name: product.name })),
+      heading: seo.heading || "",
+      intro: seo.intro || "",
+      products: collection.products
+        .slice(0, 40)
+        .map((product) => ({ id: product.id, name: product.name, price: product.price })),
     };
   }
   return { savedAt: Date.now(), products: byId, collections };
@@ -223,14 +228,37 @@ function productSchema(origin, id, product) {
 // Plain text and links for the page, served inside #root below the loading screen.
 // Search engines read it straight away instead of a near-empty page; shoppers never
 // see it (the loader fills the screen and the app replaces it within a second).
-function crawlerHtml({ heading, paragraphs = [], links = [] }) {
-  const parts = [`<h1>${escapeHtml(heading)}</h1>`];
-  for (const text of paragraphs.filter(Boolean)) parts.push(`<p>${escapeHtml(text)}</p>`);
-  if (links.length) {
-    parts.push(
-      `<ul>${links.map(([label, href]) => `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a></li>`).join("")}</ul>`
-    );
+function crawlerHtml({ heading, paragraphs = [], sections = [], links = [], faq = false }) {
+  // A paragraph is a string, or a list of pieces: text, or [link text, path].
+  const paragraph = (value) => {
+    const pieces = Array.isArray(value) ? value : [value];
+    const html = pieces
+      .map((piece) =>
+        Array.isArray(piece) ? `<a href="${escapeHtml(piece[1])}">${escapeHtml(piece[0])}</a>` : escapeHtml(piece)
+      )
+      .join("");
+    return html.trim() ? `<p>${html}</p>` : "";
+  };
+  const list = (items) =>
+    items.length
+      ? `<ul>${items
+          .map((item) =>
+            Array.isArray(item)
+              ? `<li><a href="${escapeHtml(item[1])}">${escapeHtml(item[0])}</a></li>`
+              : `<li>${escapeHtml(item)}</li>`
+          )
+          .join("")}</ul>`
+      : "";
+  const parts = [`<h1>${escapeHtml(heading)}</h1>`, ...paragraphs.filter(Boolean).map(paragraph)];
+  for (const section of sections) {
+    const body = (section.paragraphs || []).filter(Boolean).map(paragraph).join("") + list(section.list || []);
+    if (body) parts.push(`<h2>${escapeHtml(section.heading)}</h2>${body}`);
   }
+  if (faq) {
+    parts.push("<h2>Frequently asked questions</h2>");
+    for (const item of storeFaq) parts.push(`<h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p>`);
+  }
+  if (links.length) parts.push(list(links));
   return `<div class="pt-seo">${parts.join("")}</div>`;
 }
 
@@ -269,7 +297,28 @@ async function pageFor(url, env, ctx) {
         : catalog
           ? collectionLinks(catalog)
           : [["Shop all metal posters", "/products"], ["Collections", "/collections"]];
-    const body = crawlerHtml({ heading: page.title.split(" | ")[0], paragraphs: [page.description], links });
+    const storeStory = pathname === "/" || pathname === "/about";
+    const sections = [];
+    if (storeStory) {
+      sections.push({ heading: homeCopyIntro.heading, paragraphs: [homeCopyIntro.paragraph] });
+      for (const section of homeCopySections) sections.push({ heading: section.heading, paragraphs: [section.paragraph] });
+    }
+    if (pathname === "/collections") {
+      sections.push({
+        heading: "Every collection",
+        list: Object.entries(catalog.collections).map(([slug, item]) => [
+          `${item.title} metal posters – ${item.count} posters from ${money(item.fromPrice)}. ${item.description || ""}`.trim(),
+          `/collections/${slug}`,
+        ]),
+      });
+    }
+    const body = crawlerHtml({
+      heading: page.title.split(" | ")[0],
+      paragraphs: [page.description],
+      sections,
+      faq: storeStory || pathname === "/collections",
+      links: pathname === "/collections" ? [] : links,
+    });
     return { ...page, canonical, schema, body, image: `${origin}${SHARE_IMAGE_PATH}`, imageAlt: "Metal Poster Town – ultra HD metal posters" };
   }
 
@@ -290,9 +339,27 @@ async function pageFor(url, env, ctx) {
       heading: product.name,
       paragraphs: [
         product.description,
-        prices.length ? `Ultra HD metal poster from ${money(Math.min(...prices))}. Sizes: ${product.sizes.map((size) => `${size.name} ${money(size.price)}`).join(", ")}.` : "",
-        product.inStock ? "In stock. Shipped across India; free shipping when you buy 2 or more posters." : "Currently out of stock.",
+        prices.length ? `Ultra HD metal poster from ${money(Math.min(...prices))}.` : "",
+        product.inStock ? "In stock and ready to ship across India." : "Currently out of stock.",
       ],
+      sections: [
+        {
+          heading: "Product details",
+          paragraphs:
+            product.fullDescription && product.fullDescription !== product.description
+              ? product.fullDescription.split(/\n\s*\n/)
+              : [],
+        },
+        { heading: "Highlights", list: product.features || [] },
+        { heading: "Sizes and prices", list: product.sizes.map((size) => `${size.name}: ${money(size.price)}`) },
+        {
+          heading: "Offers and delivery",
+          paragraphs: [
+            `Free shipping when you buy ${FREE_SHIPPING_MIN_ITEMS} or more posters, and any ${A4_BUNDLE_SIZE} A4 metal posters for ${money(A4_BUNDLE_PRICE)}. Orders are dispatched within 24 to 48 hours and reach most of India in 3 to 7 days. Pay with any UPI app.`,
+          ],
+        },
+      ],
+      faq: true,
       links: [
         ...(product.collection ? [[`More ${product.collection.title} metal posters`, `/collections/${product.collection.slug}`]] : []),
         ["Shop all metal posters", "/products"],
@@ -328,7 +395,17 @@ async function pageFor(url, env, ctx) {
     const body = crawlerHtml({
       heading: `${collection.title} metal posters`,
       paragraphs: [collection.seoDescription, collection.description, `${collection.count} posters from ${money(collection.fromPrice)}.`],
-      links: (collection.products || []).map((item) => [item.name, `/singleproduct/${item.id}`]),
+      sections: [
+        {
+          heading: `${collection.title} posters in this collection`,
+          list: (collection.products || []).map((item) => [
+            item.price ? `${item.name} – from ${money(item.price)}` : item.name,
+            `/singleproduct/${item.id}`,
+          ]),
+        },
+        { heading: `About our ${collection.heading || `${collection.title} metal posters`}`, paragraphs: [collection.intro] },
+      ],
+      faq: true,
     });
     return {
       title: collection.seoTitle,
