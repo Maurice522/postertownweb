@@ -32,19 +32,19 @@ export const collectionSeo = {
   },
   naruto: {
     keyword: "naruto metal poster",
-    title: "Naruto Metal Posters – Itachi & Madara | Metal Poster Town",
+    title: "Naruto Metal Posters – Sasuke & Kakashi | Metal Poster Town",
     description:
-      "Naruto metal posters of Naruto, Sasuke, Itachi, Madara and the Akatsuki in ultra HD on 1 mm steel. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
+      "Naruto metal posters of Naruto, Sasuke, Kakashi, Madara, Might Guy and Team 7 in ultra HD on 1 mm steel. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
     heading: "Naruto metal posters",
-    intro: `From the Hidden Leaf to the Fourth Great Ninja War, our Naruto metal posters cover Naruto, Sasuke, Itachi, Madara and the Akatsuki. The Sharingan reds and chakra blues look especially striking on metal. ${MATERIAL}`,
+    intro: `From Team 7 to the Fourth Great Ninja War, our Naruto metal posters cover Naruto, Sasuke, Kakashi, Jiraiya, Might Guy and Madara. The Sharingan reds and chakra blues look especially striking on metal. ${MATERIAL}`,
   },
   "jujutsu-kaisen": {
     keyword: "gojo metal poster",
     title: "Gojo & Jujutsu Kaisen Metal Posters | Metal Poster Town",
     description:
-      "Satoru Gojo and Jujutsu Kaisen metal posters in ultra HD on 1 mm steel: neon Gojo, Sukuna and more. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
+      "Satoru Gojo metal posters from Jujutsu Kaisen in ultra HD on 1 mm steel, in vivid neon designs. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
     heading: "Gojo and Jujutsu Kaisen metal posters",
-    intro: `Domain Expansion, on your wall. Our Jujutsu Kaisen metal posters include neon Satoru Gojo designs and the sorcerers and curses of Jujutsu High, printed in high contrast so every glow and shadow stands out. ${MATERIAL}`,
+    intro: `Domain Expansion, on your wall. Our Jujutsu Kaisen metal posters feature Satoru Gojo in neon designs, printed in high contrast so every glow and shadow stands out. ${MATERIAL}`,
   },
   "solo-leveling": {
     keyword: "solo leveling metal poster",
@@ -94,8 +94,13 @@ export const collectionSeo = {
   },
 };
 
+// "Black Metal Posters" and "Wide Prints" already say what they are; others get
+// "metal posters" added ("New Arrivals" → "New Arrivals metal posters").
+const headingFor = (title) => (/poster|print/i.test(title) ? title : `${title} metal posters`);
+
 export const collectionSeoFor = (collection) =>
   collectionSeo[collection.slug] || {
-    title: `${collection.title} Metal Posters | Metal Poster Town`,
+    title: `${headingFor(collection.title).replace(/^./, (c) => c.toUpperCase()).replace(/ metal posters$/, " Metal Posters")} | Metal Poster Town`,
     description: `${collection.description} Printed on 1 mm metal in A4, A3 and A2 sizes.`,
+    heading: headingFor(collection.title),
   };

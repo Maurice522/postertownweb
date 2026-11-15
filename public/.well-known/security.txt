@@ -1,0 +1,5 @@
+# How to report a security problem with metalpostertown.in
+Contact: mailto:Official@metalpostertown.in
+Expires: 2027-11-15T00:00:00.000Z
+Preferred-Languages: en, hi
+Canonical: https://metalpostertown.in/.well-known/security.txt

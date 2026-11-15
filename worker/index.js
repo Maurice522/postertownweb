@@ -15,6 +15,7 @@ import { normalizeProducts } from "../src/utils/productHelpers.js";
 import { homeCopyIntro, homeCopySections } from "../src/data/homeCopy.js";
 import { storeFaq } from "../src/data/faq.js";
 import { aboutCopy } from "../src/data/aboutCopy.js";
+import { POLICY_UPDATED, policies, policyByPath } from "../src/data/policies.js";
 import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS, SHIPPING_FEE } from "../src/utils/pricing.js";
 
 const SITE_NAME = "Metal Poster Town";
@@ -285,10 +286,23 @@ function crawlerHtml({ heading, paragraphs = [], sections = [], links = [], faq 
   return `<div class="pt-seo">${parts.join("")}</div>`;
 }
 
+// Matches the per-size availability in the Product schema (poster-003 had A3/A2 out
+// of stock while the text said "in stock").
+function stockSentence(sizes = [], inStock) {
+  if (!sizes.length) return inStock ? "In stock and ready to ship across India." : "Currently out of stock.";
+  const name = (size) => size.name.split(" · ").slice(0, 2).join(" ");
+  const available = sizes.filter((size) => size.inStock).map(name);
+  const missing = sizes.filter((size) => !size.inStock).map(name);
+  if (!available.length) return "Currently out of stock in every size.";
+  if (!missing.length) return "All sizes in stock and ready to ship across India.";
+  return `In stock: ${available.join(", ")}. Currently out of stock: ${missing.join(", ")}.`;
+}
+
+const posterCount = (count) => `${count} ${count === 1 ? "poster" : "posters"}`;
 const money = (value) => `₹${Number(value || 0).toLocaleString("en-IN")}`;
 
 function collectionLinks(catalog) {
-  return Object.entries(catalog.collections).map(([slug, item]) => [`${item.title} metal posters`, `/collections/${slug}`]);
+  return Object.entries(catalog.collections).map(([slug, item]) => [item.heading || item.title, `/collections/${slug}`]);
 }
 
 // What to put in the page's head for this address, or null when it isn't a page.
@@ -297,6 +311,24 @@ async function pageFor(url, env, ctx) {
   // Links in tags always name the real domain, whichever address served the page.
   const origin = env.SITE_URL;
   const canonical = `${origin}${pathname}`;
+
+  // Shipping, refund, privacy and terms pages (src/data/policies.js).
+  const policy = policyByPath[pathname];
+  if (policy) {
+    return {
+      title: policy.metaTitle,
+      description: policy.description,
+      canonical,
+      image: `${origin}${SHARE_IMAGE_PATH}`,
+      schema: [breadcrumbs(origin, [["Home", "/"], [policy.title, pathname]])],
+      body: crawlerHtml({
+        heading: policy.title,
+        paragraphs: [policy.intro],
+        sections: [...policy.sections, { heading: "Last updated", paragraphs: [POLICY_UPDATED] }],
+        links: policies.filter((item) => item.path !== pathname).map((item) => [item.title, item.path]),
+      }),
+    };
+  }
 
   if (STATIC_PAGES[pathname]) {
     const page = STATIC_PAGES[pathname];
@@ -345,7 +377,7 @@ async function pageFor(url, env, ctx) {
       sections.push({
         heading: "Every collection",
         list: Object.entries(catalog.collections).map(([slug, item]) => [
-          `${item.title} metal posters – ${item.count} posters from ${money(item.fromPrice)}. ${item.description || ""}`.trim(),
+          `${item.heading || item.title} – ${posterCount(item.count)} from ${money(item.fromPrice)}. ${item.description || ""}`.trim(),
           `/collections/${slug}`,
         ]),
       });
@@ -378,7 +410,7 @@ async function pageFor(url, env, ctx) {
       paragraphs: [
         product.description,
         prices.length ? `Ultra HD metal poster from ${money(Math.min(...prices))}.` : "",
-        product.inStock ? "In stock and ready to ship across India." : "Currently out of stock.",
+        stockSentence(product.sizes, product.inStock),
       ],
       sections: [
         {
@@ -399,7 +431,7 @@ async function pageFor(url, env, ctx) {
       ],
       faq: true,
       links: [
-        ...(product.collection ? [[`More ${product.collection.title} metal posters`, `/collections/${product.collection.slug}`]] : []),
+        ...(product.collection ? [[`More ${product.collection.title} posters`, `/collections/${product.collection.slug}`]] : []),
         ["Shop all metal posters", "/products"],
       ],
     });
@@ -431,8 +463,8 @@ async function pageFor(url, env, ctx) {
     const collection = catalog.collections[collectionMatch[1]];
     if (!collection) return null;
     const body = crawlerHtml({
-      heading: `${collection.title} metal posters`,
-      paragraphs: [collection.seoDescription, collection.description, `${collection.count} posters from ${money(collection.fromPrice)}.`],
+      heading: collection.heading || collection.title,
+      paragraphs: [collection.seoDescription, collection.description, `${posterCount(collection.count)} from ${money(collection.fromPrice)}.`],
       sections: [
         {
           heading: `${collection.title} posters in this collection`,
@@ -441,7 +473,7 @@ async function pageFor(url, env, ctx) {
             `/singleproduct/${item.id}`,
           ]),
         },
-        { heading: `About our ${collection.heading || `${collection.title} metal posters`}`, paragraphs: [collection.intro] },
+        { heading: `About our ${collection.heading || collection.title}`, paragraphs: [collection.intro] },
       ],
       faq: true,
     });
@@ -451,7 +483,7 @@ async function pageFor(url, env, ctx) {
       body,
       canonical,
       image: collection.image ? shareImage(collection.image) : `${origin}${SHARE_IMAGE_PATH}`,
-      imageAlt: `${collection.title} metal posters`,
+      imageAlt: collection.heading || collection.title,
       schema: [
         breadcrumbs(origin, [["Home", "/"], ["Collections", "/collections"], [collection.title, pathname]]),
       ],
@@ -516,6 +548,12 @@ async function renderApp(request, env, page, status) {
   headers.set("Cache-Control", "public, max-age=0, must-revalidate");
   headers.delete("ETag");
   headers.set("Strict-Transport-Security", "max-age=31536000");
+  // Basic security headers (no Content-Security-Policy yet: GTM and Google sign-in
+  // load scripts from several Google domains, so it needs a report-only trial first).
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("X-Frame-Options", "SAMEORIGIN");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
   // The workers.dev test address must never compete with the real domain in search.
   if (head.noindex || new URL(request.url).hostname !== new URL(env.SITE_URL).hostname) {
     headers.set("X-Robots-Tag", "noindex");
@@ -529,6 +567,7 @@ async function sitemap(url, env, ctx) {
     `<url><loc>${env.SITE_URL}${path}</loc>${lastmod ? `<lastmod>${String(lastmod).slice(0, 10)}</lastmod>` : ""}</url>`;
   const body = [
     ...Object.keys(STATIC_PAGES).map((path) => entry(path)),
+    ...policies.map((policy) => entry(policy.path)),
     ...Object.keys(catalog.collections).map((slug) => entry(`/collections/${slug}`)),
     ...Object.entries(catalog.products).map(([id, product]) => entry(`/singleproduct/${id}`, product.updatedAt)),
   ].join("");

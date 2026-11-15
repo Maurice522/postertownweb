@@ -32,7 +32,7 @@ export const homeCopySections = [
       ["One Piece metal posters", "/collections/one-piece"],
       " of Luffy's Gear 5, Zoro and Shanks; ",
       ["Naruto metal posters", "/collections/naruto"],
-      " of Naruto, Sasuke, Itachi and Madara; ",
+      " of Naruto, Sasuke, Kakashi and Madara; ",
       ["Gojo metal posters", "/collections/jujutsu-kaisen"],
       " from Jujutsu Kaisen; ",
       ["Solo Leveling metal posters", "/collections/solo-leveling"],

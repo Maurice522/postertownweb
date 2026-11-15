@@ -101,7 +101,7 @@ const CollectionPage = () => {
           </section>
         )}
 
-        <FaqSection intro={`Common questions about our ${collection.title} metal posters, delivery and offers.`} />
+        <FaqSection intro={`Common questions about our ${seo.heading || collection.title}, delivery and offers.`} />
 
         {others.length > 0 && (
           <section className="more-collections">

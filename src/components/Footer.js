@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { FiArrowRight, FiMail, FiPhone } from "react-icons/fi";
 import { useMemo } from "react";
@@ -100,9 +100,9 @@ const Footer = () => {
                   <FiPhone />
                   +91 9953749307
                 </a>
-                <a href="mailto:hello@postertown.in">
+                <a href="mailto:Official@metalpostertown.in">
                   <FiMail />
-                  hello@postertown.in
+                  Official@metalpostertown.in
                 </a>
               </div>
             </div>
@@ -121,11 +121,13 @@ const Footer = () => {
           </section>
 
           <section className="footer-bottom">
-            <p>© {new Date().getFullYear()} Poster Town. All rights reserved.</p>
-            <div className="footer-bottom-links">
-              <span>Privacy Policy</span>
-              <span>Terms & Conditions</span>
-            </div>
+            <p>© {new Date().getFullYear()} Metal Poster Town. All rights reserved.</p>
+            <nav className="footer-bottom-links" aria-label="Store policies">
+              <Link to="/shipping-policy">Shipping</Link>
+              <Link to="/refund-policy">Refunds & Returns</Link>
+              <Link to="/privacy-policy">Privacy Policy</Link>
+              <Link to="/terms">Terms & Conditions</Link>
+            </nav>
           </section>
         </div>
       </footer>
@@ -181,8 +183,14 @@ const Wrapper = styled.section`
 
   .footer-brand p,
   .footer-bottom p,
-  .footer-bottom-links span {
+  .footer-bottom-links a {
     color: rgba(255, 241, 231, 0.72);
+    text-decoration: none;
+  }
+
+  .footer-bottom-links a:hover {
+    color: #fff;
+    text-decoration: underline;
   }
 
   .footer-brand p {
