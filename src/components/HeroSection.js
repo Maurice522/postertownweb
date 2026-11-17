@@ -1,16 +1,12 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "../styles/Button";
-import SplitText from "./SplitText";
 import LoadingImage from "./LoadingImage";
 import Magnet from './Magnet'
 import React, { useEffect, useRef } from 'react';
 
 const HeroSection = ({ myData }) => {
 
-  const handleAnimationComplete = () => {
-    console.log('All letters have animated!');
-  };
   
   const imageRef = useRef(null);
 
@@ -49,21 +45,12 @@ const HeroSection = ({ myData }) => {
     <Wrapper>
       <div className="hero">
         <div className="hero-copy">
-          {/* One heading: "Metal posters for your wall by Poster Town!" */}
+          {/* One heading, plain text so search engines read it as written (the old
+              per-letter animation turned it into "P o s t e r T o w n"). The worker serves
+              the same words before the app loads (worker/index.js, HOME_HEADING). */}
           <h1 className="hero-heading">
-            <span className="intro-data">Metal posters for your wall by</span>{" "}
-            <SplitText
-              text="Poster Town!"
-              as="span"
-              className="logotxt"
-              delay={100}
-              animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
-              animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-              easing="easeOutCubic"
-              threshold={0.2}
-              rootMargin="-50px"
-              onLetterAnimationComplete={handleAnimationComplete}
-            />
+            <span className="intro-data">Ultra HD metal posters for your wall by</span>{" "}
+            <span className="logotxt">Poster Town!</span>
           </h1>
           <p className="hero-tagline">
             Transform your space with bold, quirky metal posters from Poster Town—where every wall <b>becomes a statement.</b>
@@ -106,6 +93,19 @@ const Wrapper = styled.section`
     display: block !important;
   }
 
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.4em);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logotxt {
+      animation: none;
+    }
+  }
+
   /* Longer than the old "Welcome to", so a touch smaller to stay on one line. */
   .hero-heading .intro-data {
     font-size: clamp(1.5rem, 1.7vw, 2.1rem);
@@ -120,6 +120,7 @@ const Wrapper = styled.section`
   }
 
   .logotxt {
+    animation: hero-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
     margin: 0;
     color: #1d1d1d;
     font-size: clamp(3.6rem, 4.6vw, 5.6rem);

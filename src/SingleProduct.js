@@ -12,6 +12,8 @@ import Star from "./components/Star";
 import AddToCart from "./components/AddToCart";
 import ProductReviews from "./components/ProductReviews";
 import FaqSection from "./components/FaqSection";
+import MobileBuyBar from "./components/MobileBuyBar";
+import { faqForPage } from "./data/faq";
 import { useProductContext } from "./context/productcontex";
 import { normalizeImagePath, paperSizeFor } from "./utils/productHelpers";
 import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS, isDemonSlayer } from "./utils/pricing";
@@ -151,6 +153,7 @@ const SingleProduct = () => {
   // GA4 view_item, once per product opened (a background catalog refresh swaps in a new
   // copy of the same product, which shouldn't count again).
   const viewedProductRef = useRef(null);
+  const buySectionRef = useRef(null);
   useEffect(() => {
     if (!currentProduct || viewedProductRef.current === currentProduct.id) return;
     viewedProductRef.current = currentProduct.id;
@@ -352,7 +355,7 @@ const SingleProduct = () => {
 
               <div className="product-data">
                 <div className="eyebrow-row">
-                  <span className="product-badge">Best in Class | Top in Market</span>
+                  <span className="product-badge">Ultra HD metal print</span>
                   <span className="category-tag">{category || "Anime"}</span>
                 </div>
                 <h1>{name}</h1>
@@ -394,15 +397,15 @@ const SingleProduct = () => {
 
                 <div className="offer-panel">
                   <div>
-                    <strong>Currently in demand</strong>
+                    <strong>{stock > 0 ? "In stock" : "Sold out"}</strong>
                     <p className="stock-copy">
-                      {stock > 0 ? "Currently, this item has stock" : "This item is currently sold out"}
+                      {stock > 0 ? "Ready to print and ship" : "This item is currently sold out"}
                     </p>
                   </div>
                   <div className="delivery-pill">Estimated dispatch in 24-48 hours</div>
                 </div>
 
-                <div className="size-section">
+                <div className="size-section" ref={buySectionRef}>
                   <h3>Size</h3>
                   <div className="size-options">
                     {sizes.map((size) => (
@@ -598,7 +601,9 @@ const SingleProduct = () => {
 
             <ProductReviews product={currentProduct} />
 
-            <FaqSection className="faq-panel" intro="Quick answers before you place the order." />
+            <FaqSection items={faqForPage.product} className="faq-panel" intro="Quick answers before you place the order." />
+
+            <MobileBuyBar product={cartReadyProduct} price={price} sizeLabel={selectedSize?.label} watchRef={buySectionRef} />
 
             <div className="page-outro">
               <div className="page-outro-copy">

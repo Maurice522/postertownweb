@@ -9,7 +9,7 @@ export const SITE_URL = "https://metalpostertown.in";
 
 // Matches the home page tags set by the Cloudflare Worker (worker/index.js).
 const DEFAULTS = {
-  title: "Metal Posters for Wall – Ultra HD Anime Art | Metal Poster Town",
+  title: "Metal Posters for Wall – Ultra HD Anime | Metal Poster Town",
   description:
     "Ultra HD metal posters for your wall from Metal Poster Town: anime, Demon Slayer, One Piece, Naruto, Gojo, Batman and more on 1 mm steel. Free shipping on 2+.",
 };

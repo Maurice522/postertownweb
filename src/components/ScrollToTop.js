@@ -32,7 +32,15 @@ const Button = styled.button`
   position: fixed;
   bottom: 2rem;
   right: 2rem;
+  transition: bottom 0.25s ease;
   width: 50px;
+
+  /* Sit above the mobile buy bar on product pages (MobileBuyBar.js). */
+  @media (max-width: ${({ theme }) => theme.media.mobile}) {
+    body.buy-bar-open & {
+      bottom: 9rem;
+    }
+  }
   height: 50px;
   border-radius: 50%;
   background: ${({ theme }) => theme.colors.btn};

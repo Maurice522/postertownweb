@@ -48,7 +48,7 @@ export const collectionSeo = {
   },
   "solo-leveling": {
     keyword: "solo leveling metal poster",
-    title: "Solo Leveling Metal Posters – Sung Jinwoo | Metal Poster Town",
+    title: "Solo Leveling Metal Posters | Metal Poster Town",
     description:
       "Solo Leveling metal posters of Sung Jinwoo and the shadow army in ultra HD on 1 mm steel. A4, A3 and A2 sizes. Free shipping on 2+ posters.",
     heading: "Solo Leveling metal posters",

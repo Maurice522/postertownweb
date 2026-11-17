@@ -57,3 +57,20 @@ export const storeFaq = [
       "Tell us within 7 days of delivery and send photos of the damage. We'll arrange a replacement or another fix for the problem.",
   },
 ];
+
+// A few questions per page type instead of the whole list everywhere: the full FAQ
+// lives on the home page; repeating all ten on every page made most of the site's
+// text identical. Shared by the pages and the Cloudflare Worker.
+const pick = (...questions) => storeFaq.filter((item) => questions.includes(item.question));
+export const faqForPage = {
+  home: storeFaq,
+  product: pick(
+    "What sizes are available?",
+    "How do you hang a metal poster?",
+    "Will the print look exactly like the photo?",
+    "What if my poster arrives damaged?"
+  ),
+  collection: pick("What is a metal poster?", "How do you hang a metal poster?", "Is shipping free?", "Do you have bundle offers?"),
+  collections: pick("What is a metal poster?", "What sizes are available?", "Do you have bundle offers?"),
+  about: pick("How long does delivery take?", "How do I pay?", "What if my poster arrives damaged?"),
+};

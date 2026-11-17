@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { FiArrowRight } from "react-icons/fi";
 import FormatPrice from "./Helpers/FormatPrice";
 import FaqSection from "./components/FaqSection";
+import { faqForPage } from "./data/faq";
 import PosterFan from "./components/PosterFan";
 import { CollectionBandSkeleton } from "./components/Skeletons";
 import { useProductContext } from "./context/productcontex";
@@ -114,7 +115,7 @@ const Collections = () => {
           </Link>
         </section>
 
-        <FaqSection intro="Everything to know about our metal posters, delivery and offers." />
+        <FaqSection items={faqForPage.collections} intro="What metal posters are, the sizes, and our bundle offer." />
       </div>
     </Wrapper>
   );

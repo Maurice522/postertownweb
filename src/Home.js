@@ -24,7 +24,7 @@ const Home = () => {
       <HomeSeoCopy />
 
       <div className="home-faq">
-        <FaqSection intro="Everything to know about our metal posters, delivery and offers." />
+        <FaqSection schema intro="Everything to know about our metal posters, delivery and offers." />
       </div>
 
       <section className="page-outro">

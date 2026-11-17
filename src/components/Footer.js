@@ -123,6 +123,7 @@ const Footer = () => {
           <section className="footer-bottom">
             <p>© {new Date().getFullYear()} Metal Poster Town. All rights reserved.</p>
             <nav className="footer-bottom-links" aria-label="Store policies">
+              <Link to="/guides">Guides</Link>
               <Link to="/shipping-policy">Shipping</Link>
               <Link to="/refund-policy">Refunds & Returns</Link>
               <Link to="/privacy-policy">Privacy Policy</Link>

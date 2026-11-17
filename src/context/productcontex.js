@@ -48,40 +48,31 @@ const AppProvider = ({ children }) => {
     };
   });
 
-  // Live catalog from the backend (what the admin console manages).
+  // The catalog comes from /catalog.json: the site's own edge copy (worker/index.js),
+  // refreshed from the backend every few minutes, so nobody waits for the Render API
+  // to wake up. index.html preloads it. The API is only a fallback.
   const getProducts = async () => {
-    let cached = readCachedCatalog();
-    let gotLive = false;
-    if (!cached) {
-      dispatch({ type: "SET_LOADING" });
-      // First visit in this browser: show the catalog saved at build time while the
-      // live API (possibly waking up) catches up.
-      axios
-        .get("/catalog-snapshot.json", { timeout: 15000 })
-        .then((res) => {
-          const snapshot = res.data?.products;
-          if (gotLive || !Array.isArray(snapshot) || !snapshot.length) return;
-          cached = snapshot;
-          dispatch({ type: "SET_API_DATA", payload: normalizeProducts(snapshot) });
-        })
-        .catch(() => {});
+    const cached = readCachedCatalog();
+    if (!cached) dispatch({ type: "SET_LOADING" });
+    const show = (products) => {
+      saveCachedCatalog(products);
+      dispatch({ type: "SET_API_DATA", payload: normalizeProducts(products) });
+    };
+    try {
+      const res = await axios.get("/catalog.json", { timeout: 15000 });
+      const products = res.data?.products;
+      if (Array.isArray(products) && products.length) return show(products);
+    } catch {
+      // Fall through to the API.
     }
     try {
       // Render's free plan can take ~50s to wake the backend after a quiet spell.
       const res = await axios.get(`${API_BASE_URL}/api/products`, { timeout: 60000 });
-      const live = Array.isArray(res.data) ? res.data : [];
-      if (live.length) {
-        gotLive = true;
-        saveCachedCatalog(live);
-        dispatch({ type: "SET_API_DATA", payload: normalizeProducts(live) });
-      } else if (!cached) {
-        dispatch({ type: "SET_API_DATA", payload: normalizeProducts(await bundledCatalog()) });
-      }
+      if (Array.isArray(res.data) && res.data.length) return show(res.data);
     } catch (error) {
-      if (cached) return;
-      console.error("Could not load products from the API; showing the bundled catalog", error);
-      dispatch({ type: "SET_API_DATA", payload: normalizeProducts(await bundledCatalog()) });
+      console.error("Could not load products; showing the bundled catalog", error);
     }
+    if (!cached) dispatch({ type: "SET_API_DATA", payload: normalizeProducts(await bundledCatalog()) });
   };
 
   // my 2nd api call for single product

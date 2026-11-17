@@ -9,6 +9,7 @@ export const STORE_NAME = "Metal Poster Town";
 export const SUPPORT_EMAIL = "Official@metalpostertown.in";
 export const SUPPORT_PHONE = "+91 9953749307";
 export const POLICY_UPDATED = "15 November 2026";
+export const POLICY_DATE = "2026-11-15";
 
 const operator = BUSINESS_NAME ? `${STORE_NAME} (operated by ${BUSINESS_NAME})` : STORE_NAME;
 const contactLine = `Email ${SUPPORT_EMAIL} or WhatsApp/call ${SUPPORT_PHONE}.`;

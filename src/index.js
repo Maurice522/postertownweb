@@ -1,26 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import AppErrorBoundary from "./components/AppErrorBoundary";
-import { Auth0Provider } from "@auth0/auth0-react";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
-const domain = process.env.REACT_APP_AUTH_DOMAIN;
-const clientId = process.env.REACT_APP_CLIENT_ID;
-
+// App sets up the catalog, filter, cart and user providers itself. (Sign-in is the
+// site's own email + Google login in context/user_context.js; Auth0 was never used.)
 root.render(
-  <Auth0Provider
-    domain={domain}
-    clientId={clientId}
-    redirectUri={window.location.origin}>
-    {/* App sets up the catalog, filter and cart providers itself. */}
-    <AppErrorBoundary>
-      <App />
-    </AppErrorBoundary>
-  </Auth0Provider>
+  <AppErrorBoundary>
+    <App />
+  </AppErrorBoundary>
 );
 
 // If you want to start measuring performance in your app, pass a function

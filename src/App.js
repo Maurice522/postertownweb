@@ -24,6 +24,8 @@ const Collections = lazy(() => import(/* webpackPrefetch: true */ "./Collections
 const CollectionPage = lazy(() => import("./CollectionPage"));
 const About = lazy(() => import("./About"));
 const PolicyPage = lazy(() => import("./PolicyPage"));
+const GuidePage = lazy(() => import("./GuidePage"));
+const GuidesIndex = lazy(() => import("./GuidePage").then((module) => ({ default: module.GuidesIndex })));
 const Orders = lazy(() => import("./Orders"));
 const Cart = lazy(() => import("./Cart"));
 const Auth = lazy(() => import("./Auth"));
@@ -91,6 +93,8 @@ const App = () => {
                       <Route path="/refund-policy" element={<PolicyPage />} />
                       <Route path="/privacy-policy" element={<PolicyPage />} />
                       <Route path="/terms" element={<PolicyPage />} />
+                      <Route path="/guides" element={<GuidesIndex />} />
+                      <Route path="/guides/:slug" element={<GuidePage />} />
                       <Route path="/products" element={<Products />} />
                       <Route path="/collections" element={<Collections />} />
                       <Route path="/collections/:slug" element={<CollectionPage />} />

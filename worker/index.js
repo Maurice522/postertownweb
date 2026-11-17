@@ -13,9 +13,10 @@ import { buildCollections, primaryCollectionFor } from "../src/data/collections.
 import { collectionSeoFor } from "../src/data/collectionSeo.js";
 import { normalizeProducts } from "../src/utils/productHelpers.js";
 import { homeCopyIntro, homeCopySections } from "../src/data/homeCopy.js";
-import { storeFaq } from "../src/data/faq.js";
+import { faqForPage } from "../src/data/faq.js";
 import { aboutCopy } from "../src/data/aboutCopy.js";
-import { POLICY_UPDATED, policies, policyByPath } from "../src/data/policies.js";
+import { POLICY_DATE, POLICY_UPDATED, policies, policyByPath } from "../src/data/policies.js";
+import { GUIDES_UPDATED, guideBySlug, guides } from "../src/data/guides.js";
 import { A4_BUNDLE_PRICE, A4_BUNDLE_SIZE, FREE_SHIPPING_MIN_ITEMS, SHIPPING_FEE } from "../src/utils/pricing.js";
 
 const SITE_NAME = "Metal Poster Town";
@@ -23,6 +24,8 @@ const DEFAULT_DESCRIPTION =
   "Ultra HD metal posters for your wall from Metal Poster Town: anime, Demon Slayer, One Piece, Naruto, Gojo, Batman and more on 1 mm steel. Free shipping on 2+.";
 // Link-preview image for pages without their own (public/og-image.jpg, 1200x630).
 const SHARE_IMAGE_PATH = "/og-image.jpg";
+// The home page h1, word for word as the app renders it (components/HeroSection.js).
+const HOME_HEADING = "Ultra HD metal posters for your wall by Poster Town!";
 
 // The catalog is re-read from the API when the cached copy is older than this. Older
 // copies are still served (and refreshed in the background) so pages never wait.
@@ -35,11 +38,11 @@ const CATALOG_CACHE_KEY = "https://catalog.internal/seo-index-v4";
 const PRIVATE_PATHS = new Set(["/cart", "/orders", "/contact", "/auth"]);
 const STATIC_PAGES = {
   "/": {
-    title: "Metal Posters for Wall – Ultra HD Anime Art | Metal Poster Town",
+    title: "Metal Posters for Wall – Ultra HD Anime | Metal Poster Town",
     description: DEFAULT_DESCRIPTION,
   },
   "/products": {
-    title: "All Metal Posters – Anime, Superhero & Cars | Metal Poster Town",
+    title: "All Metal Posters: Anime & Superhero | Metal Poster Town",
     description:
       "Browse every Poster Town metal poster: ultra HD anime, superhero, car and gaming designs on 1 mm steel. Any 3 A4 for ₹1599 and free shipping on 2+ posters.",
   },
@@ -108,6 +111,19 @@ function seoIndex(rawProducts) {
   return { savedAt: Date.now(), products: byId, collections };
 }
 
+// The full product list, as the storefront app uses it. Kept at the edge so shoppers
+// never wait for the Render API (2–3 s, or ~50 s when it wakes from sleep).
+const RAW_CATALOG_KEY = "https://catalog.internal/raw-v1";
+
+async function storeRaw(products) {
+  await caches.default.put(
+    RAW_CATALOG_KEY,
+    new Response(JSON.stringify({ savedAt: Date.now(), products }), {
+      headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=604800" },
+    })
+  );
+}
+
 async function fetchCatalog(env) {
   const res = await fetch(`${env.API_BASE_URL}/api/products`, {
     signal: AbortSignal.timeout(API_TIMEOUT_MS),
@@ -116,7 +132,31 @@ async function fetchCatalog(env) {
   if (!res.ok) throw new Error(`API ${res.status}`);
   const products = await res.json();
   if (!Array.isArray(products) || !products.length) throw new Error("empty catalog");
+  await storeRaw(products);
   return seoIndex(products);
+}
+
+// GET /catalog.json: the edge copy of the catalog (refreshed in the background when
+// older than 5 minutes), else the live API, else the copy shipped with the build.
+async function catalogJson(request, env, ctx, url) {
+  const headers = { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=60" };
+  const cached = await caches.default.match(RAW_CATALOG_KEY);
+  if (cached) {
+    const body = await cached.text();
+    const savedAt = Number((body.match(/^\{"savedAt":(\d+)/) || [])[1]) || 0;
+    if (Date.now() - savedAt > CATALOG_FRESH_MS) ctx.waitUntil(fetchCatalog(env).then(storeIndex).catch(() => {}));
+    return new Response(body, { headers });
+  }
+  try {
+    await storeIndex(await fetchCatalog(env));
+    const fresh = await caches.default.match(RAW_CATALOG_KEY);
+    if (fresh) return new Response(await fresh.text(), { headers });
+  } catch {
+    // API asleep or slow: fall through to the build's copy and refresh in the background.
+    ctx.waitUntil(fetchCatalog(env).then(storeIndex).catch(() => {}));
+  }
+  const snapshot = await env.ASSETS.fetch(new URL("/catalog-snapshot.json", url));
+  return new Response(snapshot.body, { status: snapshot.status, headers: { ...headers, "Cache-Control": "no-store" } });
 }
 
 async function storeIndex(index) {
@@ -230,10 +270,13 @@ function productSchema(origin, id, product) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": `${url}#product`,
+    url,
+    material: "Galvanised steel",
     name: product.name,
     description: product.description,
     image: [...new Set([product.image, ...product.gallery].filter(Boolean))].map(largeImage),
-    ...(product.sku ? { sku: product.sku } : {}),
+    ...(product.sku ? { sku: product.sku.replace(/-{2,}/g, "-") } : {}),
     ...(product.category ? { category: product.category } : {}),
     brand: { "@type": "Brand", name: SITE_NAME },
     offers,
@@ -280,7 +323,7 @@ function crawlerHtml({ heading, paragraphs = [], sections = [], links = [], faq 
   }
   if (faq) {
     parts.push("<h2>Frequently asked questions</h2>");
-    for (const item of storeFaq) parts.push(`<h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p>`);
+    for (const item of faqForPage[faq] || faqForPage.home) parts.push(`<h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p>`);
   }
   if (links.length) parts.push(list(links));
   return `<div class="pt-seo">${parts.join("")}</div>`;
@@ -298,6 +341,61 @@ function stockSentence(sizes = [], inStock) {
   return `In stock: ${available.join(", ")}. Currently out of stock: ${missing.join(", ")}.`;
 }
 
+// A guide's blocks as plain HTML for the server-rendered text (same words as GuidePage.js).
+function guideHtml(guide, catalog) {
+  const esc = escapeHtml;
+  const pieces = (value) =>
+    (Array.isArray(value) ? value : [value])
+      .map((piece) => (Array.isArray(piece) ? `<a href="${esc(piece[1])}">${esc(piece[0])}</a>` : esc(piece)))
+      .join("");
+  const table = (head, rows) =>
+    `<table><thead><tr>${head.map((cell) => `<th>${esc(cell)}</th>`).join("")}</tr></thead><tbody>${rows
+      .map((row) => `<tr>${row.map((cell) => `<td>${esc(cell)}</td>`).join("")}</tr>`)
+      .join("")}</tbody></table>`;
+  const parts = [`<h1>${esc(guide.title)}</h1>`, `<p>${esc(guide.intro)}</p>`];
+  for (const block of guide.blocks) {
+    if (block.h2) parts.push(`<h2>${esc(block.h2)}</h2>`);
+    else if (block.p) parts.push(`<p>${pieces(block.p)}</p>`);
+    else if (block.list) parts.push(`<ul>${block.list.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>`);
+    else if (block.steps) parts.push(`<ol>${block.steps.map((item) => `<li>${esc(item)}</li>`).join("")}</ol>`);
+    else if (block.table) parts.push(table(block.table.head, block.table.rows));
+    else if (block.priceTable && catalog) {
+      const rows = [["A4", "Small (A4), 12 x 9 in"], ["A3", "Medium (A3), 15.8 x 12 in"], ["A2", "Large (A2), 24 x 18 in"]]
+        .map(([paper, label]) => {
+          const prices = Object.values(catalog.products).flatMap((product) =>
+            (product.sizes || []).filter((size) => size.name.includes(` ${paper} `) || size.name.includes(`· ${paper}`)).map((size) => size.price)
+          );
+          if (!prices.length) return null;
+          const min = Math.min(...prices);
+          const max = Math.max(...prices);
+          return [label, min === max ? money(min) : `${money(min)} – ${money(max)}`];
+        })
+        .filter(Boolean);
+      if (rows.length) parts.push(table(["Size", "Price range"], rows));
+    }
+  }
+  parts.push(
+    `<h2>More guides</h2><ul>${guides
+      .filter((item) => item.slug !== guide.slug)
+      .map((item) => `<li><a href="/guides/${item.slug}">${esc(item.title)}</a></li>`)
+      .join("")}</ul>`
+  );
+  return `<div class="pt-seo">${parts.join("")}</div>`;
+}
+
+// Up to 6 other posters, from the same collection first, then the same category.
+function relatedProducts(catalog, id, product) {
+  const others = Object.entries(catalog.products).filter(([otherId]) => otherId !== id);
+  const same = (other) =>
+    (product.collection && other.collection?.slug === product.collection.slug ? 2 : 0) + (other.category === product.category ? 1 : 0);
+  return others
+    .map((entry) => [entry, same(entry[1])])
+    .filter(([, score]) => score > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([entry]) => entry);
+}
+
 const posterCount = (count) => `${count} ${count === 1 ? "poster" : "posters"}`;
 const money = (value) => `₹${Number(value || 0).toLocaleString("en-IN")}`;
 
@@ -311,6 +409,51 @@ async function pageFor(url, env, ctx) {
   // Links in tags always name the real domain, whichever address served the page.
   const origin = env.SITE_URL;
   const canonical = `${origin}${pathname}`;
+
+  // Buying guides (src/data/guides.js), with Article schema.
+  if (pathname === "/guides") {
+    return {
+      title: "Metal Poster Guides – Hanging, Sizes & Prices | Metal Poster Town",
+      description: "Guides to metal posters: what they are, how to hang one without drilling, how they compare with canvas and paper, and prices in India.",
+      canonical,
+      image: `${origin}${SHARE_IMAGE_PATH}`,
+      schema: [breadcrumbs(origin, [["Home", "/"], ["Guides", "/guides"]])],
+      body: crawlerHtml({
+        heading: "Metal poster guides",
+        paragraphs: ["Everything to know before you buy: what metal posters are, how to hang them, how they compare and what they cost."],
+        sections: guides.map((guide) => ({ heading: guide.title, paragraphs: [[guide.description + " ", ["Read the guide", `/guides/${guide.slug}`]]] })),
+      }),
+    };
+  }
+  const guideMatch = pathname.match(/^\/guides\/([\w-]+)$/);
+  if (guideMatch) {
+    const guide = guideBySlug[guideMatch[1]];
+    if (!guide) return null;
+    const catalog = guide.blocks.some((block) => block.priceTable) ? await getCatalog(env, ctx, url) : null;
+    return {
+      title: guide.metaTitle,
+      description: guide.description,
+      canonical,
+      type: "article",
+      image: `${origin}${SHARE_IMAGE_PATH}`,
+      schema: [
+        {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: guide.title,
+          description: guide.description,
+          url: canonical,
+          datePublished: GUIDES_UPDATED,
+          dateModified: GUIDES_UPDATED,
+          image: `${origin}${SHARE_IMAGE_PATH}`,
+          author: { "@type": "Organization", name: SITE_NAME, url: origin },
+          publisher: { "@type": "Organization", name: SITE_NAME, logo: { "@type": "ImageObject", url: `${origin}/logo512.png` } },
+        },
+        breadcrumbs(origin, [["Home", "/"], ["Guides", "/guides"], [guide.title, pathname]]),
+      ],
+      body: guideHtml(guide, catalog),
+    };
+  }
 
   // Shipping, refund, privacy and terms pages (src/data/policies.js).
   const policy = policyByPath[pathname];
@@ -383,10 +526,10 @@ async function pageFor(url, env, ctx) {
       });
     }
     const body = crawlerHtml({
-      heading: pathname === "/about" ? aboutCopy.heading : page.title.split(" | ")[0],
+      heading: pathname === "/" ? HOME_HEADING : pathname === "/about" ? aboutCopy.heading : page.title.split(" | ")[0],
       paragraphs: pathname === "/about" ? [aboutCopy.intro] : [page.description],
       sections,
-      faq: ["/", "/about", "/collections"].includes(pathname),
+      faq: { "/": "home", "/about": "about", "/collections": "collections" }[pathname] || false,
       links: pathname === "/collections" ? [] : links,
     });
     return { ...page, canonical, schema, body, image: `${origin}${SHARE_IMAGE_PATH}`, imageAlt: "Metal Poster Town – ultra HD metal posters" };
@@ -429,8 +572,9 @@ async function pageFor(url, env, ctx) {
           ],
         },
       ],
-      faq: true,
+      faq: "product",
       links: [
+        ...relatedProducts(catalog, id, product).map(([otherId, other]) => [other.name, `/singleproduct/${otherId}`]),
         ...(product.collection ? [[`More ${product.collection.title} posters`, `/collections/${product.collection.slug}`]] : []),
         ["Shop all metal posters", "/products"],
       ],
@@ -475,7 +619,7 @@ async function pageFor(url, env, ctx) {
         },
         { heading: `About our ${collection.heading || collection.title}`, paragraphs: [collection.intro] },
       ],
-      faq: true,
+      faq: "collection",
     });
     return {
       title: collection.seoTitle,
@@ -486,6 +630,22 @@ async function pageFor(url, env, ctx) {
       imageAlt: collection.heading || collection.title,
       schema: [
         breadcrumbs(origin, [["Home", "/"], ["Collections", "/collections"], [collection.title, pathname]]),
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: collection.heading || collection.title,
+          url: canonical,
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: (collection.products || []).length,
+            itemListElement: (collection.products || []).map((item, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: `${origin}/singleproduct/${item.id}`,
+              name: item.name,
+            })),
+          },
+        },
       ],
     };
   }
@@ -561,14 +721,70 @@ async function renderApp(request, env, page, status) {
   return new Response(rewritten.body, { status, headers });
 }
 
+// GET /merchant-feed.xml: Google Merchant Center product feed (RSS 2.0, g: namespace),
+// one item per size, grouped by product. Shipping on 2+ posters is free; that rule is
+// set in Merchant Center's shipping settings (a feed row can't express it).
+async function merchantFeed(url, env, ctx) {
+  const catalog = await getCatalog(env, ctx, url);
+  const origin = env.SITE_URL;
+  const x = (value = "") =>
+    String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const items = [];
+  for (const [id, product] of Object.entries(catalog.products)) {
+    const link = `${origin}/singleproduct/${id}`;
+    const images = [...new Set([product.image, ...product.gallery].filter(Boolean))].map(largeImage);
+    const description = [product.description, product.fullDescription].filter(Boolean).join(" ").replace(/\s+/g, " ").slice(0, 4900);
+    const sizes = product.sizes.length ? product.sizes : [{ name: "", sku: product.sku, price: product.price, inStock: product.inStock }];
+    sizes.forEach((size, index) => {
+      if (!(size.price > 0)) return;
+      const label = size.name.split(" · ").slice(0, 2).join(" "); // "Small A4"
+      items.push(`<item>
+<g:id>${x(size.sku || `${id}-${index + 1}`)}</g:id>
+<g:item_group_id>${x(id)}</g:item_group_id>
+<g:title>${x(`${product.name}${label ? ` – ${label}` : ""}`.slice(0, 150))}</g:title>
+<g:description>${x(description)}</g:description>
+<g:link>${x(link)}</g:link>
+<g:image_link>${x(images[0] || `${origin}${SHARE_IMAGE_PATH}`)}</g:image_link>
+${images.slice(1, 10).map((image) => `<g:additional_image_link>${x(image)}</g:additional_image_link>`).join("\n")}
+<g:availability>${size.inStock ? "in_stock" : "out_of_stock"}</g:availability>
+<g:price>${Number(size.price).toFixed(2)} INR</g:price>
+<g:brand>${x(SITE_NAME)}</g:brand>
+<g:condition>new</g:condition>
+<g:identifier_exists>no</g:identifier_exists>
+<g:google_product_category>500044</g:google_product_category>
+<g:product_type>${x(["Metal Posters", product.category, product.collection?.title].filter(Boolean).join(" > "))}</g:product_type>
+${size.name ? `<g:size>${x(size.name.replace(/ · /g, " "))}</g:size>` : ""}
+<g:material>Galvanised steel</g:material>
+<g:shipping><g:country>IN</g:country><g:price>${SHIPPING_FEE}.00 INR</g:price></g:shipping>
+</item>`);
+    });
+  }
+  const body = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+<channel>
+<title>${x(SITE_NAME)}</title>
+<link>${origin}</link>
+<description>Ultra HD metal posters printed on 1 mm galvanised steel</description>
+${items.join("\n")}
+</channel>
+</rss>
+`;
+  return new Response(body, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600" } });
+}
+
 async function sitemap(url, env, ctx) {
   const catalog = await getCatalog(env, ctx, url);
+  const updated = (id) => catalog.products[id]?.updatedAt || "";
+  const newest = Object.keys(catalog.products).map(updated).sort().pop();
+  const newestIn = (collection) => (collection.products || []).map((item) => updated(item.id)).sort().pop();
   const entry = (path, lastmod) =>
     `<url><loc>${env.SITE_URL}${path}</loc>${lastmod ? `<lastmod>${String(lastmod).slice(0, 10)}</lastmod>` : ""}</url>`;
   const body = [
-    ...Object.keys(STATIC_PAGES).map((path) => entry(path)),
-    ...policies.map((policy) => entry(policy.path)),
-    ...Object.keys(catalog.collections).map((slug) => entry(`/collections/${slug}`)),
+    ...Object.keys(STATIC_PAGES).map((path) => entry(path, ["/", "/products", "/collections"].includes(path) ? newest : null)),
+    ...policies.map((policy) => entry(policy.path, POLICY_DATE)),
+    entry("/guides", GUIDES_UPDATED),
+    ...guides.map((guide) => entry(`/guides/${guide.slug}`, GUIDES_UPDATED)),
+    ...Object.entries(catalog.collections).map(([slug, item]) => entry(`/collections/${slug}`, newestIn(item))),
     ...Object.entries(catalog.products).map(([id, product]) => entry(`/singleproduct/${id}`, product.updatedAt)),
   ].join("");
   return new Response(
@@ -595,6 +811,8 @@ export default {
     if (!["GET", "HEAD"].includes(request.method)) return env.ASSETS.fetch(request);
 
     if (url.pathname === "/sitemap.xml") return sitemap(url, env, ctx);
+    if (url.pathname === "/catalog.json") return catalogJson(request, env, ctx, url);
+    if (url.pathname === "/merchant-feed.xml") return merchantFeed(url, env, ctx);
 
     // A file (has an extension): serve it, or a real 404 — never the app page, so a
     // tab from an older deploy notices its page files are gone (AppErrorBoundary).

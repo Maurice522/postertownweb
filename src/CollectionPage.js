@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import FormatPrice from "./Helpers/FormatPrice";
 import FaqSection from "./components/FaqSection";
+import { faqForPage } from "./data/faq";
 import GridView from "./components/GridView";
 import PosterFan from "./components/PosterFan";
 import { useProductContext } from "./context/productcontex";
@@ -101,7 +102,7 @@ const CollectionPage = () => {
           </section>
         )}
 
-        <FaqSection intro={`Common questions about our ${seo.heading || collection.title}, delivery and offers.`} />
+        <FaqSection items={faqForPage.collection} intro={`Common questions about our ${seo.heading || collection.title}, delivery and offers.`} />
 
         {others.length > 0 && (
           <section className="more-collections">

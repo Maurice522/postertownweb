@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { storeFaq } from "../data/faq";
 
-// Visible FAQ plus the same questions as schema.org FAQPage data, which search
-// engines read from the rendered page. Use it at most once per page.
+// Visible FAQ. With schema, also the same questions as schema.org FAQPage data: only
+// the home page (the full FAQ) publishes it, so the markup isn't duplicated site-wide.
 const faqSchema = (items) =>
   JSON.stringify({
     "@context": "https://schema.org",
@@ -14,7 +14,7 @@ const faqSchema = (items) =>
     })),
   }).replace(/</g, "\\u003c");
 
-const FaqSection = ({ items = storeFaq, title = "Frequently asked questions", intro, className = "" }) => (
+const FaqSection = ({ items = storeFaq, title = "Frequently asked questions", intro, className = "", schema = false }) => (
   <Wrapper className={className} aria-labelledby="faq-heading">
     <h2 id="faq-heading">{title}</h2>
     {intro && <p className="faq-intro">{intro}</p>}
@@ -28,7 +28,7 @@ const FaqSection = ({ items = storeFaq, title = "Frequently asked questions", in
         </details>
       ))}
     </div>
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqSchema(items) }} />
+    {schema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqSchema(items) }} />}
   </Wrapper>
 );
 

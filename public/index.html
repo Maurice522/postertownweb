@@ -21,13 +21,16 @@
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!-- Open connections to the API and image host early; the catalog and posters come from there. -->
-    <link rel="preconnect" href="%REACT_APP_API_BASE_URL%" crossorigin />
+    <!-- Open the image host connection early; posters come from Cloudinary. -->
+    <!-- The product catalog, served from the edge by worker/index.js (productcontex.js). -->
+    <link rel="preload" href="/catalog.json" as="fetch" crossorigin="anonymous" />
     <link rel="preconnect" href="https://res.cloudinary.com" />
     <link rel="preload" as="image" href="%PUBLIC_URL%/images/rengokuext.webp" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Chokokutai&family=Permanent+Marker&family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet" />
+    <!-- Fonts load without blocking the first paint (display=swap shows text straight away). -->
+    <link href="https://fonts.googleapis.com/css2?family=Chokokutai&family=Permanent+Marker&family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Chokokutai&family=Permanent+Marker&family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet" /></noscript>
     <!-- Loader shown until the app's code arrives (React replaces #root's contents).
          Matches src/components/PageLoader.js. -->
     <style>

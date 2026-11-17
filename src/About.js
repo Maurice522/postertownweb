@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import FaqSection from "./components/FaqSection";
 import { aboutCopy } from "./data/aboutCopy";
+import { faqForPage } from "./data/faq";
 
 // About the store. The words live in data/aboutCopy.js, which the Cloudflare Worker
 // also serves to search engines.
@@ -36,7 +37,7 @@ const About = () => (
       ))}
     </div>
 
-    <FaqSection intro="Everything to know about our metal posters, delivery and offers." />
+    <FaqSection items={faqForPage.about} intro="Delivery, payment and what happens if something goes wrong." />
   </Wrapper>
 );
 

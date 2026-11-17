@@ -40,7 +40,7 @@ export const collectionDefinitions = [
     title: "Dragon Ball Z",
     tagline: "Saiyans, transformations and power levels",
     description:
-      "Goku's Ultra Instinct, Vegeta in Super Saiyan Blue, and villains like Frieza and Kid Buu. Over-9000 energy for your wall.",
+      "Goku's Ultra Instinct, Vegeta in Super Saiyan Blue, Broly's Legendary Super Saiyan rage, and villains like Frieza and Kid Buu.",
     accent: "#e8892b",
     match: isDragonBall,
     wallImage: "/images/dbzwall.webp",
