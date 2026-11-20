@@ -724,6 +724,10 @@ async function renderApp(request, env, page, status) {
 // GET /merchant-feed.xml: Google Merchant Center product feed (RSS 2.0, g: namespace),
 // one item per size, grouped by product. Shipping on 2+ posters is free; that rule is
 // set in Merchant Center's shipping settings (a feed row can't express it).
+// Kept off Google Shopping: official film key art / an actor's likeness tends to get
+// disapproved (and can hold up the whole Merchant Center account). Still sold on the site.
+const FEED_EXCLUDE = new Set(["poster-004", "the-batman-movie-poster-metal-art-1793285279638"]);
+
 async function merchantFeed(url, env, ctx) {
   const catalog = await getCatalog(env, ctx, url);
   const origin = env.SITE_URL;
@@ -731,6 +735,7 @@ async function merchantFeed(url, env, ctx) {
     String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const items = [];
   for (const [id, product] of Object.entries(catalog.products)) {
+    if (FEED_EXCLUDE.has(id)) continue;
     const link = `${origin}/singleproduct/${id}`;
     const images = [...new Set([product.image, ...product.gallery].filter(Boolean))].map(largeImage);
     const description = [product.description, product.fullDescription].filter(Boolean).join(" ").replace(/\s+/g, " ").slice(0, 4900);
